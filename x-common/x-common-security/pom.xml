@@ -7,21 +7,12 @@
         <artifactId>x-common</artifactId>
         <version>1.0.0</version>
     </parent>
-    <groupId>com.example</groupId>
     <artifactId>x-common-security</artifactId>
     <version>1.0.0</version>
     <name>x-common-security</name>
     <description>x-common-security</description>
 
     <dependencies>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-security</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
-        </dependency>
     </dependencies>
 
 </project>

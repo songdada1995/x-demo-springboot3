@@ -8,22 +8,13 @@
         <artifactId>x-demo-springboot3</artifactId>
         <version>1.0.0</version>
     </parent>
-    <groupId>com.example</groupId>
     <artifactId>x-admin</artifactId>
     <version>1.0.0</version>
     <name>x-admin</name>
     <description>x-admin</description>
 
     <dependencies>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
-        </dependency>
+
     </dependencies>
 
 </project>

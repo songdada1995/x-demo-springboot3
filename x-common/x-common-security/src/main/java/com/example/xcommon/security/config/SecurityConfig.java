@@ -1,4 +1,4 @@
-package com.example.xcommon.security;
+package com.example.xcommon.security.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.config.Customizer;
