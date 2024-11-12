@@ -14,7 +14,10 @@
     <description>x-admin</description>
 
     <dependencies>
-
+        <dependency>
+            <groupId>com.example</groupId>
+            <artifactId>x-common-security</artifactId>
+        </dependency>
     </dependencies>
 
 </project>

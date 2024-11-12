@@ -32,6 +32,12 @@
                 <scope>import</scope>
             </dependency>
 
+            <dependency>
+                <groupId>com.example</groupId>
+                <artifactId>x-common-security</artifactId>
+                <version>1.0.0</version>
+            </dependency>
+
             <!-- mysql数据库驱动 -->
             <dependency>
                 <groupId>com.mysql</groupId>
