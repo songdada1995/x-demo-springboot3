@@ -17,10 +17,10 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class GlobalExceptionHandler {
 
     /**
-     * 处理自定义异常
+     * 处理自定义业务异常
      */
-    @ExceptionHandler(ServiceException.class)
-    public R<?> handleServiceException(ServiceException e, HttpServletRequest request) {
+    @ExceptionHandler(BusinessException.class)
+    public R<?> handleBusinessException(BusinessException e, HttpServletRequest request) {
         log.error("请求地址'{}',发生业务异常.", request.getRequestURI(), e);
         return R.fail(e.getCode(), e.getMessage());
     }

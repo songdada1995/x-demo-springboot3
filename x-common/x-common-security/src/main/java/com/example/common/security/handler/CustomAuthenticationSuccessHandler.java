@@ -1,7 +1,7 @@
 package com.example.common.security.handler;
 
 import com.example.common.core.response.R;
-import com.example.common.security.util.JwtUtils;
+import com.example.common.security.utils.JwtUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

@@ -1,8 +1,9 @@
-package com.example.common.core.interceptor;
+package com.example.common.security.interceptor;
 
-import com.example.common.core.annotation.Logical;
-import com.example.common.core.annotation.RequiresPermissions;
+import com.example.common.security.annotation.Logical;
+import com.example.common.security.annotation.RequiresPermissions;
 import com.example.common.core.exception.BusinessException;
+import com.example.common.security.utils.SecurityUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;

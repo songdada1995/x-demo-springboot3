@@ -1,4 +1,4 @@
-package com.example.common.core.annotation;
+package com.example.common.security.annotation;
 
 /**
  * 权限验证的逻辑类型

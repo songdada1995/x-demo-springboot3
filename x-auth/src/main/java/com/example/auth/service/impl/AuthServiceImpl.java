@@ -4,7 +4,7 @@ import com.example.auth.domain.dto.LoginDTO;
 import com.example.auth.domain.vo.TokenVO;
 import com.example.auth.service.AuthService;
 import com.example.common.core.constant.Constants;
-import com.example.common.security.util.JwtUtils;
+import com.example.common.security.utils.JwtUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;

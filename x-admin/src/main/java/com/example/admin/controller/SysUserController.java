@@ -3,7 +3,7 @@ package com.example.admin.controller;
 import com.example.admin.domain.dto.SysUserDTO;
 import com.example.admin.domain.vo.SysUserVO;
 import com.example.admin.service.ISysUserService;
-import com.example.common.core.annotation.RequiresPermissions;
+import com.example.common.security.annotation.RequiresPermissions;
 import com.example.common.core.response.R;
 import com.example.common.core.utils.PageUtils;
 import lombok.RequiredArgsConstructor;

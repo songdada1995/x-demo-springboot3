@@ -1,4 +1,4 @@
-package com.example.common.core.annotation;
+package com.example.common.security.annotation;
 
 import java.lang.annotation.*;
 

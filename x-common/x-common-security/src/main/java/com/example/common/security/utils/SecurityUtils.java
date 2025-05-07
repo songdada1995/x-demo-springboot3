@@ -6,13 +6,13 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-import java.util.List;
+import java.util.Set;
 
 /**
  * 安全服务工具类
  */
 public class SecurityUtils {
-    
+
     /**
      * 获取用户
      */
@@ -56,7 +56,7 @@ public class SecurityUtils {
     /**
      * 获取用户权限
      */
-    public static List<String> getPermissions() {
+    public static Set<String> getPermissions() {
         try {
             return getLoginUser().getPermissions();
         } catch (Exception e) {
@@ -78,7 +78,7 @@ public class SecurityUtils {
     /**
      * 判断密码是否相同
      *
-     * @param rawPassword 真实密码
+     * @param rawPassword     真实密码
      * @param encodedPassword 加密后字符
      * @return 结果
      */

@@ -1,7 +1,7 @@
 package com.example.common.security.aspect;
 
-import com.example.common.core.annotation.Logical;
-import com.example.common.core.annotation.RequiresPermissions;
+import com.example.common.security.annotation.Logical;
+import com.example.common.security.annotation.RequiresPermissions;
 import com.example.common.core.exception.NoPermissionException;
 import com.example.common.security.utils.SecurityUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
-import java.util.List;
+import java.util.Set;
 
 /**
  * 权限校验切面
@@ -23,7 +23,7 @@ import java.util.List;
 @Component
 public class PermissionAspect {
 
-    @Before("@annotation(com.example.common.core.annotation.RequiresPermissions)")
+    @Before("@annotation(com.example.common.security.annotation.RequiresPermissions)")
     public void doBefore(JoinPoint point) {
         MethodSignature signature = (MethodSignature) point.getSignature();
         Method method = signature.getMethod();
@@ -34,7 +34,7 @@ public class PermissionAspect {
             Logical logical = requiresPermissions.logical();
             
             // 获取当前用户权限
-            List<String> userPermissions = SecurityUtils.getPermissions();
+            Set<String> userPermissions = SecurityUtils.getPermissions();
             
             // 校验权限
             boolean hasPermission = false;

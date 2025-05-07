@@ -6,7 +6,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -41,7 +40,7 @@ public class LoginUser implements UserDetails {
     /**
      * 权限列表
      */
-    private List<String> permissions;
+    private Set<String> permissions;
 
     /**
      * 角色列表

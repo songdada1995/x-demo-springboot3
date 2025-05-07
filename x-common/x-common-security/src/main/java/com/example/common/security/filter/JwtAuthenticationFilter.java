@@ -1,7 +1,7 @@
 package com.example.common.security.filter;
 
 import com.example.common.core.constant.Constants;
-import com.example.common.security.util.JwtUtils;
+import com.example.common.security.utils.JwtUtils;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
