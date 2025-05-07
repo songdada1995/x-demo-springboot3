@@ -1,5 +1,6 @@
 package com.example.admin.service.impl;
 
+import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -20,7 +21,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -360,15 +360,8 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
      * 新增用户角色关联
      */
     private void insertUserRole(Long userId, List<Long> roleIds) {
-        List<SysUserRole> list = new ArrayList<>();
-        for (Long roleId : roleIds) {
-            SysUserRole ur = new SysUserRole();
-            ur.setUserId(userId);
-            ur.setRoleId(roleId);
-            list.add(ur);
-        }
-        if (!list.isEmpty()) {
-            userRoleMapper.batchInsert(list);
+        if (CollectionUtil.isNotEmpty(roleIds)) {
+            userRoleMapper.batchInsert(userId, roleIds);
         }
     }
 } 

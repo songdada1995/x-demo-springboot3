@@ -34,6 +34,7 @@
         <easyexcel.version>3.3.3</easyexcel.version>
         <poi.version>5.0.0</poi.version>
         <hutool.version>5.8.37</hutool.version>
+        <commons-collections4.version>4.5.0</commons-collections4.version>
     </properties>
 
     <!-- dependencyManagement仅声明依赖及版本，并未引入依赖，子模块需单独引入，无须指定版本 -->
@@ -140,6 +141,12 @@
                 <artifactId>hutool-all</artifactId>
                 <version>${hutool.version}</version>
             </dependency>
+
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-collections4</artifactId>
+                <version>${commons-collections4.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -169,6 +176,10 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>

@@ -50,14 +50,13 @@ public class OAuth2AuthorizationServerConfig {
     @Bean
     @Order(1)
     public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity http) throws Exception {
-        OAuth2AuthorizationServerConfiguration.applyDefaultSecurity(http);
         http.getConfigurer(OAuth2AuthorizationServerConfigurer.class)
-            .oidc(Customizer.withDefaults());
+                .oidc(Customizer.withDefaults());
         http
-            .exceptionHandling(exceptions -> exceptions
-                .authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/login"))
-            )
-            .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()));
+                .exceptionHandling(exceptions -> exceptions
+                        .authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/login"))
+                )
+                .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()));
 
         return http.build();
     }
@@ -80,8 +79,8 @@ public class OAuth2AuthorizationServerConfig {
             @Override
             public RegisteredClient findByClientId(String clientId) {
                 OAuth2RegisteredClient client = clientMapper.selectOne(
-                    new LambdaQueryWrapper<OAuth2RegisteredClient>()
-                        .eq(OAuth2RegisteredClient::getClientId, clientId)
+                        new LambdaQueryWrapper<OAuth2RegisteredClient>()
+                                .eq(OAuth2RegisteredClient::getClientId, clientId)
                 );
                 return client != null ? client.toRegisteredClient() : null;
             }

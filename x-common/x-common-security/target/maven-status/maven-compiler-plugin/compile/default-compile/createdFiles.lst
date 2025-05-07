@@ -1,0 +1,14 @@
+com\example\common\security\interceptor\PermissionInterceptor.class
+com\example\common\security\aspect\PermissionAspect.class
+com\example\common\security\config\ResourceServerConfig.class
+com\example\common\security\handler\CustomAuthenticationSuccessHandler.class
+com\example\common\security\handler\CustomAccessDeniedHandler.class
+com\example\common\security\utils\JwtUtils.class
+com\example\common\security\annotation\RequiresPermissions.class
+com\example\common\security\config\OAuth2AuthorizationServerConfig.class
+com\example\common\security\filter\JwtAuthenticationFilter.class
+com\example\common\security\config\SecurityConfig.class
+com\example\common\security\annotation\Logical.class
+com\example\common\security\handler\CustomAuthenticationFailureHandler.class
+com\example\common\security\utils\SecurityUtils.class
+com\example\common\security\model\LoginUser.class
