@@ -26,5 +26,10 @@ replay_pid*
 /x-admin/target/
 /x-auth/target/
 /x-gateway/target/
+/x-common/x-common-core/target/
+/x-common/x-common-mybatis/target/
+/x-common/x-common-redis/target/
+/x-common/x-common-security/target/
+/x-common/x-common-swagger/target/
 /x-ui/.vscode/
 /x-ui/node_modules/
