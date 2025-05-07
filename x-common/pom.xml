@@ -14,10 +14,11 @@
     <packaging>pom</packaging>
 
     <modules>
+        <module>x-common-core</module>
+        <module>x-common-redis</module>
+        <module>x-common-mybatis</module>
+        <module>x-common-swagger</module>
         <module>x-common-security</module>
     </modules>
-
-    <dependencies>
-    </dependencies>
 
 </project>

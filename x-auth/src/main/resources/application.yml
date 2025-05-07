@@ -1,6 +1,76 @@
 server:
-  port: 6002
+  port: 9002
 
 spring:
   application:
     name: x-auth
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/x_demo?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8
+    username: root
+    password: root
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password:
+      database: 0
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 127.0.0.1:8848
+      config:
+        server-addr: 127.0.0.1:8848
+        file-extension: yaml
+    sentinel:
+      transport:
+        dashboard: 127.0.0.1:8858
+      eager: true
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:9000
+
+mybatis-plus:
+  mapper-locations: classpath*:/mapper/**/*.xml
+  type-aliases-package: com.example.auth.domain
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+  api-docs:
+    path: /v3/api-docs
+
+jwt:
+  secret: your-secret-key
+  expiration: 86400000 # 24 hours
+
+auth:
+  server:
+    # 认证服务器配置
+    issuer: http://localhost:9000
+    # 允许的源站，用于 CORS
+    allowed-origins:
+      - http://localhost:3000 # 前端应用
+      - http://localhost:8080 # 后台管理
+    # 允许的重定向URI
+    allowed-redirect-uris:
+      - http://localhost:3000/login/oauth2/code/client
+      - http://localhost:8080/login/oauth2/code/client
+    # 各种端点配置
+    token-endpoint: /oauth2/token
+    authorization-endpoint: /oauth2/authorize
+    user-info-endpoint: /userinfo
+    jwk-set-endpoint: /.well-known/jwks.json
+    logout-endpoint: /logout
+
+# 日志配置
+logging:
+  level:
+    org.springframework.security: DEBUG
+    org.springframework.security.oauth2: DEBUG
+    com.example.auth: debug

@@ -1,0 +1,40 @@
+server:
+  port: 9001
+
+spring:
+  application:
+    name: x-gateway
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+      routes:
+        - id: x-auth
+          uri: lb://x-auth
+          predicates:
+            - Path=/auth/**
+          filters:
+            - StripPrefix=1
+        - id: x-admin
+          uri: lb://x-admin
+          predicates:
+            - Path=/admin/**
+          filters:
+            - StripPrefix=1
+    nacos:
+      discovery:
+        server-addr: 127.0.0.1:8848
+      config:
+        server-addr: 127.0.0.1:8848
+        file-extension: yaml
+    sentinel:
+      transport:
+        dashboard: 127.0.0.1:8858
+      eager: true
+      scg:
+        fallback:
+          mode: response
+          response-status: 429
+          response-body: '{"code":429,"msg":"服务繁忙，请稍后重试"}'
