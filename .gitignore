@@ -33,3 +33,4 @@ replay_pid*
 /x-common/x-common-swagger/target/
 /x-ui/.vscode/
 /x-ui/node_modules/
+/.vscode/
