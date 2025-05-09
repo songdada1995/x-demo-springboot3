@@ -1,23 +1,14 @@
 /*
- *
- *  * Copyright (c) [song]. 2025-2025. All rights reserved.
- *  * This software is provided 'as-is', without any express or implied warranty.
- *  * In no event will the authors be held liable for any damages arising from the use of this software.
- *  * Permission is granted to anyone to use this software for any purpose,
- *  * including commercial applications, and to alter it and redistribute it freely,
- *  * subject to the following restrictions:
- *  * 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software.
- *  *    If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
- *  * 2. Altered source versions must be plainly marked as such, and must not be misrepresented as being the original software.
- *
+ * Copyright (c) [song]. 2025. All rights reserved.
  */
 
 package com.example.auth.config;
 
-import com.example.auth.security.CustomUserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.web.SecurityFilterChain;
 
 /**
  * @author song
@@ -27,7 +18,14 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 public class SecurityConfig {
 
     @Bean
-    public UserDetailsService userDetailsService() {
-        return new CustomUserDetailsService();
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http.csrf(csrf -> csrf.disable())
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/login", "/captchaImage").permitAll()
+                        .anyRequest().authenticated()
+                );
+        return http.build();
     }
+
 }

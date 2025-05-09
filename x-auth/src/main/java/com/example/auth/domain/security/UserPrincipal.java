@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) [song]. 2025. All rights reserved.
+ */
+
 package com.example.auth.domain.security;
 
 import com.example.auth.domain.entity.SysUser;
