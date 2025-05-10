@@ -37,6 +37,12 @@
             <artifactId>x-common-swagger</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <!-- 自定义OpenFeign -->
+        <dependency>
+            <groupId>com.example</groupId>
+            <artifactId>x-common-openfeign</artifactId>
+            <version>${project.version}</version>
+        </dependency>
         <dependency>
             <groupId>com.mysql</groupId>
             <artifactId>mysql-connector-j</artifactId>

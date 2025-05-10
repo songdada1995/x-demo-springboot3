@@ -3,9 +3,10 @@ package com.example.admin.controller;
 import com.example.admin.domain.dto.SysUserDTO;
 import com.example.admin.domain.vo.SysUserVO;
 import com.example.admin.service.ISysUserService;
-import com.example.common.security.annotation.RequiresPermissions;
 import com.example.common.core.response.R;
 import com.example.common.core.utils.PageUtils;
+import com.example.common.security.annotation.RequiresPermissions;
+import com.example.common.security.model.LoginUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -76,5 +77,13 @@ public class SysUserController {
     public R<Void> assignRole(@RequestBody SysUserDTO userDTO) {
         sysUserService.assignRole(userDTO);
         return R.ok();
+    }
+
+    /**
+     * 获取用户信息和权限信息
+     */
+    @GetMapping("/info/{username}")
+    public R<LoginUser> getUserInfo(@PathVariable("username") String username) {
+        return R.ok(sysUserService.getUserInfo(username));
     }
 } 

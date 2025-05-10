@@ -5,8 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.admin.domain.dto.SysUserDTO;
-import com.example.admin.domain.entity.SysUser;
-import com.example.admin.domain.entity.SysUserRole;
+import com.example.admin.domain.entity.*;
 import com.example.admin.domain.vo.SysUserVO;
 import com.example.admin.mapper.SysUserMapper;
 import com.example.admin.mapper.SysUserRoleMapper;
@@ -14,6 +13,7 @@ import com.example.admin.service.ISysUserRoleService;
 import com.example.admin.service.ISysUserService;
 import com.example.common.core.utils.PageUtils;
 import com.example.common.core.utils.StringUtils;
+import com.example.common.security.model.LoginUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +22,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -31,10 +33,11 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 
     private final SysUserMapper sysUserMapper;
     @Autowired
-    private PasswordEncoder passwordEncoder;
-    private final ISysUserRoleService userRoleService;
-    @Autowired
     private SysUserRoleMapper userRoleMapper;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+    @Autowired
+    private final ISysUserRoleService userRoleService;
 
     @Override
     public PageUtils<SysUserVO> list(SysUserDTO dto) {
@@ -73,26 +76,26 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         if (!checkUserNameUnique(createUserWithUsername(dto.getUsername()))) {
             throw new RuntimeException("用户名已存在");
         }
-        
+
         // 检查手机号唯一性
         if (StringUtils.isNotEmpty(dto.getPhone()) && !checkPhoneUnique(createUserWithPhone(dto.getPhone()))) {
             throw new RuntimeException("手机号已存在");
         }
-        
+
         // 检查邮箱唯一性
         if (StringUtils.isNotEmpty(dto.getEmail()) && !checkEmailUnique(createUserWithEmail(dto.getEmail()))) {
             throw new RuntimeException("邮箱已存在");
         }
-        
+
         SysUser user = new SysUser();
         BeanUtils.copyProperties(dto, user);
-        
+
         // 加密密码
         user.setPassword(passwordEncoder.encode(dto.getPassword()));
-        
+
         // 保存用户
         save(user);
-        
+
         // 保存用户角色关联
         if (dto.getRoleIds() != null && !dto.getRoleIds().isEmpty()) {
             insertUserRole(user.getUserId(), dto.getRoleIds());
@@ -106,29 +109,29 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         if (!checkUserNameUnique(createUserWithIdAndUsername(dto.getUserId(), dto.getUsername()))) {
             throw new RuntimeException("用户名已存在");
         }
-        
+
         // 检查手机号唯一性
         if (StringUtils.isNotEmpty(dto.getPhone()) && !checkPhoneUnique(createUserWithIdAndPhone(dto.getUserId(), dto.getPhone()))) {
             throw new RuntimeException("手机号已存在");
         }
-        
+
         // 检查邮箱唯一性
         if (StringUtils.isNotEmpty(dto.getEmail()) && !checkEmailUnique(createUserWithIdAndEmail(dto.getUserId(), dto.getEmail()))) {
             throw new RuntimeException("邮箱已存在");
         }
-        
+
         SysUser user = new SysUser();
         BeanUtils.copyProperties(dto, user);
-        
+
         // 更新用户
         updateById(user);
-        
+
         // 更新用户角色关联
         if (dto.getRoleIds() != null) {
             // 删除原有关联
             userRoleMapper.delete(new LambdaQueryWrapper<SysUserRole>()
                     .eq(SysUserRole::getUserId, user.getUserId()));
-            
+
             // 添加新的关联
             if (!dto.getRoleIds().isEmpty()) {
                 insertUserRole(user.getUserId(), dto.getRoleIds());
@@ -141,7 +144,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     public void remove(Long userId) {
         // 删除用户
         removeById(userId);
-        
+
         // 删除用户角色关联
         userRoleMapper.delete(new LambdaQueryWrapper<SysUserRole>()
                 .eq(SysUserRole::getUserId, userId));
@@ -280,7 +283,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     @Override
     public List<Long> getRoleIds(Long userId) {
         return userRoleMapper.selectList(new LambdaQueryWrapper<SysUserRole>()
-                .eq(SysUserRole::getUserId, userId))
+                        .eq(SysUserRole::getUserId, userId))
                 .stream()
                 .map(SysUserRole::getRoleId)
                 .collect(Collectors.toList());
@@ -292,7 +295,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         // 删除原有关联
         userRoleMapper.delete(new LambdaQueryWrapper<SysUserRole>()
                 .eq(SysUserRole::getUserId, userDTO.getUserId()));
-        
+
         // 添加新的关联
         if (userDTO.getRoleIds() != null && !userDTO.getRoleIds().isEmpty()) {
             insertUserRole(userDTO.getUserId(), userDTO.getRoleIds());
@@ -363,5 +366,30 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         if (CollectionUtil.isNotEmpty(roleIds)) {
             userRoleMapper.batchInsert(userId, roleIds);
         }
+    }
+
+    @Override
+    public LoginUser getUserInfo(String username) {
+        // 查询用户信息
+        SysUser user = selectUserByUserName(username);
+        if (user == null) {
+            return null;
+        }
+
+        // 获取用户权限信息
+        Set<String> permissions = sysUserMapper.selectPermsByUserId(user.getUserId());
+        // 查询角色信息
+        Set<String> roles = sysUserMapper.selectRolesByUserId(user.getUserId());
+
+        // 构建LoginUser对象
+        LoginUser loginUser = new LoginUser();
+        loginUser.setUserId(user.getUserId());
+        loginUser.setUsername(user.getUsername());
+        loginUser.setPassword(user.getPassword());
+        loginUser.setStatus(String.valueOf(user.getStatus()));
+        loginUser.setRoles(roles);
+        loginUser.setPermissions(permissions);
+
+        return loginUser;
     }
 } 

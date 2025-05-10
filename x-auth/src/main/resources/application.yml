@@ -26,6 +26,28 @@ spring:
       transport:
         dashboard: 127.0.0.1:8858
       eager: true
+    openfeign:
+      client:
+        config:
+          default:
+            connectTimeout: 5000
+            readTimeout: 5000
+            loggerLevel: full
+      compression:
+        request:
+          enabled: true
+        response:
+          enabled: true
+      httpclient:
+        enabled: true
+        max-connections: 200
+        max-connections-per-route: 50
+        time-to-live: 900
+        time-to-live-unit: seconds
+        follow-redirects: true
+        disable-ssl-validation: false
+        connection-timeout: 2000
+        connection-timer-repeat: 3000
   security:
     oauth2:
       resourceserver:

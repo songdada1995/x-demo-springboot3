@@ -55,4 +55,39 @@
         where m.status = '0' and r.status = '0'
         and ur.user_id = #{userId}
     </select>
+
+    <!-- 查询菜单列表 -->
+    <select id="selectMenuList" resultMap="SysMenuResult">
+        <include refid="selectMenuVo"/>
+        where status = '0'
+        <if test="menuName != null and menuName != ''">
+            and menu_name like concat('%', #{menuName}, '%')
+        </if>
+        <if test="visible != null and visible != ''">
+            and visible = #{visible}
+        </if>
+        order by parent_id, order_num
+    </select>
+
+    <!-- 根据菜单ID查询菜单 -->
+    <select id="selectMenuById" parameterType="Long" resultMap="SysMenuResult">
+        <include refid="selectMenuVo"/>
+        where menu_id = #{menuId}
+    </select>
+
+    <!-- 根据父菜单ID查询子菜单数量 -->
+    <select id="selectCountMenuByParentId" resultType="Integer">
+        select count(1) from sys_menu where parent_id = #{parentId}
+    </select>
+
+    <!-- 校验菜单名称是否唯一 -->
+    <select id="checkMenuNameUnique" resultType="Integer">
+        select count(1) from sys_menu
+        where menu_name = #{menuName}
+        and parent_id = #{parentId}
+        <if test="menuId != null">
+            and menu_id != #{menuId}
+        </if>
+        limit 1
+    </select>
 </mapper> 

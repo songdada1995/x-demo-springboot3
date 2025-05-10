@@ -6,7 +6,7 @@ import lombok.experimental.Accessors;
 import java.io.Serializable;
 
 /**
- * 响应结果
+ * 通用返回对象
  */
 @Data
 @Accessors(chain = true)

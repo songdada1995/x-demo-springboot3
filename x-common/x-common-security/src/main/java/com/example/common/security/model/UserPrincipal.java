@@ -2,21 +2,18 @@
  * Copyright (c) [song]. 2025. All rights reserved.
  */
 
-package com.example.auth.domain.security;
+package com.example.common.security.model;
 
-import com.example.auth.domain.entity.SysUser;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
+import java.util.Set;
 
 /**
  * 用户主体
@@ -52,22 +49,17 @@ public class UserPrincipal implements UserDetails {
      */
     private Integer accountLocked;
 
+    /**
+     * 权限列表
+     */
+    private Set<String> permissions;
+
+    /**
+     * 角色列表
+     */
+    private Set<String> roles;
+
     private Collection<? extends GrantedAuthority> authorities;
-
-    public static UserPrincipal create(SysUser user, List<String> permissions) {
-        List<GrantedAuthority> authorities = permissions.stream()
-                .map(permission -> new SimpleGrantedAuthority(permission))
-                .collect(Collectors.toList());
-
-        return UserPrincipal.builder()
-                .userId(user.getUserId())
-                .username(user.getUsername())
-                .password(user.getPassword())
-                .status(user.getStatus())
-                .accountLocked(user.getAccountLocked())
-                .authorities(authorities)
-                .build();
-    }
 
     @Override
     public boolean isAccountNonExpired() {

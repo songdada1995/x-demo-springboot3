@@ -1,4 +1,8 @@
-package com.example.auth.domain;
+/*
+ * Copyright (c) [song]. 2025. All rights reserved.
+ */
+
+package com.example.auth.domain.entity;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -13,7 +17,6 @@ import org.springframework.security.oauth2.server.authorization.settings.TokenSe
 
 import java.time.Instant;
 import java.util.Map;
-import java.util.Set;
 
 @Data
 @TableName("oauth2_registered_client")

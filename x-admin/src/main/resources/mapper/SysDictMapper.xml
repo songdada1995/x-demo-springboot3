@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.admin.mapper.SysDictMapper">
+    
+    <!-- 根据字典类型查询字典数据 -->
+    <select id="selectDictByType" resultType="com.example.admin.domain.entity.SysDict">
+        select dict_id, dict_name, dict_type, status, create_time, update_time, remark
+        from sys_dict
+        where dict_type = #{dictType}
+        and status = '0'
+        limit 1
+    </select>
+    
+    <!-- 查询字典类型列表 -->
+    <select id="selectDictTypeList" resultType="com.example.admin.domain.entity.SysDict">
+        select dict_id, dict_name, dict_type, status, create_time, update_time, remark
+        from sys_dict
+        where status = '0'
+        <if test="dictName != null and dictName != ''">
+            and dict_name like concat('%', #{dictName}, '%')
+        </if>
+        <if test="dictType != null and dictType != ''">
+            and dict_type like concat('%', #{dictType}, '%')
+        </if>
+        order by create_time desc
+    </select>
+</mapper> 

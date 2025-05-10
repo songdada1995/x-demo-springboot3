@@ -32,4 +32,63 @@
         </if>
     </select>
 
+    <select id="selectPermsByUserId" resultType="string">
+
+    </select>
+
+    <select id="selectRolesByUserId" resultType="string">
+
+    </select>
+
+    <!-- 根据用户名查询用户 -->
+    <select id="selectUserByUserName" resultType="com.example.admin.domain.entity.SysUser">
+        select user_id, username, password, nickname, email, phone, status, create_time, update_time, remark
+        from sys_user
+        where username = #{username}
+        and status = '0'
+        limit 1
+    </select>
+
+    <!-- 根据用户ID查询用户 -->
+    <select id="selectUserById" resultType="com.example.admin.domain.entity.SysUser">
+        select user_id, username, password, nickname, email, phone, status, create_time, update_time, remark
+        from sys_user
+        where user_id = #{userId}
+        and status = '0'
+        limit 1
+    </select>
+
+    <!-- 校验用户名称是否唯一 -->
+    <select id="checkUserNameUnique" resultType="java.lang.Integer">
+        select count(1)
+        from sys_user
+        where username = #{username}
+        <if test="userId != null">
+            and user_id != #{userId}
+        </if>
+        limit 1
+    </select>
+
+    <!-- 校验手机号码是否唯一 -->
+    <select id="checkPhoneUnique" resultType="java.lang.Integer">
+        select count(1)
+        from sys_user
+        where phone = #{phone}
+        <if test="userId != null">
+            and user_id != #{userId}
+        </if>
+        limit 1
+    </select>
+
+    <!-- 校验email是否唯一 -->
+    <select id="checkEmailUnique" resultType="java.lang.Integer">
+        select count(1)
+        from sys_user
+        where email = #{email}
+        <if test="userId != null">
+            and user_id != #{userId}
+        </if>
+        limit 1
+    </select>
+
 </mapper> 

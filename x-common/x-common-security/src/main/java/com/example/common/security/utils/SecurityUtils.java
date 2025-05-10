@@ -1,7 +1,7 @@
 package com.example.common.security.utils;
 
 import com.example.common.core.exception.NoPermissionException;
-import com.example.common.security.model.LoginUser;
+import com.example.common.security.model.UserPrincipal;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -16,9 +16,9 @@ public class SecurityUtils {
     /**
      * 获取用户
      */
-    public static LoginUser getLoginUser() {
+    public static UserPrincipal getUser() {
         try {
-            return (LoginUser) getAuthentication().getPrincipal();
+            return (UserPrincipal) getAuthentication().getPrincipal();
         } catch (Exception e) {
             throw new NoPermissionException("获取用户信息异常");
         }
@@ -36,7 +36,7 @@ public class SecurityUtils {
      */
     public static Long getUserId() {
         try {
-            return getLoginUser().getUserId();
+            return getUser().getUserId();
         } catch (Exception e) {
             throw new NoPermissionException("获取用户ID异常");
         }
@@ -47,7 +47,7 @@ public class SecurityUtils {
      */
     public static String getUsername() {
         try {
-            return getLoginUser().getUsername();
+            return getUser().getUsername();
         } catch (Exception e) {
             throw new NoPermissionException("获取用户名异常");
         }
@@ -58,7 +58,7 @@ public class SecurityUtils {
      */
     public static Set<String> getPermissions() {
         try {
-            return getLoginUser().getPermissions();
+            return getUser().getPermissions();
         } catch (Exception e) {
             throw new NoPermissionException("获取用户权限异常");
         }

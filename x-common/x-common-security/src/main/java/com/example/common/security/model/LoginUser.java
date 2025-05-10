@@ -1,6 +1,5 @@
 package com.example.common.security.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -9,7 +8,7 @@ import java.util.Collection;
 import java.util.Set;
 
 /**
- * 登录用户身份权限
+ * 登录用户信息
  */
 @Data
 public class LoginUser implements UserDetails {
@@ -29,13 +28,12 @@ public class LoginUser implements UserDetails {
     /**
      * 密码
      */
-    @JsonIgnore
     private String password;
 
     /**
      * 状态（0正常 1停用）
      */
-    private Integer status;
+    private String status;
 
     /**
      * 权限列表
@@ -50,16 +48,6 @@ public class LoginUser implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return null;
-    }
-
-    @Override
-    public String getPassword() {
-        return password;
-    }
-
-    @Override
-    public String getUsername() {
-        return username;
     }
 
     @Override
@@ -79,6 +67,6 @@ public class LoginUser implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return status == 0;
+        return "0".equals(status);
     }
 } 

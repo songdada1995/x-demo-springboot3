@@ -37,7 +37,7 @@ public class PermissionInterceptor implements HandlerInterceptor {
             return true;
         }
 
-        Set<String> userPermissions = SecurityUtils.getLoginUser().getPermissions();
+        Set<String> userPermissions = SecurityUtils.getUser().getPermissions();
         if (requiresPermissions.logical() == Logical.AND) {
             for (String permission : permissions) {
                 if (!userPermissions.contains(permission)) {
