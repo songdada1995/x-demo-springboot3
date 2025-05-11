@@ -69,8 +69,10 @@ public class OAuth2RegisteredClient {
 
     public RegisteredClient toRegisteredClient() {
         try {
-            Map<String, Object> clientSettingsMap = objectMapper.readValue(clientSettings, new TypeReference<Map<String, Object>>() {});
-            Map<String, Object> tokenSettingsMap = objectMapper.readValue(tokenSettings, new TypeReference<Map<String, Object>>() {});
+            Map<String, Object> clientSettingsMap = objectMapper.readValue(clientSettings, new TypeReference<Map<String, Object>>() {
+            });
+            Map<String, Object> tokenSettingsMap = objectMapper.readValue(tokenSettings, new TypeReference<Map<String, Object>>() {
+            });
 
             return RegisteredClient.withId(this.id)
                     .clientId(this.clientId)
@@ -105,4 +107,4 @@ public class OAuth2RegisteredClient {
             throw new RuntimeException("Failed to deserialize settings", e);
         }
     }
-} 
+}
