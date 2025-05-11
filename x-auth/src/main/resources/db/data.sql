@@ -43,13 +43,13 @@ INSERT INTO oauth2_registered_client (
     client_settings, token_settings
 ) VALUES (
     '1',
-    'x-admin',
+    'x-upms-biz',
     CURRENT_TIMESTAMP,
     '{noop}secret',
     '后台管理系统',
     'client_secret_basic',
     'authorization_code,refresh_token',
-    'http://localhost:8080/login/oauth2/code/x-admin',
+    'http://localhost:8080/login/oauth2/code/x-upms-biz',
     'openid,read,write',
     '{"@class":"java.util.Collections$UnmodifiableMap","settings.client.require-proof-key":false,"settings.client.require-authorization-consent":true}',
     '{"@class":"java.util.Collections$UnmodifiableMap","settings.token.reuse-refresh-tokens":true,"settings.token.id-token-signature-algorithm":"RS256","settings.token.access-token-time-to-live":300,"settings.token.access-token-format":"self-contained","settings.token.refresh-token-time-to-live":3600,"settings.token.authorization-code-time-to-live":300}'

@@ -10,10 +10,10 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>x-common</module>
-        <module>x-auth</module>
-        <module>x-admin</module>
         <module>x-gateway</module>
+        <module>x-auth</module>
+        <module>x-upms</module>
+        <module>x-common</module>
     </modules>
 
     <properties>
@@ -81,7 +81,32 @@
             <!-- 自定义jar包 -->
             <dependency>
                 <groupId>com.example</groupId>
-                <artifactId>x-common</artifactId>
+                <artifactId>x-common-core</artifactId>
+                <version>${x-common.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.example</groupId>
+                <artifactId>x-common-security</artifactId>
+                <version>${x-common.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.example</groupId>
+                <artifactId>x-common-redis</artifactId>
+                <version>${x-common.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.example</groupId>
+                <artifactId>x-common-mybatis</artifactId>
+                <version>${x-common.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.example</groupId>
+                <artifactId>x-common-swagger</artifactId>
+                <version>${x-common.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.example</groupId>
+                <artifactId>x-common-openfeign</artifactId>
                 <version>${x-common.version}</version>
             </dependency>
 

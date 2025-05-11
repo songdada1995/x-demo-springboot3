@@ -67,12 +67,12 @@ public class OAuth2AuthorizationServerConfig {
     @Bean
     public RegisteredClientRepository registeredClientRepository() {
         RegisteredClient client = RegisteredClient.withId(UUID.randomUUID().toString())
-                .clientId("x-admin")
+                .clientId("x-upms-biz")
                 .clientSecret("{noop}secret")
                 .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
                 .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
                 .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
-                .redirectUri("http://127.0.0.1:8080/login/oauth2/code/x-admin")
+                .redirectUri("http://127.0.0.1:8080/login/oauth2/code/x-upms-biz")
                 .scope(OidcScopes.OPENID)
                 .scope("read")
                 .scope("write")

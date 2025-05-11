@@ -1,18 +1,19 @@
 package com.example.common.security.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.Collection;
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.Set;
 
 /**
  * 登录用户信息
  */
 @Data
-public class LoginUser implements UserDetails {
-    
+public class LoginUser implements Serializable {
+
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**
@@ -28,12 +29,18 @@ public class LoginUser implements UserDetails {
     /**
      * 密码
      */
+    @JsonIgnore
     private String password;
 
     /**
      * 状态（0正常 1停用）
      */
-    private String status;
+    private Integer status;
+
+    /**
+     * 账号是否被锁（0否 1是）
+     */
+    private Integer accountLocked;
 
     /**
      * 权限列表
@@ -44,29 +51,4 @@ public class LoginUser implements UserDetails {
      * 角色列表
      */
     private Set<String> roles;
-
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
-    }
-
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return "0".equals(status);
-    }
 } 

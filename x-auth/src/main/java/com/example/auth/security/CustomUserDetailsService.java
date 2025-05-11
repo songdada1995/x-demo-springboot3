@@ -4,10 +4,10 @@
 
 package com.example.auth.security;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.example.auth.domain.entity.SysUser;
-import com.example.auth.mapper.SysUserMapper;
+import com.example.common.core.response.R;
+import com.example.common.security.model.LoginUser;
 import com.example.common.security.model.UserPrincipal;
+import com.example.upms.api.feign.RemoteUserService;
 import jakarta.annotation.Resource;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -16,7 +16,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,26 +27,24 @@ import java.util.stream.Collectors;
 public class CustomUserDetailsService implements UserDetailsService {
 
     @Resource
-    private SysUserMapper sysUserMapper;
+    private RemoteUserService remoteUserService;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        QueryWrapper<SysUser> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("username", username);
-        SysUser sysUser = sysUserMapper.selectOne(queryWrapper);
-        if (sysUser == null) {
+        R<LoginUser> userInfo = remoteUserService.getUserInfo(username);
+        if (userInfo == null) {
             throw new UsernameNotFoundException(username);
         } else {
-            List<String> roles = new ArrayList<>();
-            List<GrantedAuthority> authorities = roles.stream()
-                    .map(permission -> new SimpleGrantedAuthority(permission))
+            LoginUser loginUser = userInfo.getData();
+            List<GrantedAuthority> authorities = loginUser.getRoles().stream()
+                    .map(role -> new SimpleGrantedAuthority(role))
                     .collect(Collectors.toList());
             return UserPrincipal.builder()
-                    .userId(sysUser.getUserId())
-                    .username(sysUser.getUsername())
-                    .password(sysUser.getPassword())
-                    .status(sysUser.getStatus())
-                    .accountLocked(sysUser.getAccountLocked())
+                    .userId(loginUser.getUserId())
+                    .username(loginUser.getUsername())
+                    .password(loginUser.getPassword())
+                    .status(loginUser.getStatus())
+                    .accountLocked(loginUser.getAccountLocked())
                     .authorities(authorities)
                     .build();
         }

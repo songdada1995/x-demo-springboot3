@@ -17,10 +17,10 @@ spring:
             - Path=/auth/**
           filters:
             - StripPrefix=1
-        - id: x-admin
-          uri: lb://x-admin
+        - id: x-upms-biz
+          uri: lb://x-upms-biz
           predicates:
-            - Path=/admin/**
+            - Path=/upms/**
           filters:
             - StripPrefix=1
     nacos:

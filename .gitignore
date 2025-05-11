@@ -26,9 +26,10 @@ replay_pid*
 /x-ui/.vscode/
 /x-ui/node_modules/
 /.vscode/
-/x-admin/target/
 /x-auth/target/
 /x-gateway/target/
+/x-upms/x-upms-api/target/
+/x-upms/x-upms-biz/target/
 /x-common/x-common-core/target/
 /x-common/x-common-mybatis/target/
 /x-common/x-common-openfeign/target/

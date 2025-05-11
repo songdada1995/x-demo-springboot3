@@ -4,7 +4,6 @@
 
 package com.example.common.security.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -36,7 +35,6 @@ public class UserPrincipal implements UserDetails {
     /**
      * 密码
      */
-    @JsonIgnore
     private String password;
 
     /**

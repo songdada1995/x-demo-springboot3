@@ -15,32 +15,30 @@
         <dependency>
             <groupId>com.example</groupId>
             <artifactId>x-common-core</artifactId>
-            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.example</groupId>
             <artifactId>x-common-security</artifactId>
-            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.example</groupId>
             <artifactId>x-common-redis</artifactId>
-            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.example</groupId>
             <artifactId>x-common-mybatis</artifactId>
-            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.example</groupId>
             <artifactId>x-common-swagger</artifactId>
-            <version>${project.version}</version>
         </dependency>
-        <!-- 自定义OpenFeign -->
         <dependency>
             <groupId>com.example</groupId>
             <artifactId>x-common-openfeign</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.example</groupId>
+            <artifactId>x-upms-api</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

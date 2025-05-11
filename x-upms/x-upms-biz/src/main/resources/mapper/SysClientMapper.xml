@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.upms.mapper.SysClientMapper">
+    
+    <!-- 根据客户端ID查询客户端信息 -->
+    <select id="selectClientByClientId" resultType="com.example.upms.api.domain.entity.SysClient">
+        select client_id, client_secret, resource_ids, scope, authorized_grant_types,
+               web_server_redirect_uri, authorities, access_token_validity,
+               refresh_token_validity, additional_information, autoapprove,
+               create_time, update_time, status, remark
+        from sys_client
+        where client_id = #{clientId}
+        and status = '0'
+        limit 1
+    </select>
+    
+    <!-- 查询客户端列表 -->
+    <select id="selectClientList" resultType="com.example.upms.api.domain.entity.SysClient">
+        select client_id, client_secret, resource_ids, scope, authorized_grant_types,
+               web_server_redirect_uri, authorities, access_token_validity,
+               refresh_token_validity, additional_information, autoapprove,
+               create_time, update_time, status, remark
+        from sys_client
+        where status = '0'
+        <if test="clientId != null and clientId != ''">
+            and client_id like concat('%', #{clientId}, '%')
+        </if>
+        order by create_time desc
+    </select>
+</mapper> 

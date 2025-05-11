@@ -1,6 +1,8 @@
-CREATE DATABASE IF NOT EXISTS `x_demo` DEFAULT CHARACTER SET utf8mb4;
+CREATE
+DATABASE IF NOT EXISTS `x_demo` DEFAULT CHARACTER SET utf8mb4;
 
-USE `x_demo`;
+USE
+`x_demo`;
 
 DROP TABLE IF EXISTS `sys_menu`;
 CREATE TABLE `sys_menu`
@@ -56,21 +58,21 @@ CREATE TABLE `sys_role_menu`
 DROP TABLE IF EXISTS `sys_user`;
 CREATE TABLE `sys_user`
 (
-    `user_id`        BIGINT(20) NOT NULL AUTO_INCREMENT COMMENT '用户ID',
-    `username`       VARCHAR(50)  NOT NULL COMMENT '用户名',
-    `password`       VARCHAR(100) NOT NULL COMMENT '密码',
-    `nickname`       VARCHAR(50)  DEFAULT NULL COMMENT '昵称',
-    `email`          VARCHAR(100) DEFAULT NULL COMMENT '邮箱',
-    `phone`          VARCHAR(20)  DEFAULT NULL COMMENT '手机号',
-    `status`         TINYINT(4) DEFAULT '0' COMMENT '账号状态（0正常 1停用）',
-    `account_locked` TINYINT(4) DEFAULT '0' COMMENT '账号是否被锁（0否 1是）',
-    `login_limit`    TINYINT(4) DEFAULT '5' COMMENT '账号剩余登录重试次数',
-    `remark`         VARCHAR(500) DEFAULT NULL COMMENT '备注',
-    `create_time`    DATETIME     DEFAULT NULL COMMENT '创建时间',
-    `create_by`      VARCHAR(50)  DEFAULT NULL COMMENT '创建者',
-    `update_time`    DATETIME     DEFAULT NULL COMMENT '更新时间',
-    `update_by`      VARCHAR(50)  DEFAULT NULL COMMENT '更新者',
-    `del_flag`       TINYINT(4) DEFAULT '0' COMMENT '删除标志（0代表存在 1代表删除）',
+    `user_id`     BIGINT(20) NOT NULL AUTO_INCREMENT COMMENT '用户ID',
+    `username`    VARCHAR(50)  NOT NULL COMMENT '用户名',
+    `password`    VARCHAR(100) NOT NULL COMMENT '密码',
+    `nickname`    VARCHAR(50)  DEFAULT NULL COMMENT '昵称',
+    `email`       VARCHAR(100) DEFAULT NULL COMMENT '邮箱',
+    `phone`       VARCHAR(20)  DEFAULT NULL COMMENT '手机号',
+    `status`      TINYINT(4) DEFAULT '0' COMMENT '账号状态（0正常 1停用）',
+    `lock_flag`   TINYINT(4) DEFAULT '0' COMMENT '账号是否被锁（0否 1是）',
+    `login_limit` TINYINT(4) DEFAULT '5' COMMENT '账号剩余登录重试次数',
+    `remark`      VARCHAR(500) DEFAULT NULL COMMENT '备注',
+    `create_time` DATETIME     DEFAULT NULL COMMENT '创建时间',
+    `create_by`   VARCHAR(50)  DEFAULT NULL COMMENT '创建者',
+    `update_time` DATETIME     DEFAULT NULL COMMENT '更新时间',
+    `update_by`   VARCHAR(50)  DEFAULT NULL COMMENT '更新者',
+    `del_flag`    TINYINT(4) DEFAULT '0' COMMENT '删除标志（0代表存在 1代表删除）',
     PRIMARY KEY (`user_id`),
     UNIQUE KEY `idx_username` (`username`)
 ) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 COMMENT='系统用户表';

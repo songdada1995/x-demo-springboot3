@@ -24,7 +24,7 @@ public class SecurityConfig {
         http.csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login", "/captchaImage").permitAll()
+                        .requestMatchers("/api/auth/*", "/captchaImage").permitAll()
                         .anyRequest().authenticated()
                 );
         return http.build();
