@@ -23,9 +23,9 @@
 hs_err_pid*
 replay_pid*
 /.idea/
+/.vscode/
 /x-ui/.vscode/
 /x-ui/node_modules/
-/.vscode/
 /x-auth/target/
 /x-gateway/target/
 /x-upms/x-upms-api/target/
