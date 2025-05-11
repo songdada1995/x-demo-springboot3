@@ -24,7 +24,7 @@
         </dependency>
         <dependency>
             <groupId>com.example</groupId>
-            <artifactId>x-common-openfeign</artifactId>
+            <artifactId>x-common-feign</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

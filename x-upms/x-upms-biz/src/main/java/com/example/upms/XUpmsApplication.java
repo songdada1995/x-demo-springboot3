@@ -1,6 +1,6 @@
 package com.example.upms;
 
-import com.example.common.openfeign.annotation.EnableXFeignClients;
+import com.example.common.feign.annotation.EnableXFeignClients;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;

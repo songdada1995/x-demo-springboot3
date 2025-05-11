@@ -31,8 +31,8 @@ replay_pid*
 /x-upms/x-upms-api/target/
 /x-upms/x-upms-biz/target/
 /x-common/x-common-core/target/
+/x-common/x-common-feign/target/
 /x-common/x-common-mybatis/target/
-/x-common/x-common-openfeign/target/
 /x-common/x-common-redis/target/
 /x-common/x-common-security/target/
 /x-common/x-common-swagger/target/

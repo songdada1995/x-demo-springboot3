@@ -1,6 +1,6 @@
-package com.example.common.openfeign.annotation;
+package com.example.common.feign.annotation;
 
-import com.example.common.openfeign.config.FeignAutoConfiguration;
+import com.example.common.feign.config.FeignAutoConfiguration;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.Import;
 

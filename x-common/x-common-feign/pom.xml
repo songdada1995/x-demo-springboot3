@@ -9,7 +9,7 @@
         <version>1.0.0</version>
     </parent>
 
-    <artifactId>x-common-openfeign</artifactId>
+    <artifactId>x-common-feign</artifactId>
 
     <dependencies>
         <!-- Spring Cloud OpenFeign -->

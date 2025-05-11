@@ -1,4 +1,4 @@
-package com.example.common.openfeign.config;
+package com.example.common.feign.config;
 
 import feign.Logger;
 import feign.RequestInterceptor;
