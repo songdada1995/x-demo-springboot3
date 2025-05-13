@@ -10,7 +10,9 @@ const app = createApp(App)
 app.use(Antd, {
   theme: {
     token: {
-      colorPrimary: '#27c2ad'
+      colorPrimary: '#27c2ad',
+      colorPrimaryHover: '#2ed3bd',
+      colorPrimaryActive: '#1fb19d',
     }
   }
 })
