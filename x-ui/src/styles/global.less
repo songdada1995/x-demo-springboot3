@@ -73,4 +73,183 @@
   background-color: #1fb19d !important;
   border-color: #1fb19d !important;
   color: #fff !important;
+}
+
+/* 操作列链接样式 */
+.action-link {
+  color: #27c2ad !important;
+  font-weight: 500;
+  transition: all 0.3s;
+  
+  &:hover {
+    color: #2ed3bd !important;
+    text-decoration: none;
+  }
+  
+  &:active {
+    color: #1fb19d !important;
+  }
+}
+
+.action-danger {
+  color: #ff4d4f !important;
+  font-weight: 500;
+  
+  &:hover {
+    color: #ff7875 !important;
+    text-decoration: none;
+  }
+}
+
+/* 操作列分隔符样式 */
+.ant-divider-vertical {
+  border-color: rgba(0, 0, 0, 0.06);
+  height: 1em;
+  margin: 0 8px;
+}
+
+/* 模态框样式优化 */
+.ant-modal {
+  .ant-modal-content {
+    border-radius: 8px;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+  }
+  
+  .ant-modal-header {
+    padding: 16px 24px;
+    border-bottom: 1px solid #f0f0f0;
+    background: #fff;
+    border-radius: 8px 8px 0 0;
+  }
+  
+  .ant-modal-title {
+    color: rgba(0, 0, 0, 0.85);
+    font-weight: 600;
+    font-size: 16px;
+    line-height: 22px;
+  }
+  
+  .ant-modal-close {
+    color: rgba(0, 0, 0, 0.45);
+    
+    &:hover {
+      color: rgba(0, 0, 0, 0.75);
+    }
+  }
+  
+  .ant-modal-body {
+    padding: 24px;
+  }
+  
+  .ant-modal-footer {
+    padding: 10px 16px;
+    border-top: 1px solid #f0f0f0;
+    background: #fff;
+    border-radius: 0 0 8px 8px;
+    
+    .ant-btn + .ant-btn {
+      margin-left: 8px;
+    }
+  }
+}
+
+/* 表单项样式优化 */
+.ant-form-item {
+  margin-bottom: 20px;
+  
+  .ant-form-item-label > label {
+    color: rgba(0, 0, 0, 0.85);
+    font-weight: 500;
+  }
+  
+  .ant-input,
+  .ant-input-affix-wrapper,
+  .ant-select .ant-select-selector,
+  .ant-picker {
+    border-radius: 4px;
+    border: 1px solid #d9d9d9;
+    transition: all 0.3s;
+    
+    &:hover {
+      border-color: #27c2ad;
+    }
+    
+    &:focus,
+    &-focused {
+      border-color: #27c2ad;
+      box-shadow: 0 0 0 2px rgba(39, 194, 173, 0.2);
+      outline: 0;
+    }
+  }
+  
+  .ant-radio-wrapper,
+  .ant-checkbox-wrapper {
+    .ant-radio-checked .ant-radio-inner,
+    .ant-checkbox-checked .ant-checkbox-inner {
+      background-color: #27c2ad;
+      border-color: #27c2ad;
+    }
+  }
+}
+
+/* 表格操作列样式 */
+.action-column {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  
+  a {
+    color: #27c2ad;
+    transition: all 0.3s;
+    
+    &:hover {
+      color: #2ed3bd;
+    }
+    
+    &.danger {
+      color: #ff4d4f;
+      
+      &:hover {
+        color: #ff7875;
+      }
+    }
+  }
+}
+
+/* 全局下拉框样式 */
+.ant-select-dropdown {
+  background-color: #fff !important;
+  
+  .ant-select-item {
+    color: rgba(0, 0, 0, 0.85) !important;
+    
+    &-option-selected {
+      background-color: #f5f5f5 !important;
+      color: rgba(0, 0, 0, 0.85) !important;
+    }
+    
+    &-option-active {
+      background-color: #e6f7f5 !important;
+    }
+  }
+}
+
+/* 全局弹出菜单样式 */
+.ant-dropdown-menu {
+  background-color: #fff !important;
+  
+  &-item {
+    color: rgba(0, 0, 0, 0.85) !important;
+    
+    &:hover {
+      background-color: #e6f7f5 !important;
+    }
+    
+    &-selected {
+      background-color: #f5f5f5 !important;
+      color: #27c2ad !important;
+    }
+  }
 } 

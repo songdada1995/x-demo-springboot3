@@ -189,11 +189,12 @@ button.primary:hover {
 /* 确保所有顶部菜单项样式一致 */
 .ant-menu-horizontal .ant-menu-item,
 .ant-menu-horizontal > .ant-menu-item {
-  padding: 0 30px !important;
-  margin: 0 5px !important;
+  padding: 0 !important;
+  margin: 0 !important;
   font-size: 16px !important;
   height: 48px !important;
   line-height: 48px !important;
+  width: 200px !important; /* 与左侧菜单栏宽度一致 */
 }
 
 /* 防止顶部菜单项变成下拉框 */
@@ -209,10 +210,11 @@ button.primary:hover {
 /* 保证菜单项之间的样式一致性 */
 .ant-menu-horizontal > .ant-menu-item:first-child,
 .ant-menu-horizontal > .ant-menu-item:last-child {
-  margin: 0 5px !important;
-  padding: 0 30px !important;
+  margin: 0 !important;
+  padding: 0 !important;
   border: none !important;
   border-radius: 0 !important;
+  width: 200px !important; /* 与左侧菜单栏宽度一致 */
 }
 
 /* 表格分页选择器强制统一样式 */
@@ -336,8 +338,8 @@ button.primary:hover {
 .ant-menu-horizontal.ant-menu > .ant-menu-item,
 .ant-menu-horizontal.ant-menu > .ant-menu-item[role="menuitem"],
 .ant-menu-horizontal.ant-menu > .ant-menu-item.ant-menu-item-only-child {
-  padding: 0 30px !important;
-  margin: 0 5px !important;
+  padding: 0 !important;
+  margin: 0 !important;
   height: 48px !important;
   line-height: 48px !important;
   background-color: #121212 !important;
@@ -349,6 +351,7 @@ button.primary:hover {
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
+  width: 200px !important; /* 与左侧菜单栏宽度一致 */
 }
 
 /* 清除业务平台可能存在的特殊样式 */
@@ -359,11 +362,12 @@ button.primary:hover {
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
-  padding: 0 30px !important;
-  margin: 0 5px !important;
+  padding: 0 !important;
+  margin: 0 !important;
   font-size: 16px !important;
   border: none !important;
   box-shadow: none !important;
+  width: 200px !important; /* 与左侧菜单栏宽度一致 */
 }
 
 /* 确保选中样式一致 */
@@ -705,4 +709,15 @@ button.primary:hover {
 
 .ant-menu-inline-collapsed .ant-menu-item-selected {
   background-color: #27c2ad !important; /* 保持高亮色不变 */
+}
+
+/* 确保顶部菜单项文字居中对齐 */
+.ant-menu-horizontal > .ant-menu-item .ant-menu-title-content,
+.ant-menu-horizontal .ant-menu-title-content {
+  text-align: center !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  width: 100% !important;
+  padding: 0 !important;
 }

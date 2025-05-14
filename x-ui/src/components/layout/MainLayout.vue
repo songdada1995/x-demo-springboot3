@@ -110,6 +110,9 @@
             <menu-unfold-outlined v-if="collapsed" />
             <menu-fold-outlined v-else />
           </div>
+          <div class="breadcrumb-container">
+            <!-- 这里可以添加面包屑导航 -->
+          </div>
         </div>
         <div class="content-wrapper">
           <router-view></router-view>
@@ -138,6 +141,8 @@ import {
   AuditOutlined,
   CalculatorOutlined,
   AccountBookOutlined,
+  WalletOutlined,
+  BankOutlined,
 } from '@ant-design/icons-vue'
 import { message } from 'ant-design-vue'
 import { useAuthStore } from '../../stores/auth'
@@ -199,6 +204,12 @@ const systemMenuItems: MenuItem[] = [
 // 业务平台菜单
 const businessMenuItems: MenuItem[] = [
   {
+    key: 'financeManagement',
+    title: '财务管理',
+    icon: BankOutlined,
+    path: '/business/finance-management'
+  },
+  {
     key: 'businessPlatform',
     title: '业务管理',
     icon: AppstoreOutlined,
@@ -214,6 +225,18 @@ const businessMenuItems: MenuItem[] = [
         title: '财务报表',
         icon: AccountBookOutlined,
         path: '/business/finance'
+      },
+      {
+        key: 'account',
+        title: '账号维护',
+        icon: UserOutlined,
+        path: '/business/account'
+      },
+      {
+        key: 'warehouse',
+        title: '仓库设置',
+        icon: AppstoreOutlined,
+        path: '/business/warehouse'
       },
     ],
   },
@@ -761,7 +784,7 @@ watch(() => route.path, (newPath) => {
   display: flex;
   align-items: center;
   height: 100%;
-  gap: 15px;
+  gap: 0; /* 减少间距 */
 }
 
 .logo-area {
@@ -803,8 +826,8 @@ watch(() => route.path, (newPath) => {
   background: #121212; /* 暗黑色背景 */
   color: #fff;
   min-width: 0;
-  margin-left: 20px;
-  padding-left: 10px;
+  margin-left: 0; /* 移除左边距 */
+  padding-left: 0; /* 移除左内边距 */
 }
 
 .header-right {
@@ -881,12 +904,12 @@ watch(() => route.path, (newPath) => {
 
 /* 工具栏样式 */
 .toolbar {
-  height: 32px;
+  height: 40px; /* 增加高度 */
   background: #fff;
   border-bottom: 1px solid #f0f0f0;
   display: flex;
   align-items: center;
-  padding-left: 16px;
+  padding: 0; /* 移除内边距 */
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
 }
 
@@ -901,23 +924,32 @@ watch(() => route.path, (newPath) => {
 
 /* 收起按钮样式 */
 .sider-trigger {
-  width: 32px;
-  height: 32px;
+  width: 40px; /* 增加宽度 */
+  height: 40px; /* 增加高度 */
   color: #27c2ad; /* 保持主打配色 */
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   transition: all 0.2s;
-  background: transparent;
-  border: none;
+  background: #f9f9f9; /* 添加背景色 */
+  border-right: 1px solid #f0f0f0; /* 添加右边框 */
   padding: 0;
-  font-size: 20px;
+  font-size: 18px;
+  margin-left: 0; /* 移除左边距 */
 }
 
 .sider-trigger:hover {
   color: #27c2ad; /* 保持主打配色 */
   opacity: 0.8;
+  background-color: #f0f0f0; /* 悬停时背景色变化 */
+}
+
+.breadcrumb-container {
+  padding: 0 16px;
+  height: 100%;
+  display: flex;
+  align-items: center;
 }
 
 /* 菜单样式 */
@@ -1078,8 +1110,8 @@ watch(() => route.path, (newPath) => {
 
 /* 顶部菜单项专用样式类 */
 :deep(.top-menu-item) {
-  padding: 0 30px !important;
-  margin: 0 5px !important;
+  padding: 0 !important; /* 移除内边距 */
+  margin: 0 !important; /* 移除边距 */
   height: 48px !important;
   line-height: 48px !important;
   text-align: center !important;
@@ -1090,7 +1122,7 @@ watch(() => route.path, (newPath) => {
   background-color: #121212 !important; /* 暗黑色背景 */
   border: none !important;
   box-shadow: none !important;
-  width: auto !important; /* 覆盖左侧菜单的宽度设置 */
+  width: 110px !important; /* 进一步缩短宽度 */
   color: #fff !important; /* 设置文字颜色为白色 */
 }
 
@@ -1105,8 +1137,8 @@ watch(() => route.path, (newPath) => {
 /* 顶部菜单项基本样式 */
 :deep(.ant-menu-horizontal > .ant-menu-item) {
   color: #fff;
-  margin: 0 5px;
-  padding: 0 30px;
+  margin: 0; /* 移除边距 */
+  padding: 0; /* 移除内边距 */
   height: 48px;
   line-height: 48px;
   text-align: center;
@@ -1114,7 +1146,7 @@ watch(() => route.path, (newPath) => {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: auto !important; /* 覆盖左侧菜单的宽度设置 */
+  width: 110px !important; /* 进一步缩短宽度 */
 }
 
 /* 确保顶部菜单项文字居中对齐 */
@@ -1124,6 +1156,7 @@ watch(() => route.path, (newPath) => {
   justify-content: center !important;
   align-items: center !important;
   width: 100% !important;
+  padding: 0 !important;
 }
 
 /* 选中和悬停状态 */
@@ -1144,11 +1177,11 @@ watch(() => route.path, (newPath) => {
 :deep(.header .ant-menu-item) {
   transition: none !important;
   animation: none !important;
-  margin: 0 5px !important;
-  padding: 0 30px !important;
+  margin: 0 !important; /* 移除边距 */
+  padding: 0 !important; /* 移除内边距 */
   height: 48px !important;
   line-height: 48px !important;
-  width: auto !important; /* 覆盖左侧菜单的宽度设置 */
+  width: 110px !important; /* 进一步缩短宽度 */
 }
 
 :deep(.header .ant-menu-item:hover) {

@@ -86,16 +86,20 @@
           </template>
           <!-- 操作列 -->
           <template v-if="column.key === 'action'">
-            <a-space size="middle">
-              <a @click="handleEdit(record)">编辑</a>
+            <div class="action-column">
+              <a class="action-link" @click="handleEdit(record)">编辑</a>
               <a-divider type="vertical" />
               <a-popconfirm
                 title="确定要删除这个权限吗？"
                 @confirm="handleDelete(record)"
+                okText="确定"
+                cancelText="取消"
+                :okButtonProps="{ type: 'primary', danger: true }"
+                :cancelButtonProps="{ type: 'default' }"
               >
-                <a class="danger">删除</a>
+                <a class="action-danger">删除</a>
               </a-popconfirm>
-            </a-space>
+            </div>
           </template>
         </template>
       </a-table>
@@ -107,6 +111,11 @@
       :title="modalTitle"
       @ok="handleModalOk"
       @cancel="handleModalCancel"
+      width="600px"
+      :maskClosable="false"
+      :destroyOnClose="true"
+      okText="确定"
+      cancelText="取消"
     >
       <a-form
         ref="formRef"

@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import MainLayout from '../components/layout/MainLayout.vue'
 import Dashboard from '../components/pages/Dashboard.vue'
 import SystemIcons from '../components/pages/SystemIcons.vue'
+import BlankSystem from '../components/pages/BlankSystem.vue'
 
 const routes = [
   {
@@ -82,6 +83,16 @@ const routes = [
         }
       },
       {
+        path: '/business/finance-management',
+        name: 'FinanceManagement',
+        component: () => import('@/views/business/finance-management.vue'),
+        meta: {
+          title: '财务管理',
+          icon: 'bank',
+          requiresAuth: true
+        }
+      },
+      {
         path: '/business/cost',
         name: 'CostAccounting',
         component: () => import('@/views/finance/cost/index.vue'),
@@ -102,6 +113,122 @@ const routes = [
         name: 'FinancialReport',
         component: () => import('@/views/finance/report/index.vue'),
         meta: {
+          requiresAuth: true
+        }
+      },
+      {
+        path: '/business/finance-reports',
+        name: 'FinanceReports',
+        component: BlankSystem,
+        meta: {
+          requiresAuth: true
+        }
+      },
+      {
+        path: '/business/fund-management',
+        name: 'FundManagement',
+        component: BlankSystem,
+        meta: {
+          requiresAuth: true
+        }
+      },
+      {
+        path: '/business/transactions',
+        name: 'Transactions',
+        component: BlankSystem,
+        meta: {
+          requiresAuth: true
+        }
+      },
+      {
+        path: '/business/invoice',
+        name: 'Invoice',
+        component: BlankSystem,
+        meta: {
+          requiresAuth: true
+        }
+      },
+      {
+        path: '/business/salary',
+        name: 'Salary',
+        component: BlankSystem,
+        meta: {
+          requiresAuth: true
+        }
+      },
+      {
+        path: '/business/e-wallet',
+        name: 'EWallet',
+        component: BlankSystem,
+        meta: {
+          requiresAuth: true
+        }
+      },
+      {
+        path: '/business/audit',
+        name: 'Audit',
+        component: BlankSystem,
+        meta: {
+          requiresAuth: true
+        }
+      },
+      {
+        path: '/business/bar-charts',
+        name: 'BarCharts',
+        component: BlankSystem,
+        meta: {
+          requiresAuth: true
+        }
+      },
+      {
+        path: '/business/line-charts',
+        name: 'LineCharts',
+        component: BlankSystem,
+        meta: {
+          requiresAuth: true
+        }
+      },
+      {
+        path: '/business/pie-charts',
+        name: 'PieCharts',
+        component: BlankSystem,
+        meta: {
+          requiresAuth: true
+        }
+      },
+      {
+        path: '/business/fund-flow',
+        name: 'FundFlow',
+        component: BlankSystem,
+        meta: {
+          requiresAuth: true
+        }
+      },
+      {
+        path: '/business/stock',
+        name: 'Stock',
+        component: BlankSystem,
+        meta: {
+          requiresAuth: true
+        }
+      },
+      {
+        path: '/business/account',
+        name: 'AccountManagement',
+        component: () => import('@/views/business/account/index.vue'),
+        meta: {
+          title: '账号维护',
+          icon: 'user',
+          requiresAuth: true
+        }
+      },
+      {
+        path: '/business/warehouse',
+        name: 'WarehouseSettings',
+        component: () => import('@/views/business/warehouse/index.vue'),
+        meta: {
+          title: '仓库设置',
+          icon: 'appstore',
           requiresAuth: true
         }
       }

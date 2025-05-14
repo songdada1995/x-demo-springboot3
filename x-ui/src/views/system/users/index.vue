@@ -96,15 +96,19 @@
           <!-- 操作列 -->
           <template v-if="column.key === 'action'">
             <div class="action-column">
-              <a @click="handleEdit(record)">编辑</a>
+              <a class="action-link" @click="handleEdit(record)">编辑</a>
               <a-divider type="vertical" />
-              <a @click="handleResetPassword(record)">重置密码</a>
+              <a class="action-link" @click="handleResetPassword(record)">重置密码</a>
               <a-divider type="vertical" />
               <a-popconfirm
                 title="确定要删除这个用户吗？"
                 @confirm="handleDelete(record)"
+                okText="确定"
+                cancelText="取消"
+                :okButtonProps="{ type: 'primary', danger: true }"
+                :cancelButtonProps="{ type: 'default' }"
               >
-                <a class="danger">删除</a>
+                <a class="action-danger">删除</a>
               </a-popconfirm>
             </div>
           </template>
@@ -118,6 +122,11 @@
       :title="modalTitle"
       @ok="handleModalOk"
       @cancel="handleModalCancel"
+      width="600px"
+      :maskClosable="false"
+      :destroyOnClose="true"
+      okText="确定"
+      cancelText="取消"
     >
       <a-form
         ref="formRef"
@@ -460,12 +469,53 @@ onMounted(() => {
   justify-content: flex-start;
 }
 
-.danger {
+/* 使用全局样式 */
+:deep(.action-column) {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+}
+
+:deep(.action-link) {
+  color: #27c2ad;
+  transition: all 0.3s;
+}
+
+:deep(.action-link:hover) {
+  color: #2ed3bd;
+}
+
+:deep(.action-danger) {
   color: #ff4d4f;
 }
 
-.danger:hover {
+:deep(.action-danger:hover) {
   color: #ff7875;
+}
+
+:deep(.ant-modal-content) {
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+:deep(.ant-modal-header) {
+  padding: 16px 24px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+:deep(.ant-modal-title) {
+  font-weight: 600;
+  font-size: 16px;
+}
+
+:deep(.ant-modal-body) {
+  padding: 24px;
+}
+
+:deep(.ant-modal-footer) {
+  padding: 10px 16px;
+  border-top: 1px solid #f0f0f0;
 }
 
 :deep(.ant-form-item) {
