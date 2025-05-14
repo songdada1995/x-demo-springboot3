@@ -161,11 +161,11 @@ button.primary:hover {
 
 /* 顶部菜单栏样式 */
 .ant-menu-horizontal {
-  background: #001529 !important;
+  background: #121212 !important;
 }
 
 .ant-menu-horizontal > .ant-menu-item {
-  background: #001529 !important;
+  background: #121212 !important;
 }
 
 .ant-menu-horizontal > .ant-menu-item-selected {
@@ -203,6 +203,7 @@ button.primary:hover {
   top: 0 !important;
   vertical-align: middle !important;
   text-align: center !important;
+  background-color: #121212 !important;
 }
 
 /* 保证菜单项之间的样式一致性 */
@@ -274,10 +275,11 @@ button.primary:hover {
   max-width: 110px !important;
 }
 
-/* 确保顶部菜单背景色与左侧菜单一致 #001529 */
+/* 确保顶部菜单背景色与左侧菜单一致 #121212 */
 .ant-layout-header,
-.ant-menu-horizontal {
-  background-color: #001529 !important;
+.ant-menu-horizontal,
+.ant-menu-horizontal > .ant-menu-item {
+  background-color: #121212 !important;
 }
 
 /* 固定分页下拉框的宽度为110px */
@@ -312,7 +314,7 @@ button.primary:hover {
 .ant-menu-submenu.ant-menu-submenu-selected > .ant-menu-submenu-title,
 .ant-menu-submenu.ant-menu-item-selected > .ant-menu-submenu-title {
   background-color: transparent !important;
-  color: rgba(255, 255, 255, 0.65) !important;
+  color: white !important;
 }
 
 /* 保证只有叶子节点可以高亮 */
@@ -338,7 +340,7 @@ button.primary:hover {
   margin: 0 5px !important;
   height: 48px !important;
   line-height: 48px !important;
-  background-color: #001529 !important;
+  background-color: #121212 !important;
   border: none !important;
   box-shadow: none !important;
   text-transform: none !important;
@@ -351,8 +353,8 @@ button.primary:hover {
 
 /* 清除业务平台可能存在的特殊样式 */
 .ant-menu-horizontal > .ant-menu-item[key="business"],
-.ant-menu-horizontal > .ant-menu-item:nth-child(2) {
-  background-color: #001529 !important;
+.ant-menu-horizontal > .ant-menu-item[key="system"] {
+  background-color: #121212 !important;
   color: #fff !important;
   display: flex !important;
   align-items: center !important;
@@ -479,6 +481,8 @@ button.primary:hover {
 .ant-select-dropdown-placement-topRight {
   width: auto !important;
   min-width: 240px !important;
+  background: #1a1a1a !important; /* 暗黑色背景 */
+  border: 1px solid #2a2a2a !important;
 }
 
 /* 确保下拉选项内容不会被截断 */
@@ -486,6 +490,22 @@ button.primary:hover {
   white-space: nowrap !important;
   overflow: hidden !important;
   text-overflow: ellipsis !important;
+  color: #fff !important; /* 白色文字 */
+}
+
+.ant-select-dropdown .ant-select-item {
+  background: #1a1a1a !important; /* 暗黑色背景 */
+  color: #fff !important; /* 白色文字 */
+}
+
+.ant-select-dropdown .ant-select-item:hover,
+.ant-select-dropdown .ant-select-item-option-active {
+  background-color: #2a2a2a !important; /* 悬停颜色 */
+}
+
+.ant-select-dropdown .ant-select-item-option-selected {
+  background-color: #27c2ad !important; /* 选中项使用主题色 */
+  color: #fff !important;
 }
 
 /* 强制覆盖内联样式 */
@@ -624,4 +644,65 @@ button.primary:hover {
   white-space: nowrap !important;
   overflow: hidden !important;
   text-overflow: ellipsis !important;
+}
+
+/* 所有下拉菜单的暗黑色风格 */
+.ant-dropdown-menu,
+.ant-select-dropdown,
+.ant-cascader-menus,
+.ant-picker-dropdown,
+.ant-tooltip-inner {
+  background: #1a1a1a !important; /* 暗黑色背景 */
+  border: 1px solid #2a2a2a !important;
+  color: #fff !important;
+}
+
+.ant-dropdown-menu-item,
+.ant-dropdown-menu-submenu-title,
+.ant-select-item,
+.ant-cascader-menu-item,
+.ant-picker-cell {
+  color: #fff !important;
+}
+
+.ant-dropdown-menu-item:hover,
+.ant-dropdown-menu-submenu-title:hover,
+.ant-select-item:hover,
+.ant-cascader-menu-item:hover {
+  background-color: #2a2a2a !important; /* 悬停颜色 */
+}
+
+/* 修复折叠菜单弹出的子菜单样式 */
+.ant-menu-submenu-popup .ant-menu {
+  background: #1a1a1a !important; /* 暗黑色背景 */
+}
+
+.ant-menu-submenu-popup .ant-menu-item {
+  background: #1a1a1a !important; /* 暗黑色背景 */
+  color: #fff !important;
+}
+
+.ant-menu-submenu-popup .ant-menu-item:hover {
+  background-color: #2a2a2a !important; /* 悬停颜色 */
+}
+
+.ant-menu-submenu-popup .ant-menu-item-selected {
+  background-color: #27c2ad !important; /* 选中项使用主题色 */
+  color: #fff !important;
+}
+
+/* 修复菜单折叠时的样式 */
+.ant-menu-inline-collapsed {
+  background: #121212 !important; /* 暗黑色背景 */
+  width: 80px !important;
+}
+
+.ant-menu-inline-collapsed > .ant-menu-item,
+.ant-menu-inline-collapsed > .ant-menu-submenu > .ant-menu-submenu-title {
+  padding: 0 calc(50% - 16px) !important;
+  background: #121212 !important; /* 暗黑色背景 */
+}
+
+.ant-menu-inline-collapsed .ant-menu-item-selected {
+  background-color: #27c2ad !important; /* 保持高亮色不变 */
 }

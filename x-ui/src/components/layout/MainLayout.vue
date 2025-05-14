@@ -19,12 +19,13 @@
       </div>
       <div class="header-right">
         <a-dropdown>
-          <span class="username">
+          <span class="username" @mouseenter="arrowUp = true" @mouseleave="arrowUp = false">
             {{ userInfo?.name || userInfo?.username || 'admin' }}
-            <down-outlined />
+            <up-outlined v-if="arrowUp" />
+            <down-outlined v-else />
           </span>
           <template #overlay>
-            <a-menu @click="handleUserMenuClick">
+            <a-menu @click="handleUserMenuClick" class="user-dropdown-menu">
               <a-menu-item key="profile">
                 <user-outlined />
                 个人信息
@@ -128,6 +129,7 @@ import {
   TeamOutlined,
   AppstoreOutlined,
   DownOutlined,
+  UpOutlined,
   LockOutlined,
   LogoutOutlined,
   MenuUnfoldOutlined,
@@ -157,6 +159,7 @@ const collapsed = ref(false)
 const selectedKeys = ref<string[]>(['item-dashboard'])
 const openKeys = ref<string[]>([])
 const selectedTopKeys = ref<string[]>(['system'])
+const arrowUp = ref(false)
 
 // 系统管理菜单
 const systemMenuItems: MenuItem[] = [
@@ -730,185 +733,10 @@ watch(() => route.path, (newPath) => {
 })
 </script>
 
-<style scoped>
+<style lang="less" scoped>
 .main-layout {
-  min-height: 100vh;
+  height: 100vh;
   width: 100%;
-  overflow-x: hidden;
-}
-
-/* 全局菜单样式重置 - 防止闪烁 */
-:deep(.ant-menu),
-:deep(.ant-menu-item),
-:deep(.ant-menu-submenu),
-:deep(.ant-menu-submenu-title) {
-  transition: none !important;
-  animation: none !important;
-  -webkit-transition: none !important;
-  -webkit-animation: none !important;
-}
-
-/* 移除所有菜单项的过渡和动画 */
-:deep(.ant-menu *),
-:deep(.ant-menu-item *),
-:deep(.ant-menu-submenu *),
-:deep(.ant-menu-submenu-title *) {
-  transition: none !important;
-  animation: none !important;
-  -webkit-transition: none !important;
-  -webkit-animation: none !important;
-}
-
-/* 移除所有伪元素的动画和过渡 */
-:deep(.ant-menu::before),
-:deep(.ant-menu::after),
-:deep(.ant-menu-item::before),
-:deep(.ant-menu-item::after),
-:deep(.ant-menu-submenu::before),
-:deep(.ant-menu-submenu::after),
-:deep(.ant-menu-submenu-title::before),
-:deep(.ant-menu-submenu-title::after) {
-  transition: none !important;
-  animation: none !important;
-  -webkit-transition: none !important;
-  -webkit-animation: none !important;
-}
-
-/* 强制保持菜单选中状态 - 通用 */
-:deep(.ant-menu-item-selected) {
-  background-color: #27c2ad !important;
-  color: #fff !important;
-}
-
-/* 左侧菜单选中状态 */
-:deep(.ant-layout-sider .ant-menu-item-selected) {
-  background-color: #27c2ad !important;
-  color: #fff !important;
-  margin: 0 !important;
-  padding-right: 0 !important;
-  width: 100% !important;
-  border-radius: 0 !important;
-}
-
-/* 左侧菜单悬停状态 */
-:deep(.ant-layout-sider .ant-menu-item:hover) {
-  background-color: #27c2ad !important;
-  opacity: 0.8 !important;
-  color: #fff !important;
-  margin: 0 !important;
-  padding-right: 0 !important;
-  width: 100% !important;
-  border-radius: 0 !important;
-}
-
-/* 父级菜单标题样式基础 - 确保尺寸一致性 */
-:deep(.ant-layout-sider .ant-menu-submenu-title) {
-  margin: 0 !important;
-  padding-right: 0 !important;
-  width: 100% !important;
-  border-radius: 0 !important;
-  background-color: transparent !important;
-}
-
-/* 父级菜单标题悬停状态 - 特别处理 */
-:deep(.ant-layout-sider .ant-menu-submenu-title:hover) {
-  background-color: #27c2ad !important;
-  opacity: 0.8 !important;
-  color: #fff !important;
-  margin: 0 !important;
-  padding-right: 0 !important;
-  width: 100% !important;
-  border-radius: 0 !important;
-}
-
-/* 确保箭头图标也正确显示 */
-:deep(.ant-menu-submenu-arrow) {
-  transition: none !important;
-  animation: none !important;
-  color: inherit !important;
-}
-
-:deep(.ant-menu-submenu-title:hover .ant-menu-submenu-arrow) {
-  color: #fff !important;
-}
-
-/* 系统管理等一级菜单特别处理 */
-:deep(.ant-layout-sider .ant-menu > .ant-menu-submenu > .ant-menu-submenu-title) {
-  padding-left: 15px !important;
-  padding-right: 0 !important;
-  margin: 0 !important;
-  width: 100% !important;
-  background-color: transparent !important;
-}
-
-:deep(.ant-layout-sider .ant-menu > .ant-menu-submenu > .ant-menu-submenu-title:hover) {
-  background-color: #27c2ad !important;
-  opacity: 0.8 !important;
-  color: #fff !important;
-  padding-left: 15px !important;
-  padding-right: 0 !important;
-  width: 100% !important;
-  border-radius: 0 !important;
-}
-
-/* 确保选中子菜单的父菜单不会被高亮 */
-:deep(.ant-layout-sider .ant-menu-submenu-open > .ant-menu-submenu-title),
-:deep(.ant-layout-sider .ant-menu-submenu-active > .ant-menu-submenu-title) {
-  background-color: transparent !important;
-  color: rgba(255, 255, 255, 0.65) !important;
-}
-
-:deep(.ant-layout-sider .ant-menu-submenu-open > .ant-menu-submenu-title:hover),
-:deep(.ant-layout-sider .ant-menu-submenu-active > .ant-menu-submenu-title:hover) {
-  background-color: #27c2ad !important;
-  opacity: 0.8 !important;
-  color: #fff !important;
-}
-
-/* 一级菜单项样式 */
-:deep(.ant-layout-sider .ant-menu-dark > .ant-menu-item) {
-  padding-left: 15px !important;
-  margin: 0 !important;
-  width: 100% !important;
-}
-
-/* 二级菜单项样式 */
-:deep(.ant-layout-sider .ant-menu-submenu .ant-menu-item) {
-  padding-left: 43px !important;
-  margin: 0 !important;
-  width: 100% !important;
-}
-
-/* 顶部菜单项样式 - 保持原样不填满 */
-:deep(.header .ant-menu-item) {
-  transition: none !important;
-  animation: none !important;
-  margin: 0 5px !important;
-  padding: 0 30px !important;
-  height: 48px !important;
-  line-height: 48px !important;
-}
-
-:deep(.header .ant-menu-item:hover) {
-  background-color: #27c2ad !important;
-  opacity: 0.8 !important;
-  color: #fff !important;
-  transition: none !important;
-  animation: none !important;
-}
-
-:deep(.header .ant-menu-item-selected) {
-  background-color: #27c2ad !important;
-  color: #fff !important;
-  border-bottom: none !important;
-  transition: none !important;
-  animation: none !important;
-}
-
-/* Override any inline styles for second-level menu items */
-:deep(.ant-menu-dark .ant-menu-submenu .ant-menu-item),
-:deep(.ant-menu-dark .ant-menu-submenu li[role="menuitem"]) {
-  padding-left: 43px !important;
 }
 
 /* 顶部区域样式 */
@@ -917,10 +745,10 @@ watch(() => route.path, (newPath) => {
   align-items: center;
   justify-content: space-between;
   padding: 0;
-  background: #001529;
+  background: #121212; /* 暗黑色背景 */
   height: 48px;
   min-height: 48px;
-  box-shadow: 0 1px 4px rgba(0, 21, 41, 0.08);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
   position: fixed;
   top: 0;
   left: 0;
@@ -937,7 +765,7 @@ watch(() => route.path, (newPath) => {
 }
 
 .logo-area {
-  background: #102a40;
+  background: #1a1a1a; /* 稍浅一点的暗黑色 */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -949,8 +777,8 @@ watch(() => route.path, (newPath) => {
   flex-shrink: 0;
   box-sizing: border-box;
   transition: all 0.2s;
-  border-right: 1px solid #1e3c54;
-  box-shadow: inset 0 -1px 0 0 #1e3c54;
+  border-right: 1px solid #2a2a2a;
+  box-shadow: inset 0 -1px 0 0 #2a2a2a;
 }
 
 .logo-collapsed {
@@ -960,7 +788,7 @@ watch(() => route.path, (newPath) => {
 }
 
 .logo {
-  color: #27c2ad;
+  color: #27c2ad; /* 保持主打配色 */
   font-size: 20px;
   font-weight: bold;
   letter-spacing: 2px;
@@ -972,7 +800,7 @@ watch(() => route.path, (newPath) => {
   flex: 1;
   line-height: 48px;
   height: 48px;
-  background: #001529;
+  background: #121212; /* 暗黑色背景 */
   color: #fff;
   min-width: 0;
   margin-left: 20px;
@@ -986,6 +814,24 @@ watch(() => route.path, (newPath) => {
   padding: 0 24px;
   color: #fff;
   border-radius: 0;
+  background-color: transparent !important;
+}
+
+/* 用户名样式 */
+.username {
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background-color: transparent !important;
+  padding: 0 10px;
+  border-radius: 4px;
+  transition: all 0.3s;
+}
+
+.username:hover {
+  background-color: rgba(255, 255, 255, 0.1) !important;
 }
 
 /* 主体内容布局 */
@@ -998,7 +844,7 @@ watch(() => route.path, (newPath) => {
 
 /* 左侧区域样式 */
 .sider {
-  background: #001529;
+  background: #121212; /* 暗黑色背景 */
   overflow-y: auto;
   overflow-x: hidden;
   height: 100%;
@@ -1008,7 +854,7 @@ watch(() => route.path, (newPath) => {
 }
 
 :deep(.ant-layout-sider) {
-  background: #001529 !important;
+  background: #121212 !important; /* 暗黑色背景 */
   min-width: 200px !important;
   max-width: 200px !important;
   width: 200px !important;
@@ -1057,7 +903,7 @@ watch(() => route.path, (newPath) => {
 .sider-trigger {
   width: 32px;
   height: 32px;
-  color: #27c2ad;
+  color: #27c2ad; /* 保持主打配色 */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1070,13 +916,92 @@ watch(() => route.path, (newPath) => {
 }
 
 .sider-trigger:hover {
-  color: #27c2ad;
+  color: #27c2ad; /* 保持主打配色 */
   opacity: 0.8;
+}
+
+/* 菜单样式 */
+:deep(.ant-menu-dark) {
+  background: #121212 !important; /* 暗黑色背景 */
+  margin-top: 0 !important;
+  color: #fff !important; /* 设置文字颜色为白色 */
+}
+
+:deep(.ant-menu-dark .ant-menu-sub) {
+  background: #1a1a1a !important; /* 子菜单稍浅一点的暗黑色 */
+}
+
+:deep(.ant-menu-dark .ant-menu-item-selected) {
+  background-color: #27c2ad !important; /* 保持高亮色不变 */
+  width: 100% !important; /* 确保高亮占满整行 */
+  margin: 0 !important; /* 移除边距 */
+  padding-right: 0 !important; /* 移除右内边距 */
+  color: #fff !important; /* 确保选中项文字为白色 */
+}
+
+:deep(.ant-menu-dark .ant-menu-item) {
+  width: 100% !important; /* 确保菜单项占满整行 */
+  margin: 0 !important; /* 移除菜单项之间的边距 */
+  padding-right: 0 !important; /* 移除右内边距 */
+  color: #fff !important; /* 设置文字颜色为白色 */
+}
+
+:deep(.ant-menu-dark .ant-menu-item:hover),
+:deep(.ant-menu-dark .ant-menu-submenu-title:hover) {
+  background-color: #2a2a2a !important; /* 悬停颜色 */
+  width: 100% !important; /* 确保悬停效果占满整行 */
+  margin: 0 !important; /* 移除边距 */
+  padding-right: 0 !important; /* 移除右内边距 */
+}
+
+:deep(.ant-menu-dark .ant-menu-submenu-selected > .ant-menu-submenu-title) {
+  color: #fff !important; /* 选中的子菜单标题颜色改为白色 */
+}
+
+:deep(.ant-menu-dark .ant-menu-item-active),
+:deep(.ant-menu-dark .ant-menu-submenu-active) {
+  background-color: #2a2a2a !important; /* 活动状态颜色 */
+  width: 100% !important; /* 确保活动效果占满整行 */
+  margin: 0 !important; /* 移除边距 */
+  padding-right: 0 !important; /* 移除右内边距 */
+  color: #fff !important; /* 设置文字颜色为白色 */
+}
+
+:deep(.ant-menu-dark .ant-menu-submenu-open) {
+  color: #fff !important; /* 打开的子菜单颜色改为白色 */
+}
+
+:deep(.ant-menu-dark .ant-menu-submenu-title) {
+  width: 100% !important; /* 确保子菜单标题占满整行 */
+  margin: 0 !important; /* 移除边距 */
+  padding-right: 16px !important; /* 调整右内边距，为箭头留出空间 */
+  color: #fff !important; /* 设置文字颜色为白色 */
+}
+
+/* 移除菜单项的蓝色过渡效果 */
+:deep(.ant-menu-item::after),
+:deep(.ant-menu-submenu::after) {
+  border-right: none !important;
+  transition: none !important;
+}
+
+/* 调整菜单项的圆角 */
+:deep(.ant-menu-item),
+:deep(.ant-menu-submenu) {
+  border-radius: 0 !important;
+  margin: 0 !important;
+}
+
+/* 调整子菜单的缩进 */
+:deep(.ant-menu-sub .ant-menu-item) {
+  padding-left: 48px !important;
+  width: 100% !important; /* 确保子菜单项占满整行 */
+  margin: 0 !important; /* 移除边距 */
 }
 
 /* 顶部菜单样式 */
 :deep(.ant-menu-horizontal) {
-  background: #001529;
+  background: #121212 !important; /* 暗黑色背景 */
   color: #fff;
   border-bottom: none;
   line-height: 48px;
@@ -1084,6 +1009,71 @@ watch(() => route.path, (newPath) => {
   display: flex;
   align-items: center;
   max-width: 400px;
+}
+
+/* 修复顶部菜单项的下拉菜单背景色 */
+:deep(.ant-menu-submenu-popup) {
+  background: #121212 !important; /* 暗黑色背景 */
+}
+
+:deep(.ant-menu-submenu-popup .ant-menu) {
+  background: #1a1a1a !important; /* 稍浅一点的暗黑色 */
+}
+
+:deep(.ant-dropdown-menu) {
+  background: #1a1a1a !important; /* 稍浅一点的暗黑色 */
+  border: 1px solid #2a2a2a !important;
+}
+
+:deep(.ant-dropdown-menu-item),
+:deep(.ant-dropdown-menu-submenu-title) {
+  color: #fff !important;
+}
+
+:deep(.ant-dropdown-menu-item:hover),
+:deep(.ant-dropdown-menu-submenu-title:hover) {
+  background-color: #2a2a2a !important; /* 悬停颜色 */
+}
+
+/* 用户下拉菜单样式 */
+:deep(.user-dropdown-menu.ant-menu) {
+  background: #1a1a1a !important; /* 稍浅一点的暗黑色 */
+  border: 1px solid #2a2a2a !important;
+}
+
+:deep(.user-dropdown-menu.ant-menu .ant-menu-item) {
+  color: #fff !important;
+}
+
+:deep(.user-dropdown-menu.ant-menu .ant-menu-item:hover) {
+  background-color: #2a2a2a !important; /* 悬停颜色 */
+}
+
+/* 确保菜单项内容左对齐且占满整行 */
+:deep(.ant-menu-inline .ant-menu-item),
+:deep(.ant-menu-inline .ant-menu-submenu-title) {
+  text-align: left !important;
+  justify-content: flex-start !important;
+  width: 100% !important;
+  margin: 0 !important;
+  padding-right: 16px !important;
+}
+
+/* 修复菜单项选中时的边框和背景 */
+:deep(.ant-menu-item-selected) {
+  border-right: none !important;
+}
+
+/* 修复菜单折叠时的样式 */
+:deep(.ant-layout-sider-collapsed .ant-menu-item),
+:deep(.ant-layout-sider-collapsed .ant-menu-submenu-title) {
+  padding: 0 calc(50% - 16px) !important; /* 图标居中 */
+  width: 100% !important;
+}
+
+:deep(.ant-layout-sider-collapsed .ant-menu-item-selected) {
+  width: 100% !important;
+  padding: 0 calc(50% - 16px) !important;
 }
 
 /* 顶部菜单项专用样式类 */
@@ -1097,9 +1087,11 @@ watch(() => route.path, (newPath) => {
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
-  background-color: #001529 !important;
+  background-color: #121212 !important; /* 暗黑色背景 */
   border: none !important;
   box-shadow: none !important;
+  width: auto !important; /* 覆盖左侧菜单的宽度设置 */
+  color: #fff !important; /* 设置文字颜色为白色 */
 }
 
 :deep(.top-menu-item .ant-menu-title-content) {
@@ -1122,6 +1114,7 @@ watch(() => route.path, (newPath) => {
   display: flex;
   align-items: center;
   justify-content: center;
+  width: auto !important; /* 覆盖左侧菜单的宽度设置 */
 }
 
 /* 确保顶部菜单项文字居中对齐 */
@@ -1135,29 +1128,45 @@ watch(() => route.path, (newPath) => {
 
 /* 选中和悬停状态 */
 :deep(.ant-menu-horizontal > .ant-menu-item-selected) {
-  background-color: #27c2ad !important;
+  background-color: #27c2ad !important; /* 保持主打配色 */
   color: #fff !important;
+  width: auto !important; /* 覆盖左侧菜单的宽度设置 */
 }
 
 :deep(.ant-menu-horizontal > .ant-menu-item:hover) {
-  background-color: #27c2ad !important;
+  background-color: #27c2ad !important; /* 保持主打配色 */
   color: #fff !important;
   opacity: 0.8;
+  width: auto !important; /* 覆盖左侧菜单的宽度设置 */
 }
 
-/* 确保没有下拉框样式 */
-:deep(.ant-menu-horizontal:not(.ant-menu-dark) > .ant-menu-item),
-:deep(.ant-menu-horizontal:not(.ant-menu-dark) > .ant-menu-submenu) {
-  margin: 0 5px;
-  padding: 0 30px;
-  color: #fff;
+/* 顶部菜单项样式 - 保持原样不填满 */
+:deep(.header .ant-menu-item) {
+  transition: none !important;
+  animation: none !important;
+  margin: 0 5px !important;
+  padding: 0 30px !important;
+  height: 48px !important;
+  line-height: 48px !important;
+  width: auto !important; /* 覆盖左侧菜单的宽度设置 */
 }
 
-/* 覆盖可能的左对齐样式 - 仅针对顶部菜单 */
-:deep(.ant-menu-horizontal > .ant-menu-item),
-:deep(.ant-menu-horizontal > .ant-menu-submenu-title) {
-  text-align: center !important;
-  justify-content: center !important;
+:deep(.header .ant-menu-item:hover) {
+  background-color: #27c2ad !important; /* 保持主打配色 */
+  opacity: 0.8 !important;
+  color: #fff !important;
+  transition: none !important;
+  animation: none !important;
+  width: auto !important; /* 覆盖左侧菜单的宽度设置 */
+}
+
+:deep(.header .ant-menu-item-selected) {
+  background-color: #27c2ad !important; /* 保持主打配色 */
+  color: #fff !important;
+  border-bottom: none !important;
+  transition: none !important;
+  animation: none !important;
+  width: auto !important; /* 覆盖左侧菜单的宽度设置 */
 }
 
 /* 左侧菜单样式 - 确保左对齐 */
@@ -1174,212 +1183,84 @@ watch(() => route.path, (newPath) => {
   display: inline-block !important;
 }
 
-/* 左侧菜单样式 */
-:deep(.ant-menu-dark) {
-  background: #001529;
-  margin-top: 0 !important;
-}
-
-:deep(.ant-menu-dark > .ant-menu-item),
-:deep(.ant-menu-dark > .ant-menu-submenu > .ant-menu-submenu-title) {
-  padding-left: 15px !important;
-  height: 48px !important;
-  line-height: 48px !important;
-  text-align: left !important;
-  margin: 4px 0 !important;
-}
-
-:deep(.ant-menu-dark > .ant-menu-item .anticon),
-:deep(.ant-menu-dark > .ant-menu-submenu > .ant-menu-submenu-title .anticon) {
-  margin-right: 8px !important;
-  font-size: 16px !important;
-  min-width: 16px !important;
-}
-
-:deep(.ant-menu-dark > .ant-menu-item .ant-menu-title-content),
-:deep(.ant-menu-dark > .ant-menu-submenu > .ant-menu-submenu-title .ant-menu-title-content) {
-  display: inline-block !important;
-  text-align: left !important;
-  padding-left: 0 !important;
-  margin-left: 0 !important;
-}
-
-:deep(.ant-menu-dark .ant-menu-submenu > .ant-menu-item) {
-  padding-left: 43px !important;
-  margin: 4px 0 !important;
-  text-align: left !important;
-  height: 32px !important;
-  line-height: 32px !important;
-}
-
-:deep(.ant-menu-dark .ant-menu-submenu > .ant-menu-item .anticon) {
-  margin-right: 8px !important;
-  font-size: 14px !important;
-  min-width: 14px !important;
-}
-
-:deep(.ant-menu-dark .ant-menu-submenu > .ant-menu-item .ant-menu-title-content) {
-  display: block !important;
-  text-align: left !important;
-  padding-left: 0 !important;
-  margin-left: 0 !important;
-  width: 100% !important;
-}
-
-:deep(.ant-menu-dark .ant-menu-submenu .ant-menu-submenu > .ant-menu-item) {
-  padding-left: 63px !important;
-  margin: 4px 0 !important;
-  text-align: left !important;
-  height: 32px !important;
-  line-height: 32px !important;
-}
-
-:deep(.ant-menu-dark .ant-menu-submenu .ant-menu-submenu > .ant-menu-item .ant-menu-title-content) {
-  display: block !important;
-  text-align: left !important;
-  padding-left: 0 !important;
-  margin-left: 0 !important;
-  width: 100% !important;
-}
-
-/* 确保菜单项内容左对齐 */
-:deep(.ant-menu-item),
-:deep(.ant-menu-submenu-title) {
-  text-align: left !important;
-  justify-content: flex-start !important;
-}
-
-/* 移除菜单项的居中对齐 */
-:deep(.ant-menu-item-selected),
-:deep(.ant-menu-submenu-selected) {
-  text-align: left !important;
-  justify-content: flex-start !important;
-}
-
-/* 移除所有菜单的蓝色过渡效果 */
-:deep(.ant-menu-item::after),
-:deep(.ant-menu-submenu-title::after) {
-  display: none !important;
-}
-
-:deep(.ant-menu-item-selected::after),
-:deep(.ant-menu-submenu-selected::after) {
-  display: none !important;
-}
-
-/* 移除所有默认的过渡动画 */
-:deep(.ant-menu-item),
-:deep(.ant-menu-submenu),
-:deep(.ant-menu-submenu-title) {
-  transition: none !important;
-  border-radius: 0 !important;
-}
-
-/* 移除所有hover和active状态的默认样式 */
-:deep(.ant-menu-item:hover),
-:deep(.ant-menu-item:active),
-:deep(.ant-menu-submenu-title:hover),
-:deep(.ant-menu-submenu-title:active) {
-  background-color: #27c2ad !important;
-  color: #fff !important;
-  opacity: 0.8;
-  border-radius: 0 !important;
-}
-
-/* 移除所有focus状态的默认样式 */
-:deep(.ant-menu-item:focus),
-:deep(.ant-menu-submenu-title:focus) {
-  background-color: #27c2ad !important;
-  color: #fff !important;
-  border-radius: 0 !important;
-}
-
-/* 移除所有默认的边框和轮廓 */
-:deep(.ant-menu-item),
-:deep(.ant-menu-submenu-title) {
-  outline: none !important;
-  border: none !important;
-  box-shadow: none !important;
-  border-radius: 0 !important;
-}
-
-/* 移除子菜单的圆角 */
-:deep(.ant-menu-submenu-popup) {
-  border-radius: 0 !important;
-}
-
-:deep(.ant-menu-submenu-popup .ant-menu-item) {
-  border-radius: 0 !important;
-}
-
-/* 移除所有菜单项的圆角 */
-:deep(.ant-menu-item),
-:deep(.ant-menu-submenu-title),
-:deep(.ant-menu-submenu),
-:deep(.ant-menu-submenu-popup),
-:deep(.ant-menu-submenu-popup .ant-menu-item) {
-  border-radius: 0 !important;
-}
-
-/* 控制父级菜单的选中状态 */
-:deep(.ant-menu-submenu-selected) {
-  background-color: transparent !important;
-  color: #fff !important;
-}
-
-:deep(.ant-menu-submenu-selected > .ant-menu-submenu-title) {
-  background-color: transparent !important;
-  color: #fff !important;
-}
-
-/* 确保带有子菜单的菜单项点击时不会被高亮 */
-:deep(.ant-menu-submenu > .ant-menu-submenu-title:active),
-:deep(.ant-menu-submenu > .ant-menu-submenu-title.ant-menu-item-selected) {
-  background-color: transparent !important;
-  color: #fff !important;
-}
-
-/* 只有叶子节点菜单项可以被高亮 */
-:deep(.ant-menu-item:not(.ant-menu-submenu):active),
-:deep(.ant-menu-item:not(.ant-menu-submenu).ant-menu-item-selected) {
-  background-color: #27c2ad !important;
-  color: #fff !important;
-}
-
-:deep(.top-menu-item.ant-menu-item-selected) {
-  background-color: #27c2ad !important;
-  color: #fff !important;
-  border: none !important;
-}
-
-/* 强化顶部菜单选中状态 */
-:deep(.ant-menu-horizontal > .ant-menu-item-selected),
-:deep(.ant-menu-horizontal > .ant-menu-item.ant-menu-item-selected) {
-  background-color: #27c2ad !important;
-  color: #fff !important;
-  border-bottom: none !important;
-}
-
-:deep(.ant-menu-horizontal:not(.ant-menu-dark) > .ant-menu-item-selected) {
-  background-color: #27c2ad !important;
-  color: #fff !important;
-}
-
-/* 悬停状态 */
-:deep(.top-menu-item:hover) {
-  background-color: #27c2ad !important;
-  color: #fff !important;
-  opacity: 0.8;
-}
-
-/* 顶部菜单高亮样式类 */
+/* 高亮菜单项 */
 :deep(.highlighted-menu-item) {
-  background-color: #27c2ad !important;
-  color: white !important;
-  border-bottom: none !important;
+  background-color: #27c2ad !important; /* 保持主打配色 */
+  color: #fff !important;
+  width: auto !important; /* 覆盖左侧菜单的宽度设置 */
 }
 
-:deep(.highlighted-menu-item .ant-menu-title-content) {
-  color: white !important;
+/* 修复菜单折叠时的样式 */
+:deep(.ant-layout-sider-collapsed) {
+  background: #121212 !important; /* 暗黑色背景 */
+}
+
+:deep(.ant-layout-sider-collapsed .ant-menu-inline-collapsed) {
+  background: #121212 !important; /* 暗黑色背景 */
+}
+
+:deep(.ant-menu-inline-collapsed) {
+  background: #121212 !important; /* 暗黑色背景 */
+}
+
+:deep(.ant-menu-inline-collapsed > .ant-menu-item),
+:deep(.ant-menu-inline-collapsed > .ant-menu-submenu > .ant-menu-submenu-title) {
+  background: #121212 !important; /* 暗黑色背景 */
+  color: #fff !important;
+}
+
+:deep(.ant-menu-inline-collapsed .ant-menu-item),
+:deep(.ant-menu-inline-collapsed .ant-menu-submenu-title) {
+  padding: 0 calc(50% - 16px) !important; /* 图标居中 */
+  width: 100% !important;
+  background: #121212 !important; /* 暗黑色背景 */
+}
+
+:deep(.ant-menu-inline-collapsed .ant-menu-item-selected) {
+  width: 100% !important;
+  padding: 0 calc(50% - 16px) !important;
+  background-color: #27c2ad !important; /* 保持高亮色不变 */
+}
+
+:deep(.ant-menu-inline-collapsed .ant-menu-item:hover),
+:deep(.ant-menu-inline-collapsed .ant-menu-submenu-title:hover) {
+  background-color: #2a2a2a !important; /* 悬停颜色 */
+}
+
+/* 修复菜单折叠后的弹出子菜单样式 */
+:deep(.ant-menu-vertical .ant-menu-item),
+:deep(.ant-menu-vertical-left .ant-menu-item),
+:deep(.ant-menu-vertical-right .ant-menu-item),
+:deep(.ant-menu-inline .ant-menu-item),
+:deep(.ant-menu-vertical .ant-menu-submenu-title),
+:deep(.ant-menu-vertical-left .ant-menu-submenu-title),
+:deep(.ant-menu-vertical-right .ant-menu-submenu-title),
+:deep(.ant-menu-inline .ant-menu-submenu-title) {
+  background: #121212 !important; /* 暗黑色背景 */
+  color: #fff !important;
+}
+
+:deep(.ant-menu-vertical .ant-menu-item-selected),
+:deep(.ant-menu-vertical-left .ant-menu-item-selected),
+:deep(.ant-menu-vertical-right .ant-menu-item-selected),
+:deep(.ant-menu-inline .ant-menu-item-selected) {
+  background-color: #27c2ad !important; /* 保持高亮色不变 */
+  color: #fff !important;
+}
+
+:deep(.ant-menu-vertical .ant-menu-item:hover),
+:deep(.ant-menu-vertical-left .ant-menu-item:hover),
+:deep(.ant-menu-vertical-right .ant-menu-item:hover),
+:deep(.ant-menu-inline .ant-menu-item:hover),
+:deep(.ant-menu-vertical .ant-menu-submenu-title:hover),
+:deep(.ant-menu-vertical-left .ant-menu-submenu-title:hover),
+:deep(.ant-menu-vertical-right .ant-menu-submenu-title:hover),
+:deep(.ant-menu-inline .ant-menu-submenu-title:hover) {
+  background-color: #2a2a2a !important; /* 悬停颜色 */
+}
+
+/* 修复折叠时弹出的子菜单背景色 */
+:deep(.ant-menu-submenu-popup > .ant-menu) {
+  background: #1a1a1a !important; /* 稍浅一点的暗黑色 */
 }
 </style> 
