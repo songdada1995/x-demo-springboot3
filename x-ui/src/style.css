@@ -408,3 +408,220 @@ button.primary:hover {
   color: white !important;
   border-bottom: 2px solid transparent !important;
 }
+
+/* 全局统一搜索下拉框样式 */
+.ant-select {
+  width: 240px !important;
+}
+
+.ant-select .ant-select-selector {
+  width: 240px !important;
+}
+
+/* 确保下拉菜单与选择框宽度一致 */
+.ant-select-dropdown {
+  min-width: 240px !important;
+  width: 240px !important;
+}
+
+/* 确保所有页面中的搜索框样式一致 */
+.search-area .ant-select,
+.search-area .ant-select-selector,
+.search-form .ant-select,
+.search-form .ant-select-selector,
+.users-container .ant-select,
+.users-container .ant-select-selector,
+.roles-container .ant-select,
+.roles-container .ant-select-selector,
+.permissions-container .ant-select,
+.permissions-container .ant-select-selector,
+.cost-container .ant-select,
+.cost-container .ant-select-selector,
+.report-container .ant-select,
+.report-container .ant-select-selector {
+  width: 240px !important;
+  max-width: 240px !important;
+}
+
+/* 确保下拉菜单与选择框宽度一致 - 针对特定容器 */
+.search-area .ant-select-dropdown,
+.search-form .ant-select-dropdown,
+.users-container .ant-select-dropdown,
+.roles-container .ant-select-dropdown,
+.permissions-container .ant-select-dropdown,
+.cost-container .ant-select-dropdown,
+.report-container .ant-select-dropdown {
+  min-width: 240px !important;
+  width: 240px !important;
+}
+
+/* 分页选择器样式保持不变 - 覆盖上面的全局设置 */
+.ant-pagination-options-size-changer,
+.ant-pagination-options .ant-select,
+.ant-pagination-options .ant-select-selector,
+.ant-table-pagination .ant-select,
+.ant-table-pagination .ant-select-selector {
+  width: 110px !important;
+  max-width: 110px !important;
+}
+
+.ant-pagination-options .ant-select-dropdown,
+.ant-table-pagination .ant-select-dropdown {
+  min-width: 110px !important;
+  width: 110px !important;
+  max-width: 110px !important;
+}
+
+/* 修复下拉菜单容器样式 */
+.ant-select-dropdown-placement-bottomLeft,
+.ant-select-dropdown-placement-bottomRight,
+.ant-select-dropdown-placement-topLeft,
+.ant-select-dropdown-placement-topRight {
+  width: auto !important;
+  min-width: 240px !important;
+}
+
+/* 确保下拉选项内容不会被截断 */
+.ant-select-dropdown .ant-select-item-option-content {
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+/* 强制覆盖内联样式 */
+.ant-select[style*="width"] {
+  width: 240px !important;
+}
+
+.ant-select-selector[style*="width"] {
+  width: 240px !important;
+}
+
+/* 分页组件的选择器需要特殊处理 */
+.ant-pagination-options .ant-select[style*="width"],
+.ant-pagination-options .ant-select-selector[style*="width"],
+.ant-table-pagination .ant-select[style*="width"],
+.ant-table-pagination .ant-select-selector[style*="width"] {
+  width: 110px !important;
+}
+
+/* 确保所有搜索区域的选择器宽度一致 */
+.search-area .ant-form-item .ant-select,
+.search-form .ant-form-item .ant-select {
+  width: 240px !important;
+}
+
+.search-area .ant-form-item .ant-select-selector,
+.search-form .ant-form-item .ant-select-selector {
+  width: 240px !important;
+}
+
+/* 修复下拉框和搜索框宽度不一致的问题 */
+.ant-select-dropdown {
+  width: auto !important;
+}
+
+/* 确保下拉选项容器宽度与选择框一致 */
+.search-area .ant-select-dropdown .ant-select-dropdown-content,
+.search-form .ant-select-dropdown .ant-select-dropdown-content,
+.users-container .ant-select-dropdown .ant-select-dropdown-content,
+.roles-container .ant-select-dropdown .ant-select-dropdown-content,
+.permissions-container .ant-select-dropdown .ant-select-dropdown-content,
+.cost-container .ant-select-dropdown .ant-select-dropdown-content,
+.report-container .ant-select-dropdown .ant-select-dropdown-content {
+  min-width: 240px !important;
+}
+
+/* 修复下拉菜单位置和对齐问题 */
+.ant-select-dropdown {
+  margin-top: 4px !important;
+}
+
+/* 确保下拉菜单内容宽度与选择框一致 */
+.ant-select-dropdown .rc-virtual-list,
+.ant-select-dropdown .rc-virtual-list-holder,
+.ant-select-dropdown .rc-virtual-list-holder-inner {
+  width: 100% !important;
+}
+
+/* 确保下拉菜单选项样式一致 */
+.ant-select-dropdown .ant-select-item {
+  padding: 8px 12px !important;
+  min-height: 32px !important;
+  line-height: 1.5 !important;
+}
+
+/* 确保下拉菜单宽度与搜索框一致 */
+.ant-select-dropdown-hidden {
+  display: none;
+}
+
+/* 处理特殊情况下的下拉菜单宽度 */
+.ant-select-dropdown[style*="width"] {
+  min-width: 240px !important;
+}
+
+.ant-pagination-options .ant-select-dropdown[style*="width"],
+.ant-table-pagination .ant-select-dropdown[style*="width"] {
+  min-width: 110px !important;
+  width: 110px !important;
+  max-width: 110px !important;
+}
+
+/* 强制搜索区域中的下拉框宽度 */
+.search-area .ant-select,
+.search-area .ant-select-selector,
+.search-form .ant-select,
+.search-form .ant-select-selector {
+  width: 240px !important;
+  max-width: 240px !important;
+}
+
+/* 处理内联样式 - 确保搜索区域中的选择器宽度一致 */
+.search-area .ant-select[style],
+.search-form .ant-select[style],
+.users-container .ant-select[style],
+.roles-container .ant-select[style],
+.permissions-container .ant-select[style],
+.cost-container .ant-select[style],
+.report-container .ant-select[style] {
+  width: 240px !important;
+}
+
+/* 确保下拉菜单容器宽度与选择框匹配 */
+.ant-select-dropdown .ant-select-dropdown-content,
+.ant-select-dropdown .ant-select-dropdown-menu {
+  min-width: 240px !important;
+}
+
+/* 分页选择器的下拉菜单特殊处理 */
+.ant-pagination-options .ant-select-dropdown .ant-select-dropdown-content,
+.ant-pagination-options .ant-select-dropdown .ant-select-dropdown-menu,
+.ant-table-pagination .ant-select-dropdown .ant-select-dropdown-content,
+.ant-table-pagination .ant-select-dropdown .ant-select-dropdown-menu {
+  min-width: 110px !important;
+  max-width: 110px !important;
+}
+
+/* 确保下拉菜单的宽度与其父容器一致 */
+.ant-select-dropdown .ant-select-dropdown-content,
+.ant-select-dropdown .rc-virtual-list {
+  width: 100% !important;
+}
+
+/* 修复日期选择器样式 */
+.ant-picker {
+  width: 240px !important;
+}
+
+.ant-picker-range {
+  width: 240px !important;
+}
+
+/* 确保所有下拉框内容不会被截断 */
+.ant-select-selection-item,
+.ant-select-selection-placeholder {
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}

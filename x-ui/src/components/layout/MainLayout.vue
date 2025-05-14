@@ -20,11 +20,11 @@
       <div class="header-right">
         <a-dropdown>
           <span class="username">
-            admin
+            {{ userInfo?.name || userInfo?.username || 'admin' }}
             <down-outlined />
           </span>
           <template #overlay>
-            <a-menu>
+            <a-menu @click="handleUserMenuClick">
               <a-menu-item key="profile">
                 <user-outlined />
                 个人信息
@@ -138,6 +138,7 @@ import {
   AccountBookOutlined,
 } from '@ant-design/icons-vue'
 import { message } from 'ant-design-vue'
+import { useAuthStore } from '../../stores/auth'
 
 interface MenuItem {
   key: string
@@ -146,6 +147,9 @@ interface MenuItem {
   path?: string
   children?: MenuItem[]
 }
+
+const authStore = useAuthStore()
+const userInfo = computed(() => authStore.userInfo)
 
 const router = useRouter()
 const route = useRoute()
@@ -442,7 +446,8 @@ const handleUserMenuClick = ({ key }: { key: string }) => {
       router.push('/system/change-password')
       break
     case 'logout':
-      // 这里添加退出登录的逻辑
+      // 退出登录
+      authStore.logout()
       message.success('退出成功')
       router.push('/login')
       break
