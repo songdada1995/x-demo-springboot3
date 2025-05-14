@@ -4,9 +4,53 @@
     <div class="particles">
       <div v-for="i in 15" :key="i" class="particle"></div>
     </div>
+    
+    <!-- 左侧品牌区域 -->
+    <div class="brand-container">
+      <!-- 添加几何装饰元素 -->
+      <div class="geometric-shapes">
+        <div class="shape circle-1"></div>
+        <div class="shape circle-2"></div>
+        <div class="shape square"></div>
+        <div class="shape triangle"></div>
+        <div class="shape rectangle"></div>
+      </div>
+      
+      <!-- 添加波浪装饰 -->
+      <div class="wave-decoration top-wave"></div>
+      <div class="wave-decoration bottom-wave"></div>
+      
+      <div class="brand-content">
+        <div class="brand-logo">
+          <svg viewBox="0 0 100 100" width="80" height="80">
+            <circle cx="50" cy="50" r="40" fill="white" />
+            <path d="M30,35 L70,35 L70,65 L30,65 Z" fill="#27c2ad" />
+            <path d="M40,45 L60,45 L60,55 L40,55 Z" fill="white" />
+          </svg>
+        </div>
+        <h1 class="brand-title">X-UI</h1>
+        <p class="brand-slogan">高效、简洁、现代的管理系统</p>
+        <div class="brand-features">
+          <div class="feature-item">
+            <check-circle-outlined />
+            <span>简洁直观的操作界面</span>
+          </div>
+          <div class="feature-item">
+            <check-circle-outlined />
+            <span>强大的数据分析能力</span>
+          </div>
+          <div class="feature-item">
+            <check-circle-outlined />
+            <span>安全可靠的系统架构</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 右侧登录表单 -->
     <div class="login-form-container">
       <div class="login-logo">
-        <h1>X-UI</h1>
+        <h1>欢迎登录</h1>
       </div>
       <a-form
         :model="loginForm"
@@ -77,7 +121,7 @@
 
 <script lang="ts" setup>
 import { reactive, ref } from 'vue'
-import { UserOutlined, LockOutlined } from '@ant-design/icons-vue'
+import { UserOutlined, LockOutlined, CheckCircleOutlined } from '@ant-design/icons-vue'
 import { message } from 'ant-design-vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../../stores/auth'
@@ -119,11 +163,11 @@ const handleSubmit = async () => {
 <style scoped>
 .login-container {
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
   height: 100vh;
   width: 100vw;
-  background: linear-gradient(135deg, #001529 0%, #003a70 100%);
+  background: linear-gradient(135deg, #f5f5f5 0%, #ffffff 100%);
   position: relative;
   overflow: hidden;
 }
@@ -131,7 +175,7 @@ const handleSubmit = async () => {
 /* 添加几何图案背景 */
 .login-container {
   background-image: 
-    linear-gradient(135deg, #001529 0%, #003a70 100%),
+    linear-gradient(135deg, #f5f5f5 0%, #ffffff 100%),
     repeating-linear-gradient(45deg, rgba(39, 194, 173, 0.05) 0px, rgba(39, 194, 173, 0.05) 2px, transparent 2px, transparent 10px),
     repeating-linear-gradient(135deg, rgba(39, 194, 173, 0.05) 0px, rgba(39, 194, 173, 0.05) 2px, transparent 2px, transparent 10px);
   background-blend-mode: normal, normal, screen;
@@ -216,17 +260,313 @@ const handleSubmit = async () => {
   }
 }
 
-.login-form-container {
-  width: 400px;
-  padding: 40px;
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+/* 左侧品牌区域样式 */
+.brand-container {
+  width: 65%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 0 60px;
   position: relative;
+  z-index: 2;
+  background: linear-gradient(135deg, #27c2ad 0%, #1a8f80 100%);
+  background-image: 
+    linear-gradient(135deg, #27c2ad 0%, #1a8f80 100%),
+    linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  background-size: 100% 100%, 20px 20px, 20px 20px;
+  background-position: 0 0, 0 0, 0 0;
+  color: white;
+  overflow: hidden;
+}
+
+/* 几何装饰元素 */
+.geometric-shapes {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  z-index: -1;
+  overflow: hidden;
+}
+
+.shape {
+  position: absolute;
+  opacity: 0.15;
+  background: white;
+  animation: pulse 8s infinite alternate;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1) rotate(0deg);
+    opacity: 0.1;
+  }
+  50% {
+    transform: scale(1.05) rotate(2deg);
+    opacity: 0.15;
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 0.1;
+  }
+}
+
+.circle-1 {
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  top: -100px;
+  left: -100px;
+  animation: float 20s infinite ease-in-out;
+}
+
+.circle-2 {
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  bottom: -50px;
+  right: -50px;
+  animation: float 25s infinite ease-in-out reverse;
+}
+
+.square {
+  width: 100px;
+  height: 100px;
+  transform: rotate(45deg);
+  top: 20%;
+  right: 10%;
+  animation: rotate 30s linear infinite;
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(45deg);
+  }
+  to {
+    transform: rotate(405deg);
+  }
+}
+
+.triangle {
+  width: 0;
+  height: 0;
+  border-left: 80px solid transparent;
+  border-right: 80px solid transparent;
+  border-bottom: 140px solid white;
+  background: transparent;
+  opacity: 0.1;
+  bottom: 10%;
+  left: 5%;
+  animation: float 18s infinite ease-in-out 2s;
+}
+
+.rectangle {
+  width: 120px;
+  height: 60px;
+  top: 40%;
+  left: -20px;
+  transform: rotate(-30deg);
+  animation: slide 15s infinite alternate;
+}
+
+@keyframes slide {
+  0% {
+    transform: translateX(-20px) rotate(-30deg);
+  }
+  100% {
+    transform: translateX(20px) rotate(-25deg);
+  }
+}
+
+/* 添加更多装饰元素 */
+.brand-container::before {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  background-image: 
+    radial-gradient(circle at 70% 20%, rgba(255, 255, 255, 0.1) 0%, transparent 25%),
+    radial-gradient(circle at 30% 80%, rgba(255, 255, 255, 0.08) 0%, transparent 20%);
+  z-index: 0;
+}
+
+/* 波浪装饰 */
+.wave-decoration {
+  position: absolute;
+  width: 100%;
+  height: 100px;
+  left: 0;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  opacity: 0.2;
+  animation: wave 10s infinite ease-in-out alternate;
+}
+
+@keyframes wave {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(10px);
+  }
+}
+
+.top-wave {
+  top: 0;
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="%23ffffff" d="M0,192L48,197.3C96,203,192,213,288,229.3C384,245,480,267,576,250.7C672,235,768,181,864,181.3C960,181,1056,235,1152,234.7C1248,235,1344,181,1392,154.7L1440,128L1440,0L1392,0C1344,0,1248,0,1152,0C1056,0,960,0,864,0C768,0,672,0,576,0C480,0,384,0,288,0C192,0,96,0,48,0L0,0Z"></path></svg>');
+}
+
+.bottom-wave {
+  bottom: 0;
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="%23ffffff" d="M0,128L48,144C96,160,192,192,288,197.3C384,203,480,181,576,154.7C672,128,768,96,864,90.7C960,85,1056,107,1152,128C1248,149,1344,171,1392,181.3L1440,192L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>');
+  animation-delay: 1s;
+}
+
+/* 品牌 Logo 动画 */
+.brand-logo svg {
+  animation: logoFloat 6s infinite ease-in-out;
+}
+
+@keyframes logoFloat {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* 品牌标题增强 */
+.brand-title {
+  font-size: 48px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  letter-spacing: 2px;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  background: linear-gradient(to right, #ffffff, #e0f5f2);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  position: relative;
+  display: inline-block;
+}
+
+.brand-title::after {
+  content: "";
+  position: absolute;
+  bottom: -5px;
+  left: 0;
+  width: 0;
+  height: 3px;
+  background: white;
+  animation: titleLine 3s forwards 1s;
+}
+
+@keyframes titleLine {
+  0% {
+    width: 0;
+  }
+  100% {
+    width: 100%;
+  }
+}
+
+/* 特性项目动画 */
+.feature-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+  font-size: 18px;
+  opacity: 0;
+  transform: translateX(-20px);
+  animation: featureAppear 0.5s forwards;
+}
+
+.feature-item:nth-child(1) {
+  animation-delay: 1s;
+}
+
+.feature-item:nth-child(2) {
+  animation-delay: 1.3s;
+}
+
+.feature-item:nth-child(3) {
+  animation-delay: 1.6s;
+}
+
+@keyframes featureAppear {
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.feature-item .anticon {
+  margin-right: 12px;
+  font-size: 20px;
+  animation: iconPulse 2s infinite alternate;
+}
+
+@keyframes iconPulse {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.2);
+  }
+}
+
+.brand-content {
+  max-width: 500px;
+  text-align: left;
+  position: relative;
+  z-index: 2;
+}
+
+.brand-logo {
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: flex-start;
+}
+
+.brand-slogan {
+  font-size: 24px;
+  margin-bottom: 40px;
+  opacity: 0.9;
+}
+
+.brand-features {
+  margin-top: 40px;
+}
+
+/* 右侧登录表单样式 */
+.login-form-container {
+  width: 420px;
+  padding: 45px;
+  margin-right: 0;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  position: absolute;
+  left: calc(65% + ((100% - 65%) / 2) - 210px);
+  top: 35%;
+  transform: translateY(-50%);
   z-index: 2;
   backdrop-filter: blur(5px);
   background-color: rgba(255, 255, 255, 0.95);
   border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.3s ease;
+}
+
+.login-form-container:hover {
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+  transform: translateY(-52%);
 }
 
 .login-logo {
@@ -248,7 +588,7 @@ const handleSubmit = async () => {
 
 .login-logo h1 {
   color: #27c2ad;
-  font-size: 36px;
+  font-size: 28px;
   font-weight: bold;
   letter-spacing: 2px;
   margin: 0;
@@ -395,6 +735,11 @@ const handleSubmit = async () => {
   animation: fadeIn 0.8s ease-out forwards;
 }
 
+.brand-content {
+  animation: fadeIn 0.8s ease-out 0.3s forwards;
+  opacity: 0;
+}
+
 /* 确保输入框内容正确对齐 */
 :deep(.ant-input),
 :deep(.ant-input-affix-wrapper .ant-input) {
@@ -420,5 +765,96 @@ const handleSubmit = async () => {
 
 :deep(.ant-form-item-has-feedback .ant-input-affix-wrapper .ant-input-suffix) {
   padding-right: 0;
+}
+
+/* 响应式调整 */
+@media (max-width: 1400px) {
+  .brand-container {
+    width: 60%;
+  }
+  
+  .login-form-container {
+    left: calc(60% + ((100% - 60%) / 2) - 200px);
+    width: 400px;
+  }
+}
+
+@media (max-width: 1200px) {
+  .brand-container {
+    padding: 0 40px;
+    width: 55%;
+  }
+  
+  .login-form-container {
+    left: calc(55% + ((100% - 55%) / 2) - 190px);
+    width: 380px;
+    padding: 40px;
+  }
+}
+
+@media (max-width: 992px) {
+  .login-container {
+    flex-direction: column;
+    justify-content: flex-start;
+  }
+  
+  .brand-container {
+    width: 100%;
+    height: 55%;
+    padding: 20px;
+  }
+  
+  .brand-content {
+    text-align: center;
+    max-width: 600px;
+  }
+  
+  .brand-logo {
+    justify-content: center;
+  }
+  
+  .login-form-container {
+    position: relative;
+    left: auto;
+    right: auto;
+    top: auto;
+    transform: none;
+    margin: -120px auto 0;
+    width: 90%;
+    max-width: 400px;
+    padding: 40px;
+  }
+  
+  .login-form-container:hover {
+    transform: none;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  }
+  
+  .feature-item {
+    justify-content: center;
+  }
+  
+  .geometric-shapes .shape {
+    transform: scale(0.7);
+  }
+}
+
+@media (max-width: 576px) {
+  .login-form-container {
+    width: 90%;
+    padding: 30px 20px;
+  }
+  
+  .brand-title {
+    font-size: 36px;
+  }
+  
+  .brand-slogan {
+    font-size: 18px;
+  }
+  
+  .feature-item {
+    font-size: 16px;
+  }
 }
 </style> 
