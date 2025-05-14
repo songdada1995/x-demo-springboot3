@@ -95,7 +95,7 @@
           </template>
           <!-- 操作列 -->
           <template v-if="column.key === 'action'">
-            <a-space>
+            <div class="action-column">
               <a @click="handleEdit(record)">编辑</a>
               <a-divider type="vertical" />
               <a @click="handleResetPassword(record)">重置密码</a>
@@ -106,7 +106,7 @@
               >
                 <a class="danger">删除</a>
               </a-popconfirm>
-            </a-space>
+            </div>
           </template>
         </template>
       </a-table>
@@ -179,6 +179,25 @@ import {
   DeleteOutlined,
 } from '@ant-design/icons-vue'
 import type { TablePaginationConfig } from 'ant-design-vue'
+import zhCN from 'ant-design-vue/es/date-picker/locale/zh_CN'
+import { createDefaultPagination } from '../../../utils/pagination'
+
+// 日期选择器中文配置
+const locale = zhCN
+
+// 分页本地化配置
+const paginationLocale = {
+  items_per_page: '条/页',
+  jump_to: '跳至',
+  jump_to_confirm: '确定',
+  page: '页',
+  prev_page: '上一页',
+  next_page: '下一页',
+  prev_5: '向前 5 页',
+  next_5: '向后 5 页',
+  prev_3: '向前 3 页',
+  next_3: '向后 3 页',
+}
 
 // 搜索表单数据
 const searchForm = reactive({
@@ -196,36 +215,43 @@ const columns = [
     title: '用户名',
     dataIndex: 'username',
     key: 'username',
+    width: 120,
   },
   {
     title: '姓名',
     dataIndex: 'name',
     key: 'name',
+    width: 100,
   },
   {
     title: '手机号',
     dataIndex: 'phone',
     key: 'phone',
+    width: 120,
   },
   {
     title: '邮箱',
     dataIndex: 'email',
     key: 'email',
+    width: 180,
   },
   {
     title: '状态',
     dataIndex: 'status',
     key: 'status',
+    width: 80,
   },
   {
     title: '创建时间',
     dataIndex: 'createTime',
     key: 'createTime',
+    width: 160,
   },
   {
     title: '操作',
     key: 'action',
-    width: 200,
+    fixed: 'right',
+    width: 240,
   },
 ]
 
@@ -270,13 +296,7 @@ const dataSource = ref([
 const loading = ref(false)
 
 // 分页配置
-const pagination = reactive<TablePaginationConfig>({
-  total: 0,
-  current: 1,
-  pageSize: 10,
-  showSizeChanger: true,
-  showQuickJumper: true,
-})
+const pagination = reactive<TablePaginationConfig>(createDefaultPagination())
 
 // 选中的行
 const selectedRowKeys = ref<string[]>([])
@@ -340,7 +360,8 @@ const handleBatchEdit = () => {
     message.warning('请选择一条记录进行编辑')
     return
   }
-  const record = dataSource.value.find(item => item.id === selectedRowKeys.value[0])
+  const id = Number(selectedRowKeys.value[0])
+  const record = dataSource.value.find(item => item.id === id)
   if (record) {
     handleEdit(record)
   }
@@ -357,8 +378,8 @@ const handleBatchDelete = () => {
 }
 
 // 处理选择变化
-const onSelectChange = (keys: string[]) => {
-  selectedRowKeys.value = keys
+const onSelectChange = (keys: string[] | number[]) => {
+  selectedRowKeys.value = keys.map(key => key.toString())
 }
 
 // 新增用户
@@ -632,5 +653,67 @@ onMounted(() => {
 
 :deep(.ant-picker-input > input) {
   padding-left: 0 !important;
+}
+
+.action-column {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  flex-wrap: nowrap;
+  white-space: nowrap;
+}
+
+.action-column a {
+  margin: 0 4px;
+}
+
+/* 分页组件样式优化 */
+:deep(.ant-pagination) {
+  margin-top: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+:deep(.ant-pagination-options) {
+  margin-left: 16px;
+}
+
+:deep(.ant-pagination-options-size-changer) {
+  margin-right: 8px;
+  width: 110px;
+}
+
+:deep(.ant-pagination-options-size-changer .ant-select-selector) {
+  padding-right: 8px !important;
+}
+
+:deep(.ant-pagination-options-quick-jumper) {
+  margin-right: 0;
+}
+
+:deep(.ant-pagination-options-quick-jumper input) {
+  width: 50px;
+  margin: 0 8px;
+}
+
+:deep(.ant-select-dropdown) {
+  min-width: 100px !important;
+  width: auto !important;
+}
+
+:deep(.ant-select-item-option-content) {
+  white-space: nowrap;
+}
+
+:deep(.ant-select-dropdown .ant-select-item) {
+  padding: 5px 12px;
+  min-height: 32px;
+}
+
+/* 确保下拉菜单不会太宽 */
+:deep(.ant-select-dropdown) {
+  max-width: 120px;
 }
 </style> 

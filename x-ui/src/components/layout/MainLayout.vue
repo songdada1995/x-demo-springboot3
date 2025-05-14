@@ -13,8 +13,8 @@
           class="top-menu"
           @select="handleTopMenuSelect"
         >
-          <a-menu-item key="system">系统管理</a-menu-item>
-          <a-menu-item key="business">业务平台</a-menu-item>
+          <a-menu-item key="system" :class="['top-menu-item', {'highlighted-menu-item': selectedTopKeys[0] === 'system'}]">系统管理</a-menu-item>
+          <a-menu-item key="business" :class="['top-menu-item', {'highlighted-menu-item': selectedTopKeys[0] === 'business'}]">业务平台</a-menu-item>
         </a-menu>
       </div>
       <div class="header-right">
@@ -60,9 +60,11 @@
           theme="dark"
           @select="handleMenuSelect"
           @openChange="handleOpenChange"
+          :selectable="true"
+          :multiple="false"
         >
           <template v-for="item in currentMenuItems" :key="item.key">
-            <a-sub-menu v-if="item.children" :key="item.key" :selectable="false" @click="handleSubMenuClick(item)">
+            <a-sub-menu v-if="item.children" :key="item.key">
               <template #title>
                 <span>
                   <component :is="item.icon" />
@@ -70,7 +72,7 @@
                 </span>
               </template>
               <template v-for="child in item.children" :key="child.key">
-                <a-sub-menu v-if="child.children" :key="`sub-${child.key}`" :selectable="false" @click="handleSubMenuClick(child)">
+                <a-sub-menu v-if="child.children" :key="`sub-${child.key}`">
                   <template #title>
                     <span>
                       <component :is="child.icon" v-if="child.icon" />
@@ -117,8 +119,8 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, computed, onMounted, watch } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, computed, onMounted, watch, nextTick, onBeforeUnmount } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import {
   UserOutlined,
   SettingOutlined,
@@ -146,8 +148,9 @@ interface MenuItem {
 }
 
 const router = useRouter()
+const route = useRoute()
 const collapsed = ref(false)
-const selectedKeys = ref(['1'])
+const selectedKeys = ref(['item-dashboard'])
 const openKeys = ref(['systemManagement'])
 const selectedTopKeys = ref(['system'])
 
@@ -228,47 +231,128 @@ const findMenuItem = (items: MenuItem[], key: string): MenuItem | null => {
   return null
 }
 
+// 记住最后选中的菜单项
+const lastSelectedKey = ref('item-dashboard')
+
 // 处理菜单选择
 const handleMenuSelect = ({ key }: { key: string }) => {
+  console.log('Menu selected:', key)
+  
   // 移除 key 前缀以获取实际的菜单 key
   const actualKey = key.replace(/^(item-|sub-)/, '')
   const selectedItem = findMenuItem(currentMenuItems.value, actualKey)
   
+  // 如果是有子菜单的项，不进行高亮，只处理展开/收起
+  if (selectedItem && selectedItem.children) {
+    // 展开/收起子菜单
+    const isOpen = openKeys.value.includes(selectedItem.key)
+    if (isOpen) {
+      openKeys.value = openKeys.value.filter(k => k !== selectedItem.key)
+    } else {
+      openKeys.value = [...openKeys.value, selectedItem.key]
+    }
+    
+    // 恢复上一次的选中状态
+    nextTick(() => {
+      selectedKeys.value = [lastSelectedKey.value]
+    })
+    return
+  }
+  
   if (selectedItem && !selectedItem.children) {
     // 只有没有子菜单的项才能被选中
     selectedKeys.value = [key]
+    lastSelectedKey.value = key
+    localStorage.setItem('lastSelectedMenuKey', key) // 保存到localStorage
+    
+    // 如果选中的菜单项在子菜单中，确保其父菜单保持展开状态
+    const findParentMenu = (items: MenuItem[], targetKey: string): string | null => {
+      for (const item of items) {
+        if (item.children) {
+          for (const child of item.children) {
+            if (child.key === targetKey) {
+              return item.key
+            }
+            if (child.children) {
+              for (const grandChild of child.children) {
+                if (grandChild.key === targetKey) {
+                  // 如果是在二级子菜单中，展开两级菜单
+                  if (!openKeys.value.includes(`sub-${child.key}`)) {
+                    openKeys.value.push(`sub-${child.key}`)
+                  }
+                  return item.key
+                }
+              }
+            }
+          }
+          const found = findParentMenu(item.children, targetKey)
+          if (found) return found
+        }
+      }
+      return null
+    }
+    
+    const parentKey = findParentMenu(currentMenuItems.value, actualKey)
+    if (parentKey && !openKeys.value.includes(parentKey)) {
+      openKeys.value = [...openKeys.value, parentKey]
+    }
+    
+    // 路由跳转
     if (selectedItem.path) {
       router.push(selectedItem.path)
     }
-  } else {
-    // 如果有子菜单，则清除选中状态
-    selectedKeys.value = []
   }
 }
 
 // 处理菜单展开/收起
 const handleOpenChange = (keys: string[]) => {
-  const lastKey = keys[keys.length - 1]
-  const menuItem = findMenuItem(currentMenuItems.value, lastKey)
-  
-  if (menuItem && menuItem.children) {
-    // 只处理有子菜单的菜单项
+  // 直接设置展开的菜单项，不影响选中状态
+  // 如果关闭了所有菜单，保持一个基本展开项
+  if (keys.length === 0 && openKeys.value.length > 0) {
+    // 如果上一次有展开的菜单，保留第一个
+    openKeys.value = [openKeys.value[0]]
+  } else {
     openKeys.value = keys
-    // 清除选中状态
-    selectedKeys.value = []
   }
+
+  console.log('Menu openKeys changed:', openKeys.value)
 }
 
 // 处理子菜单点击
 const handleSubMenuClick = (item: MenuItem) => {
-  // 如果点击的是有子菜单的项，清除选中状态
+  console.log('SubMenu clicked:', item.key)
+  // 如果点击的是有子菜单的项，只处理展开/收起
   if (item.children) {
-    selectedKeys.value = []
+    // 检查当前是否已经展开
+    const isOpen = openKeys.value.includes(item.key)
+    if (isOpen) {
+      // 如果已展开，则关闭
+      openKeys.value = openKeys.value.filter(k => k !== item.key)
+    } else {
+      // 如果未展开，则打开
+      openKeys.value = [...openKeys.value, item.key]
+    }
+    console.log('After click, openKeys:', openKeys.value)
+    
+    // 防止菜单被选中，如果当前菜单有子项，则保持上一次选中的状态
+    // 阻止事件冒泡，防止被选中
+    selectedKeys.value = [lastSelectedKey.value]
+    
+    // 如果路由没有改变，确保不触发菜单项的选中状态改变
+    nextTick(() => {
+      if (selectedKeys.value.length === 0) {
+        selectedKeys.value = [lastSelectedKey.value]
+      }
+    })
   }
 }
 
 // 处理顶部菜单选择
 const handleTopMenuSelect = ({ key }: { key: string }) => {
+  // 确保顶部菜单的选中状态正确
+  selectedTopKeys.value = [key]
+  console.log('Top menu selected:', key)
+  
   // 重置左侧菜单选中状态
   selectedKeys.value = []
   openKeys.value = []
@@ -277,7 +361,11 @@ const handleTopMenuSelect = ({ key }: { key: string }) => {
   const firstMenuItem = findFirstMenuItem(currentMenuItems.value)
   if (firstMenuItem) {
     // 设置选中状态
-    selectedKeys.value = [`item-${firstMenuItem.key}`]
+    const newKey = `item-${firstMenuItem.key}`
+    selectedKeys.value = [newKey]
+    lastSelectedKey.value = newKey
+    localStorage.setItem('lastSelectedMenuKey', newKey)
+    
     // 如果有路径，进行路由跳转
     if (firstMenuItem.path) {
       router.push(firstMenuItem.path)
@@ -305,6 +393,17 @@ const handleTopMenuSelect = ({ key }: { key: string }) => {
       openKeys.value = []
     }
   }
+  
+  // 强制应用顶部菜单的选中样式
+  nextTick(() => {
+    // 手动给选中的菜单项添加样式
+    const selectedMenuItem = document.querySelector(`.ant-menu-horizontal .ant-menu-item[data-menu-id="${key}"]`) as HTMLElement
+    if (selectedMenuItem) {
+      selectedMenuItem.classList.add('ant-menu-item-selected')
+      selectedMenuItem.style.backgroundColor = '#27c2ad'
+      selectedMenuItem.style.color = 'white'
+    }
+  })
 }
 
 // 查找第一个可点击的菜单项（没有子菜单的项）
@@ -320,17 +419,6 @@ const findFirstMenuItem = (items: MenuItem[]): MenuItem | null => {
   }
   return null
 }
-
-// 组件挂载时初始化
-const initFirstMenuItem = () => {
-  // 默认选中仪表盘
-  selectedKeys.value = ['item-dashboard']
-  // 如果有路径，进行路由跳转
-  router.push('/dashboard')
-}
-
-// 组件挂载时初始化
-initFirstMenuItem()
 
 // 处理用户菜单点击
 const handleUserMenuClick = ({ key }: { key: string }) => {
@@ -366,14 +454,223 @@ const fixMenuStyles = () => {
   }, 100)
 }
 
-// 组件挂载后修复样式
+// 添加全局点击事件监听器
+const addGlobalClickListener = () => {
+  // 使用MutationObserver监听菜单项的class变化
+  const menuObserver = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+      if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+        const target = mutation.target as HTMLElement
+        // 如果是菜单项且有上次选中的菜单项
+        if (target.classList.contains('ant-menu-item') && lastSelectedKey.value) {
+          // 检查是否是我们应该选中的菜单项
+          const key = target.getAttribute('data-menu-id') || ''
+          if (key.includes(lastSelectedKey.value.replace(/^(item-|sub-)/, ''))) {
+            // 如果这个菜单项应该被选中但没有选中类，则添加选中类
+            if (!target.classList.contains('ant-menu-item-selected')) {
+              nextTick(() => {
+                selectedKeys.value = [lastSelectedKey.value]
+              })
+            }
+          }
+        }
+      }
+    })
+  })
+  
+  // 监听所有菜单项
+  setTimeout(() => {
+    const menuItems = document.querySelectorAll('.ant-menu-item')
+    menuItems.forEach(item => {
+      menuObserver.observe(item, { attributes: true })
+    })
+  }, 500)
+}
+
+// 组件挂载时初始化
+const initFirstMenuItem = () => {
+  // 尝试从localStorage恢复上次选中的菜单项
+  const savedKey = localStorage.getItem('lastSelectedMenuKey')
+  if (savedKey) {
+    lastSelectedKey.value = savedKey
+    selectedKeys.value = [savedKey]
+    
+    // 获取对应的菜单项
+    const actualKey = savedKey.replace(/^(item-|sub-)/, '')
+    const selectedItem = findMenuItem([...systemMenuItems, ...businessMenuItems], actualKey)
+    
+    // 查找父菜单并自动展开
+    if (selectedItem) {
+      // 如果有父菜单，展开父菜单
+      const findParentMenu = (items: MenuItem[], targetKey: string): string | null => {
+        for (const item of items) {
+          if (item.children) {
+            if (item.children.some(child => child.key === targetKey || `item-${child.key}` === savedKey)) {
+              return item.key
+            }
+            const found = findParentMenu(item.children, targetKey)
+            if (found) return found
+          }
+        }
+        return null
+      }
+      
+      const parentKey = findParentMenu([...systemMenuItems, ...businessMenuItems], actualKey)
+      if (parentKey) {
+        openKeys.value = [parentKey]
+      }
+      
+      // 如果找到对应的菜单项且有路径，则进行路由跳转
+      if (selectedItem.path) {
+        router.push(selectedItem.path)
+        return
+      }
+    }
+  }
+  
+  // 如果没有保存的菜单项或无法恢复，则默认选中仪表盘
+  selectedKeys.value = ['item-dashboard']
+  lastSelectedKey.value = 'item-dashboard'
+  localStorage.setItem('lastSelectedMenuKey', 'item-dashboard')
+  router.push('/dashboard')
+}
+
+// 在组件挂载后添加事件监听
 onMounted(() => {
   fixMenuStyles()
+  initFirstMenuItem()
+  addGlobalClickListener()
+  
+  // 确保顶部菜单的选中状态正确显示
+  nextTick(() => {
+    const topMenuKey = selectedTopKeys.value[0]
+    const selectedTopMenuItem = document.querySelector(`.ant-menu-horizontal .ant-menu-item[data-menu-id="${topMenuKey}"]`) as HTMLElement
+    if (selectedTopMenuItem) {
+      selectedTopMenuItem.classList.add('ant-menu-item-selected')
+      selectedTopMenuItem.style.backgroundColor = '#27c2ad'
+      selectedTopMenuItem.style.color = 'white'
+    }
+    
+    // 监听顶部菜单项的类变化
+    const topMenuObserver = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+          const target = mutation.target as HTMLElement
+          if (target.classList.contains('ant-menu-item') && 
+              (target.getAttribute('data-menu-id') === 'system' || 
+               target.getAttribute('data-menu-id') === 'business')) {
+            if (target.getAttribute('data-menu-id') === selectedTopKeys.value[0] && 
+                !target.classList.contains('ant-menu-item-selected')) {
+              target.classList.add('ant-menu-item-selected')
+              target.style.backgroundColor = '#27c2ad'
+              target.style.color = 'white'
+            }
+          }
+        }
+      })
+    })
+    
+    // 监听所有顶部菜单项
+    const topMenuItems = document.querySelectorAll('.ant-menu-horizontal .ant-menu-item')
+    topMenuItems.forEach(item => {
+      topMenuObserver.observe(item, { attributes: true })
+    })
+  })
+})
+
+// 在组件卸载时清除事件监听器
+onBeforeUnmount(() => {
+  // 清理工作可以在这里
 })
 
 // 监听折叠状态变化，重新应用样式
 watch(collapsed, () => {
   fixMenuStyles()
+})
+
+// 监听路由变化，保持菜单选中状态
+watch(() => route.path, (newPath) => {
+  console.log('Route changed:', newPath)
+  
+  // 根据路径查找对应的菜单项
+  const findMenuItemByPath = (items: MenuItem[], path: string): string | null => {
+    for (const item of items) {
+      if (item.path === path) {
+        return `item-${item.key}`
+      }
+      if (item.children) {
+        for (const child of item.children) {
+          if (child.path === path) {
+            return `item-${child.key}`
+          }
+          if (child.children) {
+            for (const grandChild of child.children) {
+              if (grandChild.path === path) {
+                return grandChild.key
+              }
+            }
+          }
+        }
+      }
+    }
+    return null
+  }
+  
+  // 查找菜单项所属的顶级菜单
+  const findTopMenuByPath = (path: string): 'system' | 'business' => {
+    // 检查是否在系统菜单中
+    const inSystem = findMenuItemByPath(systemMenuItems, path) !== null
+    return inSystem ? 'system' : 'business'
+  }
+  
+  // 找到对应顶级菜单
+  const topMenu = findTopMenuByPath(newPath)
+  selectedTopKeys.value = [topMenu]
+  
+  // 更新当前显示的菜单项
+  let currentItems = topMenu === 'system' ? systemMenuItems : businessMenuItems
+  
+  // 在当前菜单中查找
+  let menuKey = findMenuItemByPath(currentItems, newPath)
+  if (menuKey) {
+    // 设置选中的菜单项
+    selectedKeys.value = [menuKey]
+    lastSelectedKey.value = menuKey
+    
+    // 展开父菜单
+    const findParentMenus = (items: MenuItem[], path: string): string[] => {
+      const parents: string[] = []
+      
+      const findParent = (items: MenuItem[], path: string, level: number = 0): boolean => {
+        for (const item of items) {
+          if (item.path === path) {
+            return true
+          }
+          
+          if (item.children) {
+            const childFound = findParent(item.children, path, level + 1)
+            if (childFound) {
+              if (level === 0) {
+                parents.push(item.key)
+              } else if (level === 1) {
+                parents.push(`sub-${item.key}`)
+              }
+              return true
+            }
+          }
+        }
+        return false
+      }
+      
+      findParent(items, path)
+      return parents
+    }
+    
+    const parentMenus = findParentMenus(currentItems, newPath)
+    if (parentMenus.length > 0) {
+      openKeys.value = parentMenus
+    }
+  }
 })
 </script>
 
@@ -382,6 +679,12 @@ watch(collapsed, () => {
   min-height: 100vh;
   width: 100%;
   overflow-x: hidden;
+}
+
+/* 强制保持菜单选中状态 */
+:deep(.ant-menu-item-selected) {
+  background-color: #27c2ad !important;
+  color: #fff !important;
 }
 
 /* Override any inline styles for second-level menu items */
@@ -412,6 +715,7 @@ watch(collapsed, () => {
   display: flex;
   align-items: center;
   height: 100%;
+  gap: 15px;
 }
 
 .logo-area {
@@ -453,8 +757,8 @@ watch(collapsed, () => {
   background: #001529;
   color: #fff;
   min-width: 0;
-  margin-left: 0;
-  padding-left: 0;
+  margin-left: 20px;
+  padding-left: 10px;
 }
 
 .header-right {
@@ -564,10 +868,35 @@ watch(collapsed, () => {
   max-width: 400px;
 }
 
+/* 顶部菜单项专用样式类 */
+:deep(.top-menu-item) {
+  padding: 0 30px !important;
+  margin: 0 5px !important;
+  height: 48px !important;
+  line-height: 48px !important;
+  text-align: center !important;
+  font-size: 16px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background-color: #001529 !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+:deep(.top-menu-item .ant-menu-title-content) {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
+  width: 100% !important;
+}
+
+/* 顶部菜单项基本样式 */
 :deep(.ant-menu-horizontal > .ant-menu-item) {
   color: #fff;
-  margin: 0;
-  padding: 0 40px;
+  margin: 0 5px;
+  padding: 0 30px;
   height: 48px;
   line-height: 48px;
   text-align: center;
@@ -577,6 +906,16 @@ watch(collapsed, () => {
   justify-content: center;
 }
 
+/* 确保顶部菜单项文字居中对齐 */
+:deep(.ant-menu-horizontal > .ant-menu-item .ant-menu-title-content) {
+  text-align: center !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  width: 100% !important;
+}
+
+/* 选中和悬停状态 */
 :deep(.ant-menu-horizontal > .ant-menu-item-selected) {
   background-color: #27c2ad !important;
   color: #fff !important;
@@ -586,6 +925,35 @@ watch(collapsed, () => {
   background-color: #27c2ad !important;
   color: #fff !important;
   opacity: 0.8;
+}
+
+/* 确保没有下拉框样式 */
+:deep(.ant-menu-horizontal:not(.ant-menu-dark) > .ant-menu-item),
+:deep(.ant-menu-horizontal:not(.ant-menu-dark) > .ant-menu-submenu) {
+  margin: 0 5px;
+  padding: 0 30px;
+  color: #fff;
+}
+
+/* 覆盖可能的左对齐样式 - 仅针对顶部菜单 */
+:deep(.ant-menu-horizontal > .ant-menu-item),
+:deep(.ant-menu-horizontal > .ant-menu-submenu-title) {
+  text-align: center !important;
+  justify-content: center !important;
+}
+
+/* 左侧菜单样式 - 确保左对齐 */
+:deep(.ant-menu-inline .ant-menu-item),
+:deep(.ant-menu-inline .ant-menu-submenu-title) {
+  text-align: left !important;
+  justify-content: flex-start !important;
+}
+
+:deep(.ant-menu-inline .ant-menu-item .ant-menu-title-content),
+:deep(.ant-menu-inline .ant-menu-submenu-title .ant-menu-title-content) {
+  text-align: left !important;
+  justify-content: flex-start !important;
+  display: inline-block !important;
 }
 
 /* 左侧菜单样式 */
@@ -744,5 +1112,56 @@ watch(collapsed, () => {
 :deep(.ant-menu-submenu-selected > .ant-menu-submenu-title) {
   background-color: transparent !important;
   color: #fff !important;
+}
+
+/* 确保带有子菜单的菜单项点击时不会被高亮 */
+:deep(.ant-menu-submenu > .ant-menu-submenu-title:active),
+:deep(.ant-menu-submenu > .ant-menu-submenu-title.ant-menu-item-selected) {
+  background-color: transparent !important;
+  color: #fff !important;
+}
+
+/* 只有叶子节点菜单项可以被高亮 */
+:deep(.ant-menu-item:not(.ant-menu-submenu):active),
+:deep(.ant-menu-item:not(.ant-menu-submenu).ant-menu-item-selected) {
+  background-color: #27c2ad !important;
+  color: #fff !important;
+}
+
+:deep(.top-menu-item.ant-menu-item-selected) {
+  background-color: #27c2ad !important;
+  color: #fff !important;
+  border: none !important;
+}
+
+/* 强化顶部菜单选中状态 */
+:deep(.ant-menu-horizontal > .ant-menu-item-selected),
+:deep(.ant-menu-horizontal > .ant-menu-item.ant-menu-item-selected) {
+  background-color: #27c2ad !important;
+  color: #fff !important;
+  border-bottom: none !important;
+}
+
+:deep(.ant-menu-horizontal:not(.ant-menu-dark) > .ant-menu-item-selected) {
+  background-color: #27c2ad !important;
+  color: #fff !important;
+}
+
+/* 悬停状态 */
+:deep(.top-menu-item:hover) {
+  background-color: #27c2ad !important;
+  color: #fff !important;
+  opacity: 0.8;
+}
+
+/* 顶部菜单高亮样式类 */
+:deep(.highlighted-menu-item) {
+  background-color: #27c2ad !important;
+  color: white !important;
+  border-bottom: none !important;
+}
+
+:deep(.highlighted-menu-item .ant-menu-title-content) {
+  color: white !important;
 }
 </style> 

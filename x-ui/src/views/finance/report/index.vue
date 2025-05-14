@@ -127,7 +127,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, reactive } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
 import {
   SearchOutlined,
   ExportOutlined,
@@ -136,7 +136,10 @@ import {
   DeleteOutlined,
   ReloadOutlined,
 } from '@ant-design/icons-vue'
+import { message } from 'ant-design-vue'
+import type { TablePaginationConfig } from 'ant-design-vue'
 import zhCN from 'ant-design-vue/es/date-picker/locale/zh_CN'
+import { createDefaultPagination } from '../../../utils/pagination'
 
 // 日期选择器语言
 const locale = zhCN
@@ -193,13 +196,7 @@ const tableData = ref([
 const selectedRowKeys = ref<string[]>([])
 
 // 分页配置
-const pagination = reactive({
-  current: 1,
-  pageSize: 10,
-  total: 0,
-  showSizeChanger: true,
-  showQuickJumper: true,
-})
+const pagination = reactive<TablePaginationConfig>(createDefaultPagination())
 
 // 表格列定义
 const columns = [

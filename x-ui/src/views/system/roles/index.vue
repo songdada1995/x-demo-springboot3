@@ -152,6 +152,7 @@ import {
   DeleteOutlined,
 } from '@ant-design/icons-vue'
 import type { TablePaginationConfig } from 'ant-design-vue'
+import { createDefaultPagination } from '../../../utils/pagination'
 
 // 搜索表单数据
 const searchForm = reactive({
@@ -226,13 +227,7 @@ const dataSource = ref([
 const loading = ref(false)
 
 // 分页配置
-const pagination = reactive<TablePaginationConfig>({
-  total: 0,
-  current: 1,
-  pageSize: 10,
-  showSizeChanger: true,
-  showQuickJumper: true,
-})
+const pagination = reactive<TablePaginationConfig>(createDefaultPagination())
 
 // 选中的行
 const selectedRowKeys = ref<string[]>([])

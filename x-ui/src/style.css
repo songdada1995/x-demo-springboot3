@@ -102,3 +102,309 @@ button.primary:hover {
     background-color: #fff;
   }
 }
+
+/* 分页组件样式优化 */
+.ant-pagination {
+  margin-top: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.ant-pagination-options {
+  margin-left: 16px;
+}
+
+.ant-pagination-options-size-changer {
+  margin-right: 8px !important;
+  width: 110px !important;
+  max-width: 110px !important;
+}
+
+.ant-pagination-options-size-changer .ant-select-selector {
+  padding-right: 8px !important;
+  width: 110px !important;
+  max-width: 110px !important;
+}
+
+/* 全局强制分页选择器宽度 */
+.ant-select-selection-selected-value, 
+.ant-pagination-options .ant-select-selector,
+.ant-pagination-options .ant-select {
+  width: 110px !important;
+  max-width: 110px !important;
+}
+
+.ant-pagination-options-quick-jumper {
+  margin-right: 0;
+}
+
+.ant-pagination-options-quick-jumper input {
+  width: 50px;
+  margin: 0 8px;
+}
+
+.ant-select-dropdown {
+  min-width: 100px !important;
+  width: auto !important;
+  max-width: 120px;
+}
+
+.ant-select-item-option-content {
+  white-space: nowrap;
+}
+
+.ant-select-dropdown .ant-select-item {
+  padding: 5px 12px;
+  min-height: 32px;
+}
+
+/* 顶部菜单栏样式 */
+.ant-menu-horizontal {
+  background: #001529 !important;
+}
+
+.ant-menu-horizontal > .ant-menu-item {
+  background: #001529 !important;
+}
+
+.ant-menu-horizontal > .ant-menu-item-selected {
+  background-color: #27c2ad !important;
+}
+
+.ant-menu-horizontal > .ant-menu-item:hover {
+  background-color: #27c2ad !important;
+  opacity: 0.8;
+}
+
+/* 强制顶部菜单项所有元素居中对齐 */
+.ant-menu-horizontal > .ant-menu-item,
+.ant-menu-horizontal .ant-menu-title-content {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
+}
+
+/* 确保所有顶部菜单项样式一致 */
+.ant-menu-horizontal .ant-menu-item,
+.ant-menu-horizontal > .ant-menu-item {
+  padding: 0 30px !important;
+  margin: 0 5px !important;
+  font-size: 16px !important;
+  height: 48px !important;
+  line-height: 48px !important;
+}
+
+/* 防止顶部菜单项变成下拉框 */
+.ant-menu-horizontal.ant-menu > .ant-menu-item,
+.ant-menu-horizontal.ant-menu > .ant-menu-submenu {
+  position: relative !important;
+  top: 0 !important;
+  vertical-align: middle !important;
+  text-align: center !important;
+}
+
+/* 保证菜单项之间的样式一致性 */
+.ant-menu-horizontal > .ant-menu-item:first-child,
+.ant-menu-horizontal > .ant-menu-item:last-child {
+  margin: 0 5px !important;
+  padding: 0 30px !important;
+  border: none !important;
+  border-radius: 0 !important;
+}
+
+/* 表格分页选择器强制统一样式 */
+.ant-table-pagination.ant-pagination {
+  margin: 16px 0;
+}
+
+.ant-table-pagination .ant-pagination-options-size-changer {
+  width: 110px !important;
+  max-width: 110px !important;
+}
+
+.ant-table-pagination .ant-pagination-options-size-changer .ant-select-selector {
+  width: 110px !important;
+  max-width: 110px !important;
+}
+
+.ant-select-single .ant-select-selector .ant-select-selection-item {
+  max-width: 90px !important;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 确保所有表格中的分页器样式一致 */
+.ant-table-pagination .ant-select,
+.ant-table-pagination .ant-select-selector,
+.ant-table-pagination .ant-select-selection-search,
+.ant-table-pagination .ant-select-selection-item {
+  width: 110px !important;
+  max-width: 110px !important;
+}
+
+/* 全局覆盖分页选择器样式 - 针对特定页面 */
+.roles-container .ant-pagination-options-size-changer,
+.permissions-container .ant-pagination-options-size-changer,
+.cost-container .ant-pagination-options-size-changer,
+.report-container .ant-pagination-options-size-changer,
+.roles-container .ant-select-selector,
+.permissions-container .ant-select-selector,
+.cost-container .ant-select-selector,
+.report-container .ant-select-selector {
+  width: 110px !important;
+  max-width: 110px !important;
+}
+
+/* 强制覆盖ant-design-vue内部样式 */
+.ant-pagination-options .ant-select .ant-select-selection-search {
+  width: 100px !important;
+  max-width: 100px !important;
+}
+
+.ant-pagination-options .ant-select .ant-select-selection-search-input {
+  max-width: 100px !important;
+}
+
+/* 极端方案：直接限制内联样式 */
+.ant-select[style*="width"],
+.ant-select-selector[style*="width"] {
+  width: 110px !important;
+  max-width: 110px !important;
+}
+
+/* 确保顶部菜单背景色与左侧菜单一致 #001529 */
+.ant-layout-header,
+.ant-menu-horizontal {
+  background-color: #001529 !important;
+}
+
+/* 固定分页下拉框的宽度为110px */
+.ant-pagination-options .ant-select {
+  width: 110px !important;
+}
+
+/* 确保子菜单不会被高亮，只有叶子节点会被高亮 */
+.ant-menu-submenu-selected > .ant-menu-submenu-title {
+  background-color: transparent !important;
+  color: white !important;
+}
+
+.ant-menu-submenu:hover > .ant-menu-submenu-title {
+  color: white !important;
+}
+
+/* 强制所有的子菜单展开/收起图标保持原样式 */
+.ant-menu-submenu-arrow {
+  color: rgba(255, 255, 255, 0.65) !important;
+}
+
+.ant-menu-submenu-selected .ant-menu-submenu-arrow {
+  color: rgba(255, 255, 255, 0.65) !important;
+}
+
+/* 强制覆盖子菜单的高亮样式 */
+.ant-menu-submenu-title:hover,
+.ant-menu-submenu-title:active,
+.ant-menu-submenu-title.ant-menu-item-selected,
+.ant-menu-submenu-selected > .ant-menu-submenu-title,
+.ant-menu-submenu.ant-menu-submenu-selected > .ant-menu-submenu-title,
+.ant-menu-submenu.ant-menu-item-selected > .ant-menu-submenu-title {
+  background-color: transparent !important;
+  color: rgba(255, 255, 255, 0.65) !important;
+}
+
+/* 保证只有叶子节点可以高亮 */
+.ant-menu-item:not(.ant-menu-submenu).ant-menu-item-selected,
+.ant-menu-item:not(.ant-menu-submenu):active,
+.ant-menu-item:not(.ant-menu-submenu).ant-menu-item-active {
+  background-color: #27c2ad !important;
+  color: white !important;
+}
+
+/* 防止菜单项背景色被改变 */
+.ant-menu-dark .ant-menu-submenu-title:hover,
+.ant-menu-dark .ant-menu-submenu-open .ant-menu-submenu-title,
+.ant-menu-dark .ant-menu-submenu-selected .ant-menu-submenu-title {
+  background-color: transparent !important;
+}
+
+/* 重置所有顶部菜单项的可能特殊样式 */
+.ant-menu-horizontal.ant-menu > .ant-menu-item,
+.ant-menu-horizontal.ant-menu > .ant-menu-item[role="menuitem"],
+.ant-menu-horizontal.ant-menu > .ant-menu-item.ant-menu-item-only-child {
+  padding: 0 30px !important;
+  margin: 0 5px !important;
+  height: 48px !important;
+  line-height: 48px !important;
+  background-color: #001529 !important;
+  border: none !important;
+  box-shadow: none !important;
+  text-transform: none !important;
+  font-weight: normal !important;
+  position: relative !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* 清除业务平台可能存在的特殊样式 */
+.ant-menu-horizontal > .ant-menu-item[key="business"],
+.ant-menu-horizontal > .ant-menu-item:nth-child(2) {
+  background-color: #001529 !important;
+  color: #fff !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 30px !important;
+  margin: 0 5px !important;
+  font-size: 16px !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* 确保选中样式一致 */
+.ant-menu-horizontal > .ant-menu-item-selected,
+.ant-menu-horizontal > .ant-menu-item-selected[key="business"],
+.ant-menu-horizontal > .ant-menu-item-selected:nth-child(2) {
+  background-color: #27c2ad !important;
+  color: #fff !important;
+  border: none !important;
+}
+
+/* 顶部菜单选中状态的强制样式 */
+.ant-menu-horizontal .ant-menu-item-selected,
+.ant-menu-horizontal > .ant-menu-item-selected,
+.ant-menu-horizontal .ant-menu-item-active,
+.ant-menu-horizontal .ant-menu-item:hover {
+  background-color: #27c2ad !important;
+  color: white !important;
+  border-bottom: none !important;
+}
+
+/* 覆盖任何可能的边框样式 */
+.ant-menu-horizontal:not(.ant-menu-dark) > .ant-menu-item-selected::after,
+.ant-menu-horizontal:not(.ant-menu-dark) > .ant-menu-item-active::after,
+.ant-menu-horizontal:not(.ant-menu-dark) > .ant-menu-item:hover::after {
+  border-bottom: none !important;
+  opacity: 0 !important;
+}
+
+/* 确保在任何主题下顶部菜单的选中状态都能正确显示 */
+.ant-menu.ant-menu-horizontal .ant-menu-item-selected,
+.ant-menu.ant-menu-dark.ant-menu-horizontal .ant-menu-item-selected,
+.ant-menu.ant-menu-light.ant-menu-horizontal .ant-menu-item-selected,
+.ant-menu-horizontal.ant-menu-dark .ant-menu-item-selected,
+.ant-menu-horizontal.ant-menu-light .ant-menu-item-selected {
+  background-color: #27c2ad !important;
+  color: white !important;
+}
+
+/* !important 优先级的菜单项选中状态 */
+.ant-menu-horizontal .ant-menu-item.ant-menu-item-selected,
+.ant-menu-horizontal .ant-menu-item.top-menu-item.ant-menu-item-selected {
+  background-color: #27c2ad !important;
+  color: white !important;
+  border-bottom: 2px solid transparent !important;
+}
