@@ -547,15 +547,15 @@ const handleSubmit = async () => {
 
 /* 右侧登录表单样式 */
 .login-form-container {
-  width: 420px;
-  padding: 45px;
+  width: 400px;
+  padding: 40px;
   margin-right: 0;
   background: white;
   border-radius: 12px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
   position: absolute;
-  left: calc(65% + ((100% - 65%) / 2) - 210px);
-  top: 35%;
+  left: calc(65% + ((100% - 65%) / 2) - 200px);
+  top: 30%;
   transform: translateY(-50%);
   z-index: 2;
   backdrop-filter: blur(5px);
@@ -774,8 +774,8 @@ const handleSubmit = async () => {
   }
   
   .login-form-container {
-    left: calc(60% + ((100% - 60%) / 2) - 200px);
-    width: 400px;
+    left: calc(60% + ((100% - 60%) / 2) - 190px);
+    width: 380px;
   }
 }
 
@@ -786,9 +786,9 @@ const handleSubmit = async () => {
   }
   
   .login-form-container {
-    left: calc(55% + ((100% - 55%) / 2) - 190px);
-    width: 380px;
-    padding: 40px;
+    left: calc(55% + ((100% - 55%) / 2) - 180px);
+    width: 360px;
+    padding: 35px;
   }
 }
 
@@ -819,10 +819,10 @@ const handleSubmit = async () => {
     right: auto;
     top: auto;
     transform: none;
-    margin: -120px auto 0;
+    margin: -140px auto 0;
     width: 90%;
-    max-width: 400px;
-    padding: 40px;
+    max-width: 380px;
+    padding: 35px;
   }
   
   .login-form-container:hover {
