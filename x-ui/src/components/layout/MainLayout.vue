@@ -72,14 +72,20 @@
               <template v-for="child in item.children" :key="child.key">
                 <a-sub-menu v-if="child.children" :key="`sub-${child.key}`" :selectable="false" @click="handleSubMenuClick(child)">
                   <template #title>
-                    <span>{{ child.title }}</span>
+                    <span>
+                      <component :is="child.icon" v-if="child.icon" />
+                      <span>{{ child.title }}</span>
+                    </span>
                   </template>
                   <a-menu-item v-for="grandChild in child.children" :key="grandChild.key">
                     {{ grandChild.title }}
                   </a-menu-item>
                 </a-sub-menu>
                 <a-menu-item v-else :key="`item-${child.key}`">
-                  {{ child.title }}
+                  <span>
+                    <component :is="child.icon" v-if="child.icon" />
+                    <span>{{ child.title }}</span>
+                  </span>
                 </a-menu-item>
               </template>
             </a-sub-menu>
@@ -111,7 +117,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import {
   UserOutlined,
@@ -124,6 +130,10 @@ import {
   LogoutOutlined,
   MenuUnfoldOutlined,
   MenuFoldOutlined,
+  SafetyOutlined,
+  AuditOutlined,
+  CalculatorOutlined,
+  AccountBookOutlined,
 } from '@ant-design/icons-vue'
 import { message } from 'ant-design-vue'
 
@@ -157,16 +167,19 @@ const systemMenuItems: MenuItem[] = [
       {
         key: 'users',
         title: '用户管理',
+        icon: UserOutlined,
         path: '/system/users'
       },
       {
         key: 'roles',
         title: '角色管理',
+        icon: TeamOutlined,
         path: '/system/roles'
       },
       {
         key: 'permissions',
         title: '权限管理',
+        icon: SafetyOutlined,
         path: '/system/permissions'
       },
     ],
@@ -183,11 +196,13 @@ const businessMenuItems: MenuItem[] = [
       {
         key: '4',
         title: '成本核算',
+        icon: CalculatorOutlined,
         path: '/business/cost'
       },
       {
         key: '5',
         title: '财务报表',
+        icon: AccountBookOutlined,
         path: '/business/finance'
       },
     ],
@@ -338,6 +353,28 @@ const handleUserMenuClick = ({ key }: { key: string }) => {
 const toggleCollapsed = () => {
   collapsed.value = !collapsed.value
 }
+
+// 修复菜单样式
+const fixMenuStyles = () => {
+  setTimeout(() => {
+    // 获取所有二级菜单项
+    const secondLevelMenuItems = document.querySelectorAll('.ant-menu-dark .ant-menu-submenu .ant-menu-item')
+    // 修改它们的内联样式
+    secondLevelMenuItems.forEach(item => {
+      (item as HTMLElement).style.paddingLeft = '43px'
+    })
+  }, 100)
+}
+
+// 组件挂载后修复样式
+onMounted(() => {
+  fixMenuStyles()
+})
+
+// 监听折叠状态变化，重新应用样式
+watch(collapsed, () => {
+  fixMenuStyles()
+})
 </script>
 
 <style scoped>
@@ -345,6 +382,12 @@ const toggleCollapsed = () => {
   min-height: 100vh;
   width: 100%;
   overflow-x: hidden;
+}
+
+/* Override any inline styles for second-level menu items */
+:deep(.ant-menu-dark .ant-menu-submenu .ant-menu-item),
+:deep(.ant-menu-dark .ant-menu-submenu li[role="menuitem"]) {
+  padding-left: 43px !important;
 }
 
 /* 顶部区域样式 */
@@ -372,7 +415,7 @@ const toggleCollapsed = () => {
 }
 
 .logo-area {
-  background: #001529;
+  background: #102a40;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -384,6 +427,8 @@ const toggleCollapsed = () => {
   flex-shrink: 0;
   box-sizing: border-box;
   transition: all 0.2s;
+  border-right: 1px solid #1e3c54;
+  box-shadow: inset 0 -1px 0 0 #1e3c54;
 }
 
 .logo-collapsed {
@@ -574,11 +619,17 @@ const toggleCollapsed = () => {
 }
 
 :deep(.ant-menu-dark .ant-menu-submenu > .ant-menu-item) {
-  padding-left: 48px !important;
+  padding-left: 43px !important;
   margin: 4px 0 !important;
   text-align: left !important;
   height: 32px !important;
   line-height: 32px !important;
+}
+
+:deep(.ant-menu-dark .ant-menu-submenu > .ant-menu-item .anticon) {
+  margin-right: 8px !important;
+  font-size: 14px !important;
+  min-width: 14px !important;
 }
 
 :deep(.ant-menu-dark .ant-menu-submenu > .ant-menu-item .ant-menu-title-content) {
@@ -590,7 +641,7 @@ const toggleCollapsed = () => {
 }
 
 :deep(.ant-menu-dark .ant-menu-submenu .ant-menu-submenu > .ant-menu-item) {
-  padding-left: 72px !important;
+  padding-left: 63px !important;
   margin: 4px 0 !important;
   text-align: left !important;
   height: 32px !important;
