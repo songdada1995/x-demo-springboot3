@@ -20,5 +20,17 @@ import zhCN from 'ant-design-vue/es/locale/zh_CN'
 #app {
   height: 100vh;
   width: 100vw;
+  max-width: 100vw;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100vw;
+  max-width: 100vw;
+  overflow-x: hidden;
 }
 </style>
