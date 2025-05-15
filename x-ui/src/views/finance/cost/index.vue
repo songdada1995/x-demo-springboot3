@@ -1,129 +1,127 @@
 <template>
   <div class="cost-container">
-    <a-card class="cost-card">
-      <a-tabs v-model:activeKey="activeTab">
-        <a-tab-pane key="overview" tab="概览">
-          <a-row :gutter="[16, 16]">
-            <a-col :span="8">
-              <a-statistic
-                title="本月成本"
-                :value="256789"
-                :precision="2"
-                prefix="¥"
-              />
-            </a-col>
-            <a-col :span="8">
-              <a-statistic
-                title="上月成本"
-                :value="245678"
-                :precision="2"
-                prefix="¥"
-              />
-            </a-col>
-            <a-col :span="8">
-              <a-statistic
-                title="成本增长率"
-                :value="4.5"
-                :precision="2"
-                suffix="%"
-                :value-style="{ color: '#cf1322' }"
-              />
-            </a-col>
-          </a-row>
-        </a-tab-pane>
-        <a-tab-pane key="detail" tab="成本明细">
-          <div class="search-form">
-            <a-form layout="inline" :model="searchForm" class="search-form-inline">
-              <a-row :gutter="[16, 16]">
-                <a-col :span="6">
-                  <a-form-item label="成本类型">
-                    <a-select
-                      v-model:value="searchForm.costType"
-                      placeholder="请选择成本类型"
-                      style="width: 240px"
-                    >
-                      <a-select-option value="material">材料成本</a-select-option>
-                      <a-select-option value="labor">人工成本</a-select-option>
-                      <a-select-option value="overhead">制造费用</a-select-option>
-                    </a-select>
-                  </a-form-item>
-                </a-col>
-                <a-col :span="6">
-                  <a-form-item label="日期范围">
-                    <a-range-picker
-                      v-model:value="searchForm.dateRange"
-                      style="width: 240px"
-                      :locale="locale"
-                      :placeholder="['开始日期', '结束日期']"
-                      format="YYYY年MM月DD日"
-                    />
-                  </a-form-item>
-                </a-col>
-                <a-col :span="6">
-                  <a-form-item label="备注">
-                    <a-input
-                      v-model:value="searchForm.remark"
-                      placeholder="请输入备注"
-                      style="width: 240px"
-                    />
-                  </a-form-item>
-                </a-col>
-              </a-row>
-            </a-form>
-            <div class="button-group">
-              <a-button type="primary" class="theme-button" @click="handleSearch">
-                <template #icon><search-outlined /></template>
-                搜索
-              </a-button>
-              <a-button type="primary" class="theme-button" @click="handleExport">
-                <template #icon><export-outlined /></template>
-                导出
-              </a-button>
-              <a-button type="primary" class="theme-button" @click="handleAdd">
-                <template #icon><plus-outlined /></template>
-                新增
-              </a-button>
-              <a-button type="primary" class="theme-button" @click="handleBatchEdit">
-                <template #icon><edit-outlined /></template>
-                修改
-              </a-button>
-              <a-button danger @click="handleBatchDelete">
-                <template #icon><delete-outlined /></template>
-                删除
-              </a-button>
-              <a-button @click="handleReset">
-                <template #icon><reload-outlined /></template>
-                重置
-              </a-button>
-            </div>
-          </div>
-
-          <a-table
-            :columns="columns"
-            :data-source="tableData"
-            :loading="loading"
-            :pagination="pagination"
-            :row-selection="{ selectedRowKeys: selectedRowKeys, onChange: onSelectChange }"
-            @change="handleTableChange"
-          >
-            <template #bodyCell="{ column, record }">
-              <template v-if="column.key === 'action'">
-                <a-space>
-                  <a class="edit-link" @click="handleEdit(record)">编辑</a>
-                  <a-divider type="vertical" />
-                  <a-popconfirm
-                    title="确定要删除这条记录吗？"
-                    @confirm="handleDelete(record)"
+    <a-tabs v-model:activeKey="activeTab">
+      <a-tab-pane key="overview" tab="概览">
+        <a-row :gutter="[16, 16]">
+          <a-col :span="8">
+            <a-statistic
+              title="本月成本"
+              :value="256789"
+              :precision="2"
+              prefix="¥"
+            />
+          </a-col>
+          <a-col :span="8">
+            <a-statistic
+              title="上月成本"
+              :value="245678"
+              :precision="2"
+              prefix="¥"
+            />
+          </a-col>
+          <a-col :span="8">
+            <a-statistic
+              title="成本增长率"
+              :value="4.5"
+              :precision="2"
+              suffix="%"
+              :value-style="{ color: '#cf1322' }"
+            />
+          </a-col>
+        </a-row>
+      </a-tab-pane>
+      <a-tab-pane key="detail" tab="成本明细">
+        <div class="search-form">
+          <a-form layout="inline" :model="searchForm" class="search-form-inline">
+            <a-row :gutter="[16, 16]">
+              <a-col :span="6">
+                <a-form-item label="成本类型">
+                  <a-select
+                    v-model:value="searchForm.costType"
+                    placeholder="请选择成本类型"
+                    style="width: 240px"
                   >
-                    <a class="delete-link">删除</a>
-                  </a-popconfirm>
-                </a-space>
-              </template>
+                    <a-select-option value="material">材料成本</a-select-option>
+                    <a-select-option value="labor">人工成本</a-select-option>
+                    <a-select-option value="overhead">制造费用</a-select-option>
+                  </a-select>
+                </a-form-item>
+              </a-col>
+              <a-col :span="6">
+                <a-form-item label="日期范围">
+                  <a-range-picker
+                    v-model:value="searchForm.dateRange"
+                    style="width: 240px"
+                    :locale="locale"
+                    :placeholder="['开始日期', '结束日期']"
+                    format="YYYY年MM月DD日"
+                  />
+                </a-form-item>
+              </a-col>
+              <a-col :span="6">
+                <a-form-item label="备注">
+                  <a-input
+                    v-model:value="searchForm.remark"
+                    placeholder="请输入备注"
+                    style="width: 240px"
+                  />
+                </a-form-item>
+              </a-col>
+            </a-row>
+          </a-form>
+          <div class="button-group">
+            <a-button type="primary" class="theme-button" @click="handleSearch">
+              <template #icon><search-outlined /></template>
+              搜索
+            </a-button>
+            <a-button type="primary" class="theme-button" @click="handleExport">
+              <template #icon><export-outlined /></template>
+              导出
+            </a-button>
+            <a-button type="primary" class="theme-button" @click="handleAdd">
+              <template #icon><plus-outlined /></template>
+              新增
+            </a-button>
+            <a-button type="primary" class="theme-button" @click="handleBatchEdit">
+              <template #icon><edit-outlined /></template>
+              修改
+            </a-button>
+            <a-button danger @click="handleBatchDelete">
+              <template #icon><delete-outlined /></template>
+              删除
+            </a-button>
+            <a-button @click="handleReset">
+              <template #icon><reload-outlined /></template>
+              重置
+            </a-button>
+          </div>
+        </div>
+
+        <a-table
+          :columns="columns"
+          :data-source="tableData"
+          :loading="loading"
+          :pagination="pagination"
+          :row-selection="{ selectedRowKeys: selectedRowKeys, onChange: onSelectChange }"
+          @change="handleTableChange"
+        >
+          <template #bodyCell="{ column, record }">
+            <template v-if="column.key === 'action'">
+              <a-space>
+                <a class="edit-link" @click="handleEdit(record)">编辑</a>
+                <a-divider type="vertical" />
+                <a-popconfirm
+                  title="确定要删除这条记录吗？"
+                  @confirm="handleDelete(record)"
+                >
+                  <a class="delete-link">删除</a>
+                </a-popconfirm>
+              </a-space>
             </template>
-          </a-table>
-        </a-tab-pane>
-      </a-tabs>
-    </a-card>
+          </template>
+        </a-table>
+      </a-tab-pane>
+    </a-tabs>
   </div>
 </template>
 
@@ -148,7 +146,7 @@ import { createDefaultPagination } from '../../../utils/pagination'
 const locale = zhCN
 
 // 当前激活的标签页
-const activeTab = ref('overview')
+const activeTab = ref<string>('overview')
 
 // 搜索表单
 const searchForm = reactive({
@@ -289,26 +287,25 @@ const handleDelete = (record: any) => {
 <style lang="less" scoped>
 .cost-container {
   padding: 24px;
-  background-color: #f0f2f5;
-  min-height: 100vh;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 
-  .cost-card {
-    background-color: #fff;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  :deep(.ant-tabs-content) {
+    padding: 24px 0;
+  }
 
-    .search-form {
-      margin-bottom: 24px;
+  .search-form {
+    margin-bottom: 24px;
 
-      .search-form-inline {
-        width: 100%;
-      }
+    .search-form-inline {
+      width: 100%;
+    }
 
-      .button-group {
-        margin-top: 16px;
-        display: flex;
-        gap: 8px;
-      }
+    .button-group {
+      margin-top: 16px;
+      display: flex;
+      gap: 8px;
     }
   }
 }
