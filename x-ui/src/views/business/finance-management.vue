@@ -157,22 +157,22 @@ const navigateToSystem = (system: SystemItem) => {
 
 <style scoped>
 .finance-management-container {
-  padding: 16px;
-  max-width: 1200px;
+  padding: 12px;
+  max-width: 1400px;
   margin: 0 auto;
 }
 
 .system-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  grid-template-columns: repeat(10, 1fr);
   gap: 12px;
 }
 
 .system-card {
   background-color: #fff;
-  border-radius: 6px;
-  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.05);
-  padding: 10px;
+  border-radius: 4px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+  padding: 10px 6px;
   cursor: pointer;
   transition: all 0.3s ease;
   display: flex;
@@ -183,14 +183,14 @@ const navigateToSystem = (system: SystemItem) => {
 }
 
 .system-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 4px 12px rgba(39, 194, 173, 0.15);
+  transform: translateY(-2px);
+  box-shadow: 0 3px 8px rgba(39, 194, 173, 0.15);
   border-color: rgba(39, 194, 173, 0.3);
 }
 
 .system-icon-wrapper {
-  width: 46px;
-  height: 46px;
+  width: 54px;
+  height: 54px;
   background-color: #f5f5f5;
   border-radius: 6px;
   display: flex;
@@ -224,7 +224,7 @@ const navigateToSystem = (system: SystemItem) => {
 }
 
 .system-icon {
-  font-size: 28px;
+  font-size: 32px;
   color: #27c2ad;
   transition: all 0.3s ease;
 }
@@ -235,22 +235,54 @@ const navigateToSystem = (system: SystemItem) => {
 }
 
 .system-title {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 500;
   color: #333;
-  line-height: 1.4;
+  line-height: 1.2;
   margin-top: 4px;
 }
 
 /* 响应式调整 */
+@media (max-width: 1400px) {
+  .system-grid {
+    grid-template-columns: repeat(8, 1fr);
+    gap: 10px;
+  }
+  
+  .system-icon-wrapper {
+    width: 50px;
+    height: 50px;
+  }
+  
+  .system-icon {
+    font-size: 30px;
+  }
+}
+
+@media (max-width: 1200px) {
+  .system-grid {
+    grid-template-columns: repeat(6, 1fr);
+    gap: 10px;
+  }
+  
+  .finance-management-container {
+    padding: 10px;
+  }
+}
+
+@media (max-width: 992px) {
+  .system-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
 @media (max-width: 768px) {
   .system-grid {
-    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-    gap: 12px;
+    grid-template-columns: repeat(3, 1fr);
   }
   
   .system-card {
-    padding: 10px;
+    padding: 6px 4px;
   }
   
   .system-icon-wrapper {
@@ -259,11 +291,11 @@ const navigateToSystem = (system: SystemItem) => {
   }
   
   .system-icon {
-    font-size: 22px;
+    font-size: 24px;
   }
   
   .system-title {
-    font-size: 12px;
+    font-size: 11px;
   }
 }
 </style> 

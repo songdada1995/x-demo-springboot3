@@ -31,7 +31,8 @@
                 style="width: 240px"
                 :locale="locale"
                 :placeholder="['开始时间', '结束时间']"
-                show-time
+                :show-time="false"
+                format="YYYY-MM-DD"
               />
             </a-form-item>
           </a-col>
@@ -75,6 +76,7 @@
         :loading="loading"
         :pagination="pagination"
         :row-selection="{ selectedRowKeys, onChange: onSelectChange }"
+        row-key="id"
         @change="handleTableChange"
       >
         <!-- 权限类型列 -->
@@ -178,7 +180,11 @@ import {
   DeleteOutlined,
 } from '@ant-design/icons-vue'
 import type { TablePaginationConfig } from 'ant-design-vue'
+import zhCN from 'ant-design-vue/es/locale/zh_CN'
 import { createDefaultPagination } from '../../../utils/pagination'
+
+// 日期选择器中文配置
+const locale = zhCN
 
 // 搜索表单数据
 const searchForm = reactive({
@@ -288,7 +294,7 @@ const loading = ref(false)
 const pagination = reactive<TablePaginationConfig>(createDefaultPagination())
 
 // 选中的行
-const selectedRowKeys = ref<string[]>([])
+const selectedRowKeys = ref<number[]>([])
 
 // 表单相关
 const modalVisible = ref(false)
@@ -314,8 +320,8 @@ const rules = {
 }
 
 // 获取权限类型颜色
-const getTypeColor = (type: string) => {
-  const colors = {
+const getTypeColor = (type: 'menu' | 'button' | 'api') => {
+  const colors: Record<string, string> = {
     menu: 'blue',
     button: 'green',
     api: 'purple',
@@ -324,8 +330,8 @@ const getTypeColor = (type: string) => {
 }
 
 // 获取权限类型文本
-const getTypeText = (type: string) => {
-  const texts = {
+const getTypeText = (type: 'menu' | 'button' | 'api') => {
+  const texts: Record<string, string> = {
     menu: '菜单',
     button: '按钮',
     api: '接口',
@@ -384,7 +390,7 @@ const handleBatchDelete = () => {
 }
 
 // 处理选择变化
-const onSelectChange = (keys: string[]) => {
+const onSelectChange = (keys: number[]) => {
   selectedRowKeys.value = keys
 }
 

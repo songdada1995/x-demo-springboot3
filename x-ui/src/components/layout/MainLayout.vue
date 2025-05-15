@@ -25,19 +25,19 @@
             <down-outlined v-else />
           </span>
           <template #overlay>
-            <a-menu @click="handleUserMenuClick" class="user-dropdown-menu">
+            <a-menu :theme="'dark'" @click="handleUserMenuClick">
               <a-menu-item key="profile">
                 <user-outlined />
-                个人信息
+                <span>个人信息</span>
               </a-menu-item>
               <a-menu-item key="password">
                 <lock-outlined />
-                修改密码
+                <span>修改密码</span>
               </a-menu-item>
               <a-menu-divider />
               <a-menu-item key="logout">
                 <logout-outlined />
-                退出登录
+                <span>退出登录</span>
               </a-menu-item>
             </a-menu>
           </template>
@@ -768,7 +768,7 @@ watch(() => route.path, (newPath) => {
   align-items: center;
   justify-content: space-between;
   padding: 0;
-  background: #121212; /* 暗黑色背景 */
+  background: #242424; /* 更浅的深色背景 */
   height: 48px;
   min-height: 48px;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
@@ -788,7 +788,7 @@ watch(() => route.path, (newPath) => {
 }
 
 .logo-area {
-  background: #1a1a1a; /* 稍浅一点的暗黑色 */
+  background: #1f1f1f; /* logo区域使用稍深的颜色 */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -823,11 +823,11 @@ watch(() => route.path, (newPath) => {
   flex: 1;
   line-height: 48px;
   height: 48px;
-  background: #121212; /* 暗黑色背景 */
+  background: #242424; /* 更浅的深色背景 */
   color: #fff;
   min-width: 0;
-  margin-left: 0; /* 移除左边距 */
-  padding-left: 0; /* 移除左内边距 */
+  margin-left: 0;
+  padding-left: 0;
 }
 
 .header-right {
@@ -846,15 +846,21 @@ watch(() => route.path, (newPath) => {
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 8px;
   background-color: transparent !important;
-  padding: 0 10px;
+  padding: 0 12px;
+  height: 36px;
   border-radius: 4px;
   transition: all 0.3s;
 }
 
 .username:hover {
   background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.username .anticon {
+  font-size: 12px;
+  transition: all 0.3s;
 }
 
 /* 主体内容布局 */
@@ -954,13 +960,13 @@ watch(() => route.path, (newPath) => {
 
 /* 菜单样式 */
 :deep(.ant-menu-dark) {
-  background: #121212 !important; /* 暗黑色背景 */
+  background: #1f1f1f !important; /* 稍深的背景色 */
   margin-top: 0 !important;
-  color: #fff !important; /* 设置文字颜色为白色 */
+  color: #fff !important;
 }
 
 :deep(.ant-menu-dark .ant-menu-sub) {
-  background: #1a1a1a !important; /* 子菜单稍浅一点的暗黑色 */
+  background: #242424 !important; /* 更浅的深色背景 */
 }
 
 :deep(.ant-menu-dark .ant-menu-item-selected) {
@@ -1045,67 +1051,73 @@ watch(() => route.path, (newPath) => {
 
 /* 修复顶部菜单项的下拉菜单背景色 */
 :deep(.ant-menu-submenu-popup) {
-  background: #121212 !important; /* 暗黑色背景 */
+  background: #242424 !important; /* 更浅的深色背景 */
 }
 
 :deep(.ant-menu-submenu-popup .ant-menu) {
-  background: #1a1a1a !important; /* 稍浅一点的暗黑色 */
+  background: #1f1f1f !important; /* 稍深的背景色 */
 }
 
-:deep(.ant-dropdown-menu) {
-  background: #1a1a1a !important; /* 稍浅一点的暗黑色 */
+:deep(.ant-dropdown) {
+  min-width: 160px !important;
+}
+
+:deep(.ant-dropdown .ant-dropdown-menu) {
+  background: #1a1a1a !important;
   border: 1px solid #2a2a2a !important;
+  padding: 4px 0 !important;
+  min-width: 160px !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
 }
 
-:deep(.ant-dropdown-menu-item),
-:deep(.ant-dropdown-menu-submenu-title) {
+:deep(.ant-dropdown .ant-dropdown-menu-item) {
   color: #fff !important;
+  padding: 8px 16px !important;
+  margin: 2px 0 !important;
+  height: 40px !important;
+  line-height: 24px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  background: transparent !important;
 }
 
-:deep(.ant-dropdown-menu-item:hover),
-:deep(.ant-dropdown-menu-submenu-title:hover) {
-  background-color: #2a2a2a !important; /* 悬停颜色 */
+:deep(.ant-dropdown .ant-dropdown-menu-item:hover) {
+  background-color: rgba(39, 194, 173, 0.1) !important; /* 主题色的透明版本 */
+  color: #27c2ad !important; /* 主题色 */
 }
 
-/* 用户下拉菜单样式 */
-:deep(.user-dropdown-menu.ant-menu) {
-  background: #1a1a1a !important; /* 稍浅一点的暗黑色 */
-  border: 1px solid #2a2a2a !important;
+:deep(.ant-dropdown .ant-dropdown-menu-item .anticon) {
+  color: inherit !important;
+  font-size: 16px !important;
 }
 
-:deep(.user-dropdown-menu.ant-menu .ant-menu-item) {
-  color: #fff !important;
+:deep(.ant-dropdown .ant-dropdown-menu-divider) {
+  background-color: #2a2a2a !important;
+  margin: 4px 0 !important;
 }
 
-:deep(.user-dropdown-menu.ant-menu .ant-menu-item:hover) {
-  background-color: #2a2a2a !important; /* 悬停颜色 */
+/* 用户名区域样式 */
+.username {
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: transparent !important;
+  padding: 0 12px;
+  height: 36px;
+  border-radius: 4px;
+  transition: all 0.3s;
 }
 
-/* 确保菜单项内容左对齐且占满整行 */
-:deep(.ant-menu-inline .ant-menu-item),
-:deep(.ant-menu-inline .ant-menu-submenu-title) {
-  text-align: left !important;
-  justify-content: flex-start !important;
-  width: 100% !important;
-  margin: 0 !important;
-  padding-right: 16px !important;
+.username:hover {
+  background-color: rgba(255, 255, 255, 0.1) !important;
 }
 
-/* 修复菜单项选中时的边框和背景 */
-:deep(.ant-menu-item-selected) {
-  border-right: none !important;
-}
-
-/* 修复菜单折叠时的样式 */
-:deep(.ant-layout-sider-collapsed .ant-menu-item),
-:deep(.ant-layout-sider-collapsed .ant-menu-submenu-title) {
-  padding: 0 calc(50% - 16px) !important; /* 图标居中 */
-  width: 100% !important;
-}
-
-:deep(.ant-layout-sider-collapsed .ant-menu-item-selected) {
-  width: 100% !important;
-  padding: 0 calc(50% - 16px) !important;
+.username .anticon {
+  font-size: 12px;
+  transition: all 0.3s;
 }
 
 /* 顶部菜单项专用样式类 */
@@ -1119,7 +1131,7 @@ watch(() => route.path, (newPath) => {
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
-  background-color: #121212 !important; /* 暗黑色背景 */
+  background-color: #242424 !important; /* 更浅的深色背景 */
   border: none !important;
   box-shadow: none !important;
   width: 110px !important; /* 进一步缩短宽度 */
@@ -1225,20 +1237,20 @@ watch(() => route.path, (newPath) => {
 
 /* 修复菜单折叠时的样式 */
 :deep(.ant-layout-sider-collapsed) {
-  background: #121212 !important; /* 暗黑色背景 */
+  background: #1f1f1f !important; /* 稍深的背景色 */
 }
 
 :deep(.ant-layout-sider-collapsed .ant-menu-inline-collapsed) {
-  background: #121212 !important; /* 暗黑色背景 */
+  background: #1f1f1f !important; /* 稍深的背景色 */
 }
 
 :deep(.ant-menu-inline-collapsed) {
-  background: #121212 !important; /* 暗黑色背景 */
+  background: #1f1f1f !important; /* 稍深的背景色 */
 }
 
 :deep(.ant-menu-inline-collapsed > .ant-menu-item),
 :deep(.ant-menu-inline-collapsed > .ant-menu-submenu > .ant-menu-submenu-title) {
-  background: #121212 !important; /* 暗黑色背景 */
+  background: #1f1f1f !important; /* 稍深的背景色 */
   color: #fff !important;
 }
 
@@ -1246,7 +1258,7 @@ watch(() => route.path, (newPath) => {
 :deep(.ant-menu-inline-collapsed .ant-menu-submenu-title) {
   padding: 0 calc(50% - 16px) !important; /* 图标居中 */
   width: 100% !important;
-  background: #121212 !important; /* 暗黑色背景 */
+  background: #1f1f1f !important; /* 稍深的背景色 */
 }
 
 :deep(.ant-menu-inline-collapsed .ant-menu-item-selected) {
@@ -1269,7 +1281,7 @@ watch(() => route.path, (newPath) => {
 :deep(.ant-menu-vertical-left .ant-menu-submenu-title),
 :deep(.ant-menu-vertical-right .ant-menu-submenu-title),
 :deep(.ant-menu-inline .ant-menu-submenu-title) {
-  background: #121212 !important; /* 暗黑色背景 */
+  background: #1f1f1f !important; /* 稍深的背景色 */
   color: #fff !important;
 }
 
@@ -1294,6 +1306,43 @@ watch(() => route.path, (newPath) => {
 
 /* 修复折叠时弹出的子菜单背景色 */
 :deep(.ant-menu-submenu-popup > .ant-menu) {
-  background: #1a1a1a !important; /* 稍浅一点的暗黑色 */
+  background: #242424 !important; /* 更浅的深色背景 */
+}
+
+/* 下拉菜单容器样式 */
+:deep(.ant-dropdown) {
+  min-width: 160px !important;
+}
+
+:deep(.ant-dropdown-menu) {
+  background: #1a1a1a !important;
+  border: 1px solid #2a2a2a !important;
+  padding: 4px 0 !important;
+}
+
+:deep(.ant-dropdown-menu-item) {
+  color: #fff !important;
+  padding: 8px 16px !important;
+  margin: 2px 0 !important;
+  height: 40px !important;
+  line-height: 24px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+
+:deep(.ant-dropdown-menu-item:hover) {
+  background-color: rgba(39, 194, 173, 0.1) !important;
+  color: #27c2ad !important;
+}
+
+:deep(.ant-dropdown-menu-item .anticon) {
+  color: inherit !important;
+  font-size: 16px !important;
+}
+
+:deep(.ant-dropdown-menu-divider) {
+  background-color: #2a2a2a !important;
+  margin: 4px 0 !important;
 }
 </style> 

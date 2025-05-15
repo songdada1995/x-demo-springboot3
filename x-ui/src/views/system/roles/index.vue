@@ -30,7 +30,8 @@
                 style="width: 240px"
                 :locale="locale"
                 :placeholder="['开始时间', '结束时间']"
-                show-time
+                :show-time="false"
+                format="YYYY-MM-DD"
               />
             </a-form-item>
           </a-col>
@@ -74,6 +75,7 @@
         :loading="loading"
         :pagination="pagination"
         :row-selection="{ selectedRowKeys, onChange: onSelectChange }"
+        row-key="id"
         @change="handleTableChange"
       >
         <!-- 状态列 -->
@@ -161,6 +163,8 @@ import {
   DeleteOutlined,
 } from '@ant-design/icons-vue'
 import type { TablePaginationConfig } from 'ant-design-vue'
+import zhCN from 'ant-design-vue/es/locale/zh_CN'
+import type { Locale } from 'ant-design-vue/es/locale-provider'
 import { createDefaultPagination } from '../../../utils/pagination'
 
 // 搜索表单数据
@@ -170,6 +174,9 @@ const searchForm = reactive({
   status: '',
   createTime: [],
 })
+
+// 日期选择器中文配置
+const locale = zhCN
 
 // 表格列定义
 const columns = [
@@ -239,7 +246,7 @@ const loading = ref(false)
 const pagination = reactive<TablePaginationConfig>(createDefaultPagination())
 
 // 选中的行
-const selectedRowKeys = ref<string[]>([])
+const selectedRowKeys = ref<number[]>([])
 
 // 表单相关
 const modalVisible = ref(false)
@@ -310,8 +317,8 @@ const handleBatchDelete = () => {
   fetchData()
 }
 
-// 处理选择变化
-const onSelectChange = (keys: string[]) => {
+// 表格选择变化
+const onSelectChange = (keys: number[]) => {
   selectedRowKeys.value = keys
 }
 

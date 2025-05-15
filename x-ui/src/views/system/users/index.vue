@@ -40,7 +40,25 @@
                 style="width: 240px"
                 :locale="locale"
                 :placeholder="['开始时间', '结束时间']"
-                show-time
+                :show-time="false"
+                format="YYYY-MM-DD"
+                :picker-locale="{
+                  lang: {
+                    ...locale.lang,
+                    monthFormat: 'M月',
+                    yearFormat: 'YYYY年',
+                    dateFormat: 'YYYY年M月D日',
+                    dayFormat: 'D日',
+                    dateTimeFormat: 'YYYY年M月D日',
+                    previousMonth: '上个月',
+                    nextMonth: '下个月',
+                    previousYear: '上一年',
+                    nextYear: '下一年',
+                    today: '今天',
+                    now: '此刻',
+                    ok: '确定'
+                  }
+                }"
               />
             </a-form-item>
           </a-col>
@@ -83,7 +101,11 @@
         :data-source="dataSource"
         :loading="loading"
         :pagination="pagination"
-        :row-selection="{ selectedRowKeys, onChange: onSelectChange }"
+        :row-selection="{
+          selectedRowKeys,
+          onChange: handleSelectionChange
+        }"
+        row-key="id"
         @change="handleTableChange"
       >
         <!-- 状态列 -->
@@ -218,6 +240,9 @@ const searchForm = reactive({
   createTime: [],
 })
 
+// 选中的行
+const selectedRowKeys = ref<number[]>([])
+
 // 表格列定义
 const columns = [
   {
@@ -307,9 +332,6 @@ const loading = ref(false)
 // 分页配置
 const pagination = reactive<TablePaginationConfig>(createDefaultPagination())
 
-// 选中的行
-const selectedRowKeys = ref<string[]>([])
-
 // 表单相关
 const modalVisible = ref(false)
 const modalTitle = ref('新增用户')
@@ -386,11 +408,6 @@ const handleBatchDelete = () => {
   fetchData()
 }
 
-// 处理选择变化
-const onSelectChange = (keys: string[] | number[]) => {
-  selectedRowKeys.value = keys.map(key => key.toString())
-}
-
 // 新增用户
 const handleAdd = () => {
   modalTitle.value = '新增用户'
@@ -446,6 +463,11 @@ const handleModalOk = () => {
 // 模态框取消
 const handleModalCancel = () => {
   modalVisible.value = false
+}
+
+// 处理选择变化
+const handleSelectionChange = (keys: number[]) => {
+  selectedRowKeys.value = keys
 }
 
 // 初始化

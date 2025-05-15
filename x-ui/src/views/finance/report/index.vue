@@ -55,6 +55,7 @@
                       style="width: 240px"
                       :locale="locale"
                       :placeholder="['开始日期', '结束日期']"
+                      format="YYYY年MM月DD日"
                     />
                   </a-form-item>
                 </a-col>
@@ -108,13 +109,13 @@
             <template #bodyCell="{ column, record }">
               <template v-if="column.key === 'action'">
                 <a-space>
-                  <a @click="handleEdit(record)">编辑</a>
+                  <a class="edit-link" @click="handleEdit(record)">编辑</a>
                   <a-divider type="vertical" />
                   <a-popconfirm
                     title="确定要删除这条记录吗？"
                     @confirm="handleDelete(record)"
                   >
-                    <a>删除</a>
+                    <a class="delete-link">删除</a>
                   </a-popconfirm>
                 </a-space>
               </template>
@@ -138,11 +139,56 @@ import {
 } from '@ant-design/icons-vue'
 import { message } from 'ant-design-vue'
 import type { TablePaginationConfig } from 'ant-design-vue'
-import zhCN from 'ant-design-vue/es/date-picker/locale/zh_CN'
 import { createDefaultPagination } from '../../../utils/pagination'
 
 // 日期选择器语言
-const locale = zhCN
+const locale = {
+  lang: {
+    locale: 'zh_CN',
+    placeholder: 'Select date',
+    yearPlaceholder: 'Select year',
+    quarterPlaceholder: 'Select quarter',
+    monthPlaceholder: 'Select month',
+    weekPlaceholder: 'Select week',
+    rangePlaceholder: ['Start date', 'End date'],
+    rangeYearPlaceholder: ['Start year', 'End year'],
+    rangeMonthPlaceholder: ['Start month', 'End month'],
+    rangeQuarterPlaceholder: ['Start quarter', 'End quarter'],
+    rangeWeekPlaceholder: ['Start week', 'End week'],
+    shortWeekDays: ['日', '一', '二', '三', '四', '五', '六'],
+    shortMonths: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'],
+    today: '今天',
+    now: '此刻',
+    backToToday: '返回今天',
+    ok: '确定',
+    timeSelect: '选择时间',
+    dateSelect: '选择日期',
+    weekSelect: '选择周',
+    clear: '清除',
+    month: '月',
+    year: '年',
+    previousMonth: '上个月',
+    nextMonth: '下个月',
+    monthSelect: '选择月份',
+    yearSelect: '选择年份',
+    decadeSelect: '选择年代',
+    yearFormat: 'YYYY年',
+    monthFormat: 'M月',
+    dateFormat: 'M月D日',
+    dayFormat: 'D日',
+    dateTimeFormat: 'YYYY年M月D日 HH时mm分ss秒',
+    previousYear: '上一年',
+    nextYear: '下一年',
+    previousDecade: '上一年代',
+    nextDecade: '下一年代',
+    previousCentury: '上一世纪',
+    nextCentury: '下一世纪',
+  },
+  timePickerLocale: {
+    placeholder: '请选择时间',
+    rangePlaceholder: ['开始时间', '结束时间'],
+  },
+}
 
 // 当前激活的标签页
 const activeTab = ref('overview')
@@ -465,5 +511,21 @@ const handleDelete = (record: any) => {
 
 :deep(.ant-picker-input > input) {
   padding-left: 0 !important;
+}
+
+.edit-link {
+  color: #27c2ad;
+  cursor: pointer;
+  &:hover {
+    color: #2ed3bd;
+  }
+}
+
+.delete-link {
+  color: #ff4d4f;
+  cursor: pointer;
+  &:hover {
+    color: #ff7875;
+  }
 }
 </style> 

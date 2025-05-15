@@ -55,6 +55,7 @@
                       style="width: 240px"
                       :locale="locale"
                       :placeholder="['开始日期', '结束日期']"
+                      format="YYYY年MM月DD日"
                     />
                   </a-form-item>
                 </a-col>
@@ -108,13 +109,13 @@
             <template #bodyCell="{ column, record }">
               <template v-if="column.key === 'action'">
                 <a-space>
-                  <a @click="handleEdit(record)">编辑</a>
+                  <a class="edit-link" @click="handleEdit(record)">编辑</a>
                   <a-divider type="vertical" />
                   <a-popconfirm
                     title="确定要删除这条记录吗？"
                     @confirm="handleDelete(record)"
                   >
-                    <a>删除</a>
+                    <a class="delete-link">删除</a>
                   </a-popconfirm>
                 </a-space>
               </template>
@@ -138,7 +139,9 @@ import {
 } from '@ant-design/icons-vue'
 import { message } from 'ant-design-vue'
 import type { TablePaginationConfig } from 'ant-design-vue'
-import zhCN from 'ant-design-vue/es/date-picker/locale/zh_CN'
+import zhCN from 'ant-design-vue/es/locale/zh_CN'
+import dayjs from 'dayjs'
+import 'dayjs/locale/zh-cn'
 import { createDefaultPagination } from '../../../utils/pagination'
 
 // 日期选择器语言
@@ -465,5 +468,21 @@ const handleDelete = (record: any) => {
 
 :deep(.ant-picker-input > input) {
   padding-left: 0 !important;
+}
+
+.edit-link {
+  color: #27c2ad;
+  cursor: pointer;
+  &:hover {
+    color: #2ed3bd;
+  }
+}
+
+.delete-link {
+  color: #ff4d4f;
+  cursor: pointer;
+  &:hover {
+    color: #ff7875;
+  }
 }
 </style> 

@@ -161,11 +161,11 @@ button.primary:hover {
 
 /* 顶部菜单栏样式 */
 .ant-menu-horizontal {
-  background: #121212 !important;
+  background: #1f1f1f !important;
 }
 
 .ant-menu-horizontal > .ant-menu-item {
-  background: #121212 !important;
+  background: #1f1f1f !important;
 }
 
 .ant-menu-horizontal > .ant-menu-item-selected {
@@ -277,11 +277,11 @@ button.primary:hover {
   max-width: 110px !important;
 }
 
-/* 确保顶部菜单背景色与左侧菜单一致 #121212 */
+/* 确保顶部菜单背景色与左侧菜单一致 #1f1f1f */
 .ant-layout-header,
 .ant-menu-horizontal,
 .ant-menu-horizontal > .ant-menu-item {
-  background-color: #121212 !important;
+  background-color: #1f1f1f !important;
 }
 
 /* 固定分页下拉框的宽度为110px */
@@ -342,7 +342,7 @@ button.primary:hover {
   margin: 0 !important;
   height: 48px !important;
   line-height: 48px !important;
-  background-color: #121212 !important;
+  background-color: #1f1f1f !important;
   border: none !important;
   box-shadow: none !important;
   text-transform: none !important;
@@ -357,7 +357,7 @@ button.primary:hover {
 /* 清除业务平台可能存在的特殊样式 */
 .ant-menu-horizontal > .ant-menu-item[key="business"],
 .ant-menu-horizontal > .ant-menu-item[key="system"] {
-  background-color: #121212 !important;
+  background-color: #1f1f1f !important;
   color: #fff !important;
   display: flex !important;
   align-items: center !important;
@@ -485,8 +485,9 @@ button.primary:hover {
 .ant-select-dropdown-placement-topRight {
   width: auto !important;
   min-width: 240px !important;
-  background: #1a1a1a !important; /* 暗黑色背景 */
-  border: 1px solid #2a2a2a !important;
+  background: #ffffff !important; /* 白色背景 */
+  border: 1px solid #d9d9d9 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
 }
 
 /* 确保下拉选项内容不会被截断 */
@@ -494,22 +495,22 @@ button.primary:hover {
   white-space: nowrap !important;
   overflow: hidden !important;
   text-overflow: ellipsis !important;
-  color: #fff !important; /* 白色文字 */
+  color: rgba(0, 0, 0, 0.85) !important; /* 深色文字 */
 }
 
 .ant-select-dropdown .ant-select-item {
-  background: #1a1a1a !important; /* 暗黑色背景 */
-  color: #fff !important; /* 白色文字 */
+  background: #ffffff !important; /* 白色背景 */
+  color: rgba(0, 0, 0, 0.85) !important; /* 深色文字 */
 }
 
 .ant-select-dropdown .ant-select-item:hover,
 .ant-select-dropdown .ant-select-item-option-active {
-  background-color: #2a2a2a !important; /* 悬停颜色 */
+  background-color: #f5f5f5 !important; /* 浅灰色悬停背景 */
 }
 
 .ant-select-dropdown .ant-select-item-option-selected {
-  background-color: #27c2ad !important; /* 选中项使用主题色 */
-  color: #fff !important;
+  background-color: #e6f7f5 !important; /* 选中项使用主题色的浅色版本 */
+  color: #27c2ad !important; /* 主题色文字 */
 }
 
 /* 强制覆盖内联样式 */
@@ -650,74 +651,163 @@ button.primary:hover {
   text-overflow: ellipsis !important;
 }
 
-/* 所有下拉菜单的暗黑色风格 */
-.ant-dropdown-menu,
+/* 移除所有下拉相关组件的暗色样式 */
+.ant-dropdown-menu:not(.user-dropdown-menu),
 .ant-select-dropdown,
 .ant-cascader-menus,
 .ant-picker-dropdown,
 .ant-tooltip-inner {
-  background: #1a1a1a !important; /* 暗黑色背景 */
-  border: 1px solid #2a2a2a !important;
-  color: #fff !important;
+  background: #ffffff !important;
+  border: none !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
+  color: rgba(0, 0, 0, 0.85) !important;
 }
 
-.ant-dropdown-menu-item,
-.ant-dropdown-menu-submenu-title,
-.ant-select-item,
+.ant-dropdown-menu:not(.user-dropdown-menu) .ant-dropdown-menu-item,
+.ant-select-dropdown .ant-select-item,
 .ant-cascader-menu-item,
 .ant-picker-cell {
-  color: #fff !important;
+  color: rgba(0, 0, 0, 0.85) !important;
+  transition: color 0.3s !important;
 }
 
-.ant-dropdown-menu-item:hover,
-.ant-dropdown-menu-submenu-title:hover,
-.ant-select-item:hover,
+.ant-dropdown-menu:not(.user-dropdown-menu) .ant-dropdown-menu-item:hover,
+.ant-select-dropdown .ant-select-item:hover,
 .ant-cascader-menu-item:hover {
-  background-color: #2a2a2a !important; /* 悬停颜色 */
+  background: transparent !important;
+  color: #27c2ad !important;
 }
 
-/* 修复折叠菜单弹出的子菜单样式 */
-.ant-menu-submenu-popup .ant-menu {
-  background: #1a1a1a !important; /* 暗黑色背景 */
+/* 用户下拉菜单特殊样式 */
+.header-right .ant-dropdown .ant-dropdown-menu {
+  background: #1a1a1a !important;
+  border: 1px solid #2a2a2a !important;
+  padding: 4px 0 !important;
 }
 
-.ant-menu-submenu-popup .ant-menu-item {
-  background: #1a1a1a !important; /* 暗黑色背景 */
+.header-right .ant-dropdown .ant-dropdown-menu-item {
   color: #fff !important;
-}
-
-.ant-menu-submenu-popup .ant-menu-item:hover {
-  background-color: #2a2a2a !important; /* 悬停颜色 */
-}
-
-.ant-menu-submenu-popup .ant-menu-item-selected {
-  background-color: #27c2ad !important; /* 选中项使用主题色 */
-  color: #fff !important;
-}
-
-/* 修复菜单折叠时的样式 */
-.ant-menu-inline-collapsed {
-  background: #121212 !important; /* 暗黑色背景 */
-  width: 80px !important;
-}
-
-.ant-menu-inline-collapsed > .ant-menu-item,
-.ant-menu-inline-collapsed > .ant-menu-submenu > .ant-menu-submenu-title {
-  padding: 0 calc(50% - 16px) !important;
-  background: #121212 !important; /* 暗黑色背景 */
-}
-
-.ant-menu-inline-collapsed .ant-menu-item-selected {
-  background-color: #27c2ad !important; /* 保持高亮色不变 */
-}
-
-/* 确保顶部菜单项文字居中对齐 */
-.ant-menu-horizontal > .ant-menu-item .ant-menu-title-content,
-.ant-menu-horizontal .ant-menu-title-content {
-  text-align: center !important;
+  padding: 8px 16px !important;
+  margin: 2px 0 !important;
+  height: 40px !important;
+  line-height: 24px !important;
   display: flex !important;
-  justify-content: center !important;
   align-items: center !important;
-  width: 100% !important;
+  gap: 8px !important;
+  background: transparent !important;
+}
+
+.header-right .ant-dropdown .ant-dropdown-menu-item:hover {
+  background-color: rgba(39, 194, 173, 0.1) !important;
+  color: #27c2ad !important;
+}
+
+.header-right .ant-dropdown .ant-dropdown-menu-item .anticon {
+  color: inherit !important;
+  font-size: 16px !important;
+}
+
+.header-right .ant-dropdown .ant-dropdown-menu-divider {
+  background-color: #2a2a2a !important;
+  margin: 4px 0 !important;
+}
+
+/* 修复日期选择框的外层样式 */
+.ant-picker-dropdown.css-dev-only-do-not-override-1ttdmso,
+.ant-picker-dropdown-range,
+.ant-picker-dropdown-placement-bottomLeft {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
   padding: 0 !important;
+}
+
+.ant-picker-dropdown .ant-picker-panel-container {
+  background: #ffffff !important;
+  border: 1px solid #d9d9d9 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
+  border-radius: 2px !important;
+}
+
+.ant-picker-dropdown .ant-picker-panel {
+  border: none !important;
+}
+
+/* 修复下拉框选项的悬停效果 */
+.ant-select-dropdown .ant-select-item-option-content {
+  transition: color 0.3s !important;
+}
+
+.ant-select-dropdown .ant-select-item:hover .ant-select-item-option-content,
+.ant-select-dropdown .ant-select-item-option-active .ant-select-item-option-content {
+  color: #27c2ad !important;
+}
+
+.ant-select-dropdown .ant-select-item-option-selected .ant-select-item-option-content {
+  color: #27c2ad !important;
+  font-weight: bold !important;
+}
+
+/* 确保搜索栏下拉框的文字颜色正确 */
+.search-area .ant-select-dropdown .ant-select-item-option-content,
+.search-form .ant-select-dropdown .ant-select-item-option-content {
+  color: rgba(0, 0, 0, 0.85) !important;
+}
+
+.search-area .ant-select-dropdown .ant-select-item:hover .ant-select-item-option-content,
+.search-form .ant-select-dropdown .ant-select-item:hover .ant-select-item-option-content {
+  color: #27c2ad !important;
+}
+
+.search-area .ant-select-dropdown .ant-select-item-option-selected .ant-select-item-option-content,
+.search-form .ant-select-dropdown .ant-select-item-option-selected .ant-select-item-option-content {
+  color: #27c2ad !important;
+  font-weight: bold !important;
+}
+
+/* 移除所有可能的外层样式干扰 */
+.ant-picker-dropdown[class*="css-dev-only-do-not-override"] {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+/* 确保日期面板样式正确 */
+.ant-picker-panel-container {
+  margin: 0 !important;
+  padding: 0 !important;
+  background: #ffffff !important;
+}
+
+/* 修复日期选择器的选中和悬停效果 */
+.ant-picker-cell {
+  transition: color 0.3s !important;
+}
+
+.ant-picker-cell:hover .ant-picker-cell-inner {
+  color: #27c2ad !important;
+}
+
+.ant-picker-cell-in-view.ant-picker-cell-selected .ant-picker-cell-inner,
+.ant-picker-cell-in-view.ant-picker-cell-range-start .ant-picker-cell-inner,
+.ant-picker-cell-in-view.ant-picker-cell-range-end .ant-picker-cell-inner {
+  background: transparent !important;
+  color: #27c2ad !important;
+  font-weight: bold !important;
+}
+
+.ant-picker-cell-in-view.ant-picker-cell-today .ant-picker-cell-inner::before {
+  border-color: #27c2ad !important;
+}
+
+/* 修复日期范围选择的背景色 */
+.ant-picker-cell-in-view.ant-picker-cell-in-range::before {
+  background: #e6f7f5 !important;
+}
+
+.ant-picker-cell-in-view.ant-picker-cell-range-hover::before,
+.ant-picker-cell-in-view.ant-picker-cell-range-hover-start::before,
+.ant-picker-cell-in-view.ant-picker-cell-range-hover-end::before {
+  background: #f0faf9 !important;
 }
