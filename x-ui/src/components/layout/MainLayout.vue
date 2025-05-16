@@ -708,20 +708,20 @@ const initFirstMenuItem = () => {
     selectedTopKeys.value = [topMenu]
     
     // 根据路径查找对应的菜单项
-    const findMenuItemByPath = (items: MenuItem[], path: string): { key: string, parentKeys: string[] } | null => {
+    const findMenuItemByPath = (items: MenuItem[], path: string): { key: string, parentKeys: string[], menuItem: MenuItem } | null => {
       for (const item of items) {
         if (item.path === path) {
-          return { key: `item-${item.key}`, parentKeys: [] }
+          return { key: `item-${item.key}`, parentKeys: [], menuItem: item }
         }
         if (item.children) {
           for (const child of item.children) {
             if (child.path === path) {
-              return { key: `item-${child.key}`, parentKeys: [item.key] }
+              return { key: `item-${child.key}`, parentKeys: [item.key], menuItem: child }
             }
             if (child.children) {
               for (const grandChild of child.children) {
                 if (grandChild.path === path) {
-                  return { key: grandChild.key, parentKeys: [item.key, `sub-${child.key}`] }
+                  return { key: grandChild.key, parentKeys: [item.key, `sub-${child.key}`], menuItem: grandChild }
                 }
               }
             }
@@ -741,6 +741,17 @@ const initFirstMenuItem = () => {
       
       // 只展开当前菜单所在的父菜单
       openKeys.value = menuInfo.parentKeys
+
+      // 更新标签页
+      if (menuInfo && menuInfo.menuItem.path && menuInfo.menuItem.key) {
+        pageTabs.value = [{
+          key: menuInfo.menuItem.key,
+          title: menuInfo.menuItem.title,
+          path: menuInfo.menuItem.path,
+          icon: menuInfo.menuItem.icon
+        }]
+        activeTabKey.value = menuInfo.menuItem.key
+      }
       return
     }
   } else {
@@ -751,6 +762,15 @@ const initFirstMenuItem = () => {
     
     // 确保不会有任何菜单展开
     openKeys.value = []
+
+    // 更新标签页为仪表盘
+    pageTabs.value = [{
+      key: 'dashboard',
+      title: '仪表盘',
+      path: '/dashboard',
+      icon: DashboardOutlined
+    }]
+    activeTabKey.value = 'dashboard'
   }
 }
 
