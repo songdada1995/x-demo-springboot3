@@ -661,14 +661,16 @@ watch(() => route.path, () => {
   justify-content: center;
   height: 48px;
   min-height: 48px;
-  width: 200px;
-  min-width: 200px;
-  max-width: 200px;
+  width: 199px;
+  min-width: 199px;
+  max-width: 199px;
   flex-shrink: 0;
   box-sizing: border-box;
   transition: all 0.2s;
   border-right: 1px solid rgba(255, 255, 255, 0.1);
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+  position: relative;
+  z-index: 1001;
 }
 
 .logo-collapsed {
@@ -690,14 +692,16 @@ watch(() => route.path, () => {
   flex: 1;
   line-height: 48px;
   height: 48px;
-  background: #ffffff !important;
+  background: transparent !important;
   border: none !important;
   margin: 0 !important;
   padding: 0 !important;
+  position: relative;
+  z-index: 1000;
 }
 
 :deep(.top-menu.ant-menu) {
-  background: #ffffff !important;
+  background: transparent !important;
   border: none !important;
   line-height: 48px !important;
   height: 48px !important;
@@ -724,18 +728,19 @@ watch(() => route.path, () => {
   align-items: center !important;
   justify-content: center !important;
   gap: 8px !important;
+  position: relative;
 }
 
 :deep(.top-menu.ant-menu-horizontal > .ant-menu-item:hover) {
   color: #333333 !important;
-  background-color: #e6e6e6 !important;
+  background-color: #f0f0f0 !important;
   border-radius: 0 !important;
 }
 
 :deep(.top-menu.ant-menu-horizontal > .ant-menu-item-selected),
 :deep(.top-menu.ant-menu-horizontal > .ant-menu-item.ant-menu-item-selected) {
   color: #333333 !important;
-  background-color: #e6e6e6 !important;
+  background-color: #f0f0f0 !important;
   border-radius: 0 !important;
 }
 
@@ -835,14 +840,27 @@ watch(() => route.path, () => {
   position: relative;
   transition: all 0.2s;
   z-index: 990;
+  width: 199px !important;
+  min-width: 199px !important;
+  max-width: 199px !important;
+  flex: 0 0 199px !important;
+  box-sizing: border-box !important;
 }
 
 :deep(.ant-layout-sider) {
   background: #ffffff !important;
-  min-width: 200px !important;
-  max-width: 200px !important;
-  width: 200px !important;
-  flex: 0 0 200px !important;
+  min-width: 199px !important;
+  max-width: 199px !important;
+  width: 199px !important;
+  flex: 0 0 199px !important;
+  box-sizing: border-box !important;
+}
+
+:deep(.ant-layout-sider-children) {
+  width: 199px !important;
+  min-width: 199px !important;
+  max-width: 199px !important;
+  box-sizing: border-box !important;
 }
 
 :deep(.ant-layout-sider-collapsed) {
@@ -850,6 +868,12 @@ watch(() => route.path, () => {
   max-width: 80px !important;
   width: 80px !important;
   flex: 0 0 80px !important;
+}
+
+:deep(.ant-layout-sider-collapsed .ant-layout-sider-children) {
+  width: 80px !important;
+  min-width: 80px !important;
+  max-width: 80px !important;
 }
 
 /* 内容区域样式 */
