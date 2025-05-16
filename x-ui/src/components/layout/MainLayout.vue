@@ -625,9 +625,9 @@ watch(() => route.path, () => {
   justify-content: center;
   height: 48px;
   min-height: 48px;
-  width: 199px;
-  min-width: 199px;
-  max-width: 199px;
+  width: 200px;
+  min-width: 200px;
+  max-width: 200px;
   flex-shrink: 0;
   box-sizing: border-box;
   transition: all 0.2s;
@@ -685,14 +685,13 @@ watch(() => route.path, () => {
   color: #ffffff !important;
   background: transparent !important;
   border: none !important;
-  min-width: 110px !important;
+  min-width: 180px !important;
   transition: all 0.3s !important;
   border-radius: 0 !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
   gap: 8px !important;
-  position: relative;
 }
 
 :deep(.top-menu.ant-menu-horizontal > .ant-menu-item:hover) {
@@ -858,26 +857,26 @@ watch(() => route.path, () => {
   position: relative;
   transition: all 0.2s;
   z-index: 990;
-  width: 199px !important;
-  min-width: 199px !important;
-  max-width: 199px !important;
-  flex: 0 0 199px !important;
+  width: 200px !important;
+  min-width: 200px !important;
+  max-width: 200px !important;
+  flex: 0 0 200px !important;
   box-sizing: border-box !important;
 }
 
 :deep(.ant-layout-sider) {
   background: #ffffff !important;
-  min-width: 199px !important;
-  max-width: 199px !important;
-  width: 199px !important;
-  flex: 0 0 199px !important;
+  min-width: 200px !important;
+  max-width: 200px !important;
+  width: 200px !important;
+  flex: 0 0 200px !important;
   box-sizing: border-box !important;
 }
 
 :deep(.ant-layout-sider-children) {
-  width: 199px !important;
-  min-width: 199px !important;
-  max-width: 199px !important;
+  width: 200px !important;
+  min-width: 200px !important;
+  max-width: 200px !important;
   box-sizing: border-box !important;
 }
 
@@ -1131,7 +1130,7 @@ watch(() => route.path, () => {
   color: #ffffff !important;
   background: transparent !important;
   border: none !important;
-  min-width: 110px !important;
+  min-width: 180px !important;
   transition: all 0.3s !important;
   border-radius: 0 !important;
   display: flex !important;
