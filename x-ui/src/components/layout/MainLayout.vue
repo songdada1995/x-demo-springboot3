@@ -766,38 +766,43 @@ watch(() => route.path, () => {
 .header-right {
   display: flex;
   align-items: center;
-  padding: 0 24px;
+  padding: 0;
   margin-left: auto;
   height: 48px;
+  width: 168px;
+  min-width: 168px;
+  max-width: 168px;
   
   :deep(.ant-dropdown) {
-    width: 120px;
+    width: 168px;
   }
   
   :deep(.ant-dropdown-menu) {
-    width: 120px;
-    min-width: 120px;
-    max-width: 120px;
+    width: 168px;
+    min-width: 168px;
+    max-width: 168px;
   }
   
   :deep(.ant-dropdown-menu-item) {
     padding: 8px 12px;
-    width: 120px;
-    min-width: 120px;
-    max-width: 120px;
+    width: 168px;
+    min-width: 168px;
+    max-width: 168px;
   }
   
-.username {
+  .username {
     display: inline-flex;
-  align-items: center;
-  gap: 8px;
-    padding: 0 16px;
-  height: 36px;
+    align-items: center;
+    gap: 8px;
+    padding: 0 12px;
+    height: 48px;
     cursor: pointer;
-  border-radius: 4px;
-  transition: all 0.3s;
+    border-radius: 0;
+    transition: all 0.3s;
     color: #ffffff;
-    width: auto;
+    width: 100%;
+    min-width: 168px;
+    margin: 0;
     
     &:hover {
       background-color: rgba(255, 255, 255, 0.1);
@@ -811,12 +816,14 @@ watch(() => route.path, () => {
     .anticon {
       font-size: 14px;
       color: #ffffff;
-  transition: all 0.3s;
+      transition: all 0.3s;
     }
 
     span {
       display: inline-block;
       white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
   }
 }
@@ -1187,9 +1194,9 @@ watch(() => route.path, () => {
   background: #ffffff;
   border-radius: 4px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-  width: 120px;
-  min-width: 120px;
-  max-width: 120px;
+  width: 168px;
+  min-width: 168px;
+  max-width: 168px;
 
   .ant-dropdown-menu-item {
     padding: 8px 12px;
@@ -1198,9 +1205,9 @@ watch(() => route.path, () => {
     line-height: 22px;
     display: flex;
     align-items: center;
-    width: 120px;
-    min-width: 120px;
-    max-width: 120px;
+    width: 168px;
+    min-width: 168px;
+    max-width: 168px;
     
     .anticon {
       margin-right: 8px;
@@ -1214,7 +1221,7 @@ watch(() => route.path, () => {
     }
     
     &:hover {
-      background-color: #e6e6e6;
+      background-color: #f0f0f0;
       color: #333333;
     }
   }
@@ -1222,7 +1229,7 @@ watch(() => route.path, () => {
   .ant-dropdown-menu-item-divider {
     background-color: #e6e6e6;
     margin: 4px 0;
-    width: 120px;
+    width: 168px;
   }
 }
 
