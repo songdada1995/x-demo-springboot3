@@ -1456,12 +1456,12 @@ const refreshAllTabs = () => {
   }
 
   .ant-tabs-tab {
-    padding: 0 12px; /* 减小标签内边距 */
+    padding: 0 12px;
     height: 32px;
     line-height: 32px;
     background: transparent;
     border: none;
-    margin: 0 1px; /* 减小标签间距 */
+    margin: 0 1px;
     border-radius: 0;
     transition: all 0.3s;
     display: flex;
@@ -1476,6 +1476,18 @@ const refreshAllTabs = () => {
     .ant-tabs-tab-btn {
       font-size: 14px;
     }
+
+    /* 添加底部边框 */
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background-color: transparent;
+      transition: all 0.3s;
+    }
   }
 
   .ant-tabs-tab-active {
@@ -1485,6 +1497,7 @@ const refreshAllTabs = () => {
       color: #333333;
     }
 
+    /* 激活状态显示底部边框 */
     &::after {
       background-color: #27c2ad;
     }
