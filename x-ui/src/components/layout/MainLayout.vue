@@ -107,16 +107,72 @@
       <a-layout-content class="content">
         <!-- 工具栏 -->
         <div class="toolbar">
-          <div class="sider-trigger" @click="toggleCollapsed">
-            <menu-unfold-outlined v-if="collapsed" />
-            <menu-fold-outlined v-else />
+          <div class="toolbar-left">
+            <div class="sider-trigger" @click="toggleCollapsed">
+              <menu-unfold-outlined v-if="collapsed" />
+              <menu-fold-outlined v-else />
+            </div>
+            <a-tabs
+              v-model:activeKey="activeTabKey"
+              type="editable-card"
+              @edit="onTabEdit"
+              @change="onTabChange"
+              hide-add
+              class="page-tabs"
+            >
+              <a-tab-pane
+                v-for="tab in pageTabs"
+                :key="tab.key"
+                :closable="pageTabs.length > 1"
+                :title="tab.title"
+              >
+                <template #tab>
+                  <span>
+                    <component :is="tab.icon" v-if="tab.icon" />
+                    {{ tab.title }}
+                  </span>
+                </template>
+              </a-tab-pane>
+            </a-tabs>
           </div>
-          <div class="breadcrumb-container">
-            <!-- 这里可以添加面包屑导航 -->
+          <div class="toolbar-right">
+            <div class="tab-actions">
+              <a-dropdown>
+                <template #overlay>
+                  <a-menu>
+                    <a-menu-item key="closeOthers" @click="closeOtherTabs">
+                      <template #icon><close-circle-outlined /></template>
+                      关闭其他标签页
+                    </a-menu-item>
+                    <a-menu-item key="closeCurrent" @click="closeCurrentTab">
+                      <template #icon><close-outlined /></template>
+                      关闭当前标签页
+                    </a-menu-item>
+                    <a-menu-item key="closeAll" @click="closeAllTabs">
+                      <template #icon><delete-outlined /></template>
+                      关闭全部标签页
+                    </a-menu-item>
+                    <a-menu-divider />
+                    <a-menu-item key="refreshCurrent" @click="refreshCurrentTab">
+                      <template #icon><reload-outlined /></template>
+                      刷新当前标签页
+                    </a-menu-item>
+                    <a-menu-item key="refreshAll" @click="refreshAllTabs">
+                      <template #icon><sync-outlined /></template>
+                      刷新全部标签页
+                    </a-menu-item>
+                  </a-menu>
+                </template>
+                <a-button type="text" class="action-button">
+                  <template #icon><more-outlined /></template>
+                </a-button>
+              </a-dropdown>
+            </div>
           </div>
         </div>
+
         <div class="content-wrapper">
-          <router-view></router-view>
+          <router-view :key="refreshKey"></router-view>
         </div>
       </a-layout-content>
     </a-layout>
@@ -124,7 +180,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, computed, onMounted, watch, nextTick, onBeforeUnmount } from 'vue'
+import { ref, computed, onMounted, watch, nextTick, onBeforeUnmount, provide } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import {
   UserOutlined,
@@ -144,6 +200,12 @@ import {
   AccountBookOutlined,
   WalletOutlined,
   BankOutlined,
+  MoreOutlined,
+  CloseCircleOutlined,
+  CloseOutlined,
+  DeleteOutlined,
+  ReloadOutlined,
+  SyncOutlined,
 } from '@ant-design/icons-vue'
 import { message } from 'ant-design-vue'
 import { useAuthStore } from '../../stores/auth'
@@ -265,7 +327,136 @@ const findMenuItem = (items: MenuItem[], key: string): MenuItem | null => {
 // 记住最后选中的菜单项
 const lastSelectedKey = ref('item-dashboard')
 
-// 处理菜单选择
+// 标签页相关
+interface PageTab {
+  key: string
+  title: string
+  path: string
+  icon?: any
+}
+
+const pageTabs = ref<PageTab[]>([
+  {
+    key: 'dashboard',
+    title: '仪表盘',
+    path: '/dashboard',
+    icon: DashboardOutlined
+  }
+])
+const activeTabKey = ref('dashboard')
+
+// 处理标签页编辑（关闭）
+const onTabEdit = (targetKey: string, action: 'add' | 'remove') => {
+  if (action === 'remove') {
+    // 如果只有一个标签页，不允许关闭
+    if (pageTabs.value.length <= 1) {
+      return
+    }
+
+    const tabs = pageTabs.value
+    let activeKey = activeTabKey.value
+    let lastIndex = -1
+
+    tabs.forEach((tab, i) => {
+      if (tab.key === targetKey) {
+        lastIndex = i - 1
+      }
+    })
+
+    const newTabs = tabs.filter(tab => tab.key !== targetKey)
+    if (newTabs.length && activeKey === targetKey) {
+      if (lastIndex >= 0) {
+        activeKey = newTabs[lastIndex].key
+      } else {
+        activeKey = newTabs[0].key
+      }
+    }
+
+    pageTabs.value = newTabs
+    activeTabKey.value = activeKey
+    
+    // 确保路由跳转到激活的标签页
+    const activeTab = newTabs.find(tab => tab.key === activeKey)
+    if (activeTab) {
+      router.push(activeTab.path)
+    }
+  }
+}
+
+// 处理标签页切换
+const onTabChange = (key: string) => {
+  const tab = pageTabs.value.find(tab => tab.key === key)
+  if (tab) {
+    // 更新路由
+    router.push(tab.path)
+    
+    // 更新菜单选中状态
+    updateMenuSelection(tab.path)
+  }
+}
+
+// 更新菜单选中状态
+const updateMenuSelection = (path: string) => {
+  // 根据路径判断应该选中哪个顶部菜单
+  const isSystemPath = path.startsWith('/system') || path === '/dashboard'
+  selectedTopKeys.value = [isSystemPath ? 'system' : 'business']
+
+  // 查找对应的菜单项
+  const findMenuItemByPath = (items: MenuItem[], path: string): { key: string, parentKeys: string[] } | null => {
+    for (const item of items) {
+      if (item.path === path) {
+        return { key: `item-${item.key}`, parentKeys: [] }
+      }
+      if (item.children) {
+        for (const child of item.children) {
+          if (child.path === path) {
+            return { key: `item-${child.key}`, parentKeys: [item.key] }
+          }
+          if (child.children) {
+            for (const grandChild of child.children) {
+              if (grandChild.path === path) {
+                return { key: grandChild.key, parentKeys: [item.key, `sub-${child.key}`] }
+              }
+            }
+          }
+        }
+      }
+    }
+    return null
+  }
+
+  const currentItems = selectedTopKeys.value[0] === 'system' ? systemMenuItems : businessMenuItems
+  const menuInfo = findMenuItemByPath(currentItems, path)
+
+  if (menuInfo) {
+    // 更新左侧菜单选中状态
+    selectedKeys.value = [menuInfo.key]
+    lastSelectedKey.value = menuInfo.key
+    localStorage.setItem('lastSelectedMenuKey', menuInfo.key)
+
+    // 展开父级菜单
+    openKeys.value = menuInfo.parentKeys
+  }
+}
+
+// 添加新标签页
+const addTab = (menuItem: MenuItem) => {
+  if (!menuItem.path) return
+
+  const existingTab = pageTabs.value.find(tab => tab.path === menuItem.path)
+  if (!existingTab) {
+    const newTab: PageTab = {
+      key: menuItem.key,
+      title: menuItem.title,
+      path: menuItem.path,
+      icon: menuItem.icon
+    }
+    pageTabs.value.push(newTab)
+  }
+  activeTabKey.value = menuItem.key
+}
+
+// 修改菜单选择处理函数
 const handleMenuSelect = ({ key }: { key: string }) => {
   // 移除 key 前缀以获取实际的菜单 key
   const actualKey = key.replace(/^(item-|sub-)/, '')
@@ -282,7 +473,7 @@ const handleMenuSelect = ({ key }: { key: string }) => {
     return
   }
   
-    // 只有没有子菜单的项才能被选中
+  // 只有没有子菜单的项才能被选中
   if (selectedItem && !selectedItem.children) {
     selectedKeys.value = [key]
     lastSelectedKey.value = key
@@ -316,8 +507,9 @@ const handleMenuSelect = ({ key }: { key: string }) => {
       openKeys.value = [...openKeys.value, parentKey]
     }
     
-    // 路由跳转
+    // 添加标签页并路由跳转
     if (selectedItem.path) {
+      addTab(selectedItem)
       router.push(selectedItem.path)
     }
   }
@@ -585,6 +777,103 @@ watch(collapsed, () => {
 watch(() => route.path, () => {
   initTopMenu()
 })
+
+// 监听路由变化，自动添加标签页
+watch(() => route.path, (newPath) => {
+  const findMenuItemByPath = (items: MenuItem[], path: string): MenuItem | null => {
+    for (const item of items) {
+      if (item.path === path) {
+        return item
+      }
+      if (item.children) {
+        for (const child of item.children) {
+          if (child.path === path) {
+            return child
+          }
+          if (child.children) {
+            for (const grandChild of child.children) {
+              if (grandChild.path === path) {
+                return grandChild
+              }
+            }
+          }
+        }
+      }
+    }
+    return null
+  }
+
+  const menuItem = findMenuItemByPath(currentMenuItems.value, newPath)
+  if (menuItem) {
+    addTab(menuItem)
+    // 更新菜单选中状态
+    updateMenuSelection(newPath)
+  }
+}, { immediate: true })
+
+// 关闭其他标签页
+const closeOtherTabs = () => {
+  // 如果只有一个标签页，不需要操作
+  if (pageTabs.value.length <= 1) {
+    return
+  }
+
+  const currentTab = pageTabs.value.find(tab => tab.key === activeTabKey.value)
+  if (currentTab) {
+    pageTabs.value = [currentTab]
+    // 确保路由跳转到当前标签页
+    router.push(currentTab.path)
+  }
+}
+
+// 关闭当前标签页
+const closeCurrentTab = () => {
+  // 如果只有一个标签页，不允许关闭
+  if (pageTabs.value.length <= 1) {
+    return
+  }
+  
+  if (activeTabKey.value !== 'dashboard') {
+    const tabs = pageTabs.value
+    const currentIndex = tabs.findIndex(tab => tab.key === activeTabKey.value)
+    const nextTab = tabs[currentIndex + 1] || tabs[currentIndex - 1]
+    
+    // 直接关闭当前标签页
+    onTabEdit(activeTabKey.value, 'remove')
+    
+    // 如果有关闭后的下一个标签页，切换到它
+    if (nextTab) {
+      activeTabKey.value = nextTab.key
+      router.push(nextTab.path)
+    }
+  }
+}
+
+// 关闭全部标签页
+const closeAllTabs = () => {
+  const dashboardTab = pageTabs.value.find(tab => tab.key === 'dashboard')
+  if (dashboardTab) {
+    pageTabs.value = [dashboardTab]
+    activeTabKey.value = 'dashboard'
+    router.push('/dashboard')
+  }
+}
+
+// 提供刷新方法给子组件
+const refreshKey = ref(0)
+provide('refreshKey', refreshKey)
+
+// 刷新当前标签页
+const refreshCurrentTab = () => {
+  // 通过改变 key 来触发组件重新渲染
+  refreshKey.value++
+}
+
+// 刷新全部标签页
+const refreshAllTabs = () => {
+  // 通过改变 key 来触发组件重新渲染
+  refreshKey.value++
+}
 </script>
 
 <style lang="less" scoped>
@@ -664,20 +953,21 @@ watch(() => route.path, () => {
   z-index: 1000;
 }
 
-:deep(.top-menu.ant-menu) {
+/* 顶部菜单样式 */
+:deep(.ant-menu.top-menu) {
   background: transparent !important;
   border: none !important;
   line-height: 48px !important;
   height: 48px !important;
 }
 
-:deep(.top-menu.ant-menu-horizontal) {
+:deep(.ant-menu.top-menu.ant-menu-horizontal) {
   line-height: 48px !important;
   height: 48px !important;
   border: none !important;
 }
 
-:deep(.top-menu.ant-menu-horizontal > .ant-menu-item) {
+:deep(.ant-menu.top-menu.ant-menu-horizontal > .ant-menu-item) {
   height: 48px !important;
   line-height: 48px !important;
   margin: 0 !important;
@@ -694,36 +984,63 @@ watch(() => route.path, () => {
   gap: 8px !important;
 }
 
-:deep(.top-menu.ant-menu-horizontal > .ant-menu-item:hover) {
+:deep(.ant-menu.top-menu.ant-menu-horizontal > .ant-menu-item:hover) {
   color: #333333 !important;
   background-color: #f0f0f0 !important;
   border-radius: 0 !important;
 }
 
-:deep(.top-menu.ant-menu-horizontal > .ant-menu-item-selected),
-:deep(.top-menu.ant-menu-horizontal > .ant-menu-item.ant-menu-item-selected) {
+:deep(.ant-menu.top-menu.ant-menu-horizontal > .ant-menu-item-selected),
+:deep(.ant-menu.top-menu.ant-menu-horizontal > .ant-menu-item.ant-menu-item-selected) {
   color: #333333 !important;
   background-color: #f0f0f0 !important;
   border-radius: 0 !important;
 }
 
-:deep(.top-menu.ant-menu-horizontal > .ant-menu-item .anticon) {
+:deep(.ant-menu.top-menu.ant-menu-horizontal > .ant-menu-item .anticon) {
   font-size: 16px !important;
   margin-right: 4px !important;
   color: inherit !important;
 }
 
-:deep(.top-menu.ant-menu-horizontal > .ant-menu-item:hover .anticon),
-:deep(.top-menu.ant-menu-horizontal > .ant-menu-item-selected .anticon),
-:deep(.top-menu.ant-menu-horizontal > .ant-menu-item.ant-menu-item-selected .anticon) {
+:deep(.ant-menu.top-menu.ant-menu-horizontal > .ant-menu-item:hover .anticon),
+:deep(.ant-menu.top-menu.ant-menu-horizontal > .ant-menu-item-selected .anticon),
+:deep(.ant-menu.top-menu.ant-menu-horizontal > .ant-menu-item.ant-menu-item-selected .anticon) {
   color: #333333 !important;
 }
 
-/* 确保内容居中 */
-:deep(.top-menu.ant-menu-horizontal > .ant-menu-item) {
+:deep(.ant-menu.top-menu.ant-menu-horizontal > .ant-menu-item::after),
+:deep(.ant-menu.top-menu.ant-menu-horizontal > .ant-menu-item::before) {
+  display: none !important;
+}
+
+:deep(.ant-menu.top-menu.ant-menu-horizontal > .ant-menu-item .ant-menu-title-content) {
+  transition: color 0.3s !important;
+  text-align: center !important;
+}
+
+/* 确保内容居中且无圆角 */
+:deep(.ant-menu.top-menu.ant-menu-horizontal > .ant-menu-item) {
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
+  border-radius: 0 !important;
+}
+
+/* 移除所有可能的边框和圆角 */
+:deep(.ant-menu.top-menu.ant-menu-horizontal:not(.ant-menu-dark) > .ant-menu-item),
+:deep(.ant-menu.top-menu.ant-menu-horizontal:not(.ant-menu-dark) > .ant-menu-item:hover),
+:deep(.ant-menu.top-menu.ant-menu-horizontal:not(.ant-menu-dark) > .ant-menu-item-selected) {
+  border: none !important;
+  border-radius: 0 !important;
+}
+
+/* 覆盖任何可能的主题样式 */
+:deep(.ant-menu.top-menu.ant-menu-horizontal.ant-menu-light > .ant-menu-item-selected),
+:deep(.ant-menu.top-menu.ant-menu-horizontal.ant-menu-light > .ant-menu-item.ant-menu-item-selected) {
+  color: #333333 !important;
+  background-color: #f0f0f0 !important;
+  border-radius: 0 !important;
 }
 
 .header-right {
@@ -893,79 +1210,6 @@ watch(() => route.path, () => {
   max-width: 80px !important;
 }
 
-/* 内容区域样式 */
-.content {
-  background: #f5f7fa !important;
-  position: relative;
-  padding: 0;
-  transition: all 0.2s;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  min-width: 0; /* 确保flex布局下内容可以被压缩 */
-}
-
-/* 工具栏样式 */
-.toolbar {
-  background: #ffffff;
-  border-bottom: 1px solid #f0f0f0;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  padding: 0;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
-}
-
-.content-wrapper {
-  flex: 1;
-  padding: 24px;
-  box-sizing: border-box;
-  overflow: auto;
-  background: #ffffff;
-  margin: 24px;
-  border-radius: 4px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
-  width: auto; /* 移除固定宽度，让它自适应 */
-  min-width: 0; /* 确保可以被压缩 */
-}
-
-/* 修复内容区域的滚动问题 */
-:deep(.ant-layout-content) {
-  overflow: hidden !important;
-  display: flex !important;
-  flex-direction: column !important;
-  min-width: 0 !important; /* 确保可以被压缩 */
-}
-
-/* 收起按钮样式 */
-.sider-trigger {
-  width: 40px;
-  height: 40px;
-  color: #1fa195 !important;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.2s;
-  background: #f9f9f9;
-  border-right: 1px solid #f0f0f0;
-  padding: 0;
-  font-size: 18px;
-}
-
-.sider-trigger:hover {
-  color: #52c4b7 !important;
-  background-color: #f0f7f7 !important;
-}
-
-.breadcrumb-container {
-  padding: 0 16px;
-  height: 100%;
-  display: flex;
-  align-items: center;
-}
-
 /* 左侧菜单样式 */
 :deep(.sider .ant-menu) {
   background: #ffffff !important;
@@ -1108,178 +1352,243 @@ watch(() => route.path, () => {
   }
 }
 
-/* 顶部菜单样式 */
-:deep(.ant-menu.top-menu) {
-  background: transparent !important;
-  border: none !important;
-  line-height: 48px !important;
-  height: 48px !important;
+/* 内容区域样式 */
+.content {
+  background: #f5f7fa !important;
+  position: relative;
+  padding: 0;
+  transition: all 0.2s;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-width: 0; /* 确保flex布局下内容可以被压缩 */
 }
 
-:deep(.ant-menu.top-menu.ant-menu-horizontal) {
-  line-height: 48px !important;
-  height: 48px !important;
-  border: none !important;
-}
-
-:deep(.ant-menu.top-menu.ant-menu-horizontal > .ant-menu-item) {
-  height: 48px !important;
-  line-height: 48px !important;
-  margin: 0 !important;
-  padding: 0 24px !important;
-  color: #ffffff !important;
-  background: transparent !important;
-  border: none !important;
-  min-width: 180px !important;
-  transition: all 0.3s !important;
-  border-radius: 0 !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  gap: 8px !important;
-}
-
-:deep(.ant-menu.top-menu.ant-menu-horizontal > .ant-menu-item:hover) {
-  color: #333333 !important;
-  background-color: #f0f0f0 !important;
-  border-radius: 0 !important;
-}
-
-:deep(.ant-menu.top-menu.ant-menu-horizontal > .ant-menu-item-selected),
-:deep(.ant-menu.top-menu.ant-menu-horizontal > .ant-menu-item.ant-menu-item-selected) {
-  color: #333333 !important;
-  background-color: #f0f0f0 !important;
-  border-radius: 0 !important;
-}
-
-:deep(.ant-menu.top-menu.ant-menu-horizontal > .ant-menu-item .anticon) {
-  font-size: 16px !important;
-  margin-right: 4px !important;
-  color: inherit !important;
-}
-
-:deep(.ant-menu.top-menu.ant-menu-horizontal > .ant-menu-item:hover .anticon),
-:deep(.ant-menu.top-menu.ant-menu-horizontal > .ant-menu-item-selected .anticon),
-:deep(.ant-menu.top-menu.ant-menu-horizontal > .ant-menu-item.ant-menu-item-selected .anticon) {
-  color: #333333 !important;
-}
-
-:deep(.ant-menu.top-menu.ant-menu-horizontal > .ant-menu-item::after),
-:deep(.ant-menu.top-menu.ant-menu-horizontal > .ant-menu-item::before) {
-  display: none !important;
-}
-
-:deep(.ant-menu.top-menu.ant-menu-horizontal > .ant-menu-item .ant-menu-title-content) {
-  transition: color 0.3s !important;
-  text-align: center !important;
-}
-
-/* 确保内容居中且无圆角 */
-:deep(.ant-menu.top-menu.ant-menu-horizontal > .ant-menu-item) {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  border-radius: 0 !important;
-}
-
-/* 移除所有可能的边框和圆角 */
-:deep(.ant-menu.top-menu.ant-menu-horizontal:not(.ant-menu-dark) > .ant-menu-item),
-:deep(.ant-menu.top-menu.ant-menu-horizontal:not(.ant-menu-dark) > .ant-menu-item:hover),
-:deep(.ant-menu.top-menu.ant-menu-horizontal:not(.ant-menu-dark) > .ant-menu-item-selected) {
-  border: none !important;
-  border-radius: 0 !important;
-}
-
-/* 覆盖任何可能的主题样式 */
-:deep(.ant-menu.top-menu.ant-menu-horizontal.ant-menu-light > .ant-menu-item-selected),
-:deep(.ant-menu.top-menu.ant-menu-horizontal.ant-menu-light > .ant-menu-item.ant-menu-item-selected) {
-  color: #ffffff !important;
-  background-color: #52c4b7 !important;
-  border-radius: 0 !important;
-}
-
-/* 用户下拉菜单样式 */
-:deep(.ant-dropdown-menu) {
-  padding: 4px 0;
+/* 工具栏样式 */
+.toolbar {
   background: #ffffff;
-  border-radius: 4px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-  width: 168px;
-  min-width: 168px;
-  max-width: 168px;
+  border-bottom: 1px solid #f0f0f0;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+}
 
-  .ant-dropdown-menu-item {
-    padding: 8px 12px;
-    color: #333333;
-    transition: all 0.3s;
-    line-height: 22px;
+.toolbar-left {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  height: 100%;
+  overflow: hidden;
+  gap: 8px; /* 添加间距 */
+}
+
+.toolbar-right {
+  display: flex;
+  align-items: center;
+  padding-right: 16px;
+  height: 100%;
+}
+
+.sider-trigger {
+  width: 40px;
+  height: 40px;
+  color: #1fa195 !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: #f9f9f9;
+  border-right: 1px solid #f0f0f0;
+  padding: 0;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.sider-trigger:hover {
+  color: #52c4b7 !important;
+  background-color: #f0f7f7 !important;
+}
+
+/* 标签页样式 */
+:deep(.page-tabs) {
+  flex: 1;
+  height: 100%;
+  margin-left: 0;
+  overflow: hidden;
+
+  .ant-tabs-nav {
+    margin: 0;
+    background: transparent;
+    height: 100%;
+  }
+
+  .ant-tabs-nav-wrap {
+    height: 100%;
+  }
+
+  .ant-tabs-nav-list {
+    height: 100%;
     display: flex;
     align-items: center;
-    width: 168px;
-    min-width: 168px;
-    max-width: 168px;
-    
+    padding: 0 4px; /* 添加内边距 */
+  }
+
+  .ant-tabs-tab {
+    padding: 0 16px;
+    height: 32px;
+    line-height: 32px;
+    background: transparent;
+    border: none;
+    margin: 0 2px; /* 减小标签页之间的间距 */
+    border-radius: 0; /* 移除圆角 */
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    position: relative; /* 添加相对定位 */
+
+    &:hover {
+      color: #333333;
+      background-color: #f0f0f0;
+    }
+
     .anticon {
       margin-right: 8px;
       font-size: 14px;
     }
-    
-    span {
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+
+    /* 添加底部边框 */
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background-color: transparent;
+      transition: all 0.3s;
     }
-    
-    &:hover {
-      background-color: #f0f0f0;
+  }
+
+  .ant-tabs-tab-active {
+    background: #f0f0f0;
+
+    .ant-tabs-tab-btn {
       color: #333333;
+    }
+
+    /* 激活状态显示底部边框 */
+    &::after {
+      background-color: #27c2ad;
+    }
+  }
+
+  .ant-tabs-tab-remove {
+    color: #999;
+    margin-left: 8px;
+    transition: all 0.3s;
+    font-size: 12px;
+    opacity: 0; /* 默认隐藏关闭按钮 */
+    width: 16px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+
+    &:hover {
+      color: #ff4d4f;
+      background-color: rgba(255, 77, 79, 0.1);
+    }
+  }
+
+  /* 鼠标悬停时显示关闭按钮 */
+  .ant-tabs-tab:hover .ant-tabs-tab-remove {
+    opacity: 1;
+  }
+
+  .ant-tabs-tab-active .ant-tabs-tab-remove {
+    color: #999;
+    opacity: 1;
+
+    &:hover {
+      color: #ff4d4f;
+      background-color: rgba(255, 77, 79, 0.1);
+    }
+  }
+
+  .ant-tabs-ink-bar {
+    display: none;
+  }
+}
+
+/* 调整内容区域样式 */
+.content-wrapper {
+  margin: 8px 24px 24px 24px;
+  padding: 24px;
+  background: #ffffff;
+  border-radius: 4px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+  flex: 1;
+  overflow: auto;
+}
+
+.tab-actions {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  border-left: 1px solid #f0f0f0;
+  padding-left: 16px;
+  margin-left: 16px;
+
+  .action-button {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #666;
+    border-radius: 4px;
+    transition: all 0.3s;
+
+    &:hover {
+      color: #27c2ad;
+      background: rgba(39, 194, 173, 0.1);
+    }
+
+    .anticon {
+      font-size: 16px;
+    }
+  }
+}
+
+:deep(.ant-dropdown-menu) {
+  padding: 4px 0;
+  min-width: 160px;
+
+  .ant-dropdown-menu-item {
+    padding: 8px 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s;
+
+    .anticon {
+      font-size: 14px;
+    }
+
+    &:hover {
+      background: #f5f5f5;
     }
   }
 
   .ant-dropdown-menu-item-divider {
-    background-color: #e6e6e6;
     margin: 4px 0;
-    width: 168px;
   }
-}
-
-/* 弹出菜单样式 */
-:deep(.ant-menu-vertical) {
-  .ant-menu-item,
-  .ant-menu-submenu-title {
-    margin: 0 !important;
-    padding: 0 16px !important;
-    color: #333333 !important;
-    background: #ffffff !important;
-
-    &:hover {
-      color: #333333 !important;
-      background: #ffffff !important;
-    }
-  }
-
-  .ant-menu-item {
-    margin: 0 !important;
-    padding: 0 16px !important;
-    color: #333333 !important;
-    background: #ffffff !important;
-
-    &:hover {
-      color: #333333 !important;
-      background-color: #e6e6e6 !important;
-    }
-
-    &.ant-menu-item-selected {
-      color: #333333 !important;
-      background-color: #e6e6e6 !important;
-    }
-  }
-}
-
-/* 禁用有子菜单项的高亮和悬浮效果 */
-:deep(.ant-menu-submenu-selected) > .ant-menu-submenu-title,
-:deep(.ant-menu-submenu) > .ant-menu-submenu-title:hover {
-  color: #333333 !important;
-  background: #ffffff !important;
 }
 </style> 
