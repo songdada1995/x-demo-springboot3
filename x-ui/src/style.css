@@ -899,30 +899,30 @@ button.primary:hover {
 }
 
 .ant-picker-cell:hover .ant-picker-cell-inner {
-  color: #27c2ad !important;
+  color: #333333 !important;
 }
 
 .ant-picker-cell-in-view.ant-picker-cell-selected .ant-picker-cell-inner,
 .ant-picker-cell-in-view.ant-picker-cell-range-start .ant-picker-cell-inner,
 .ant-picker-cell-in-view.ant-picker-cell-range-end .ant-picker-cell-inner {
   background: transparent !important;
-  color: #27c2ad !important;
+  color: #333333 !important;
   font-weight: bold !important;
 }
 
 .ant-picker-cell-in-view.ant-picker-cell-today .ant-picker-cell-inner::before {
-  border-color: #27c2ad !important;
+  border-color: #333333 !important;
 }
 
 /* 修复日期范围选择的背景色 */
 .ant-picker-cell-in-view.ant-picker-cell-in-range::before {
-  background: #e6f7f5 !important;
+  background: #f0f0f0 !important;
 }
 
 .ant-picker-cell-in-view.ant-picker-cell-range-hover::before,
 .ant-picker-cell-in-view.ant-picker-cell-range-hover-start::before,
 .ant-picker-cell-in-view.ant-picker-cell-range-hover-end::before {
-  background: #f0faf9 !important;
+  background: #f0f0f0 !important;
 }
 
 /* Global popup menu styles - ensure white background for all popups */
@@ -952,7 +952,7 @@ button.primary:hover {
 .ant-dropdown-menu-item:hover,
 .ant-select-item:hover,
 .ant-cascader-menu-item:hover {
-  background-color: #e6e6e6 !important;
+  background-color: #f0f0f0 !important;
   color: #333333 !important;
 }
 
@@ -960,7 +960,7 @@ button.primary:hover {
 .ant-dropdown-menu-item-selected,
 .ant-select-item-option-selected,
 .ant-cascader-menu-item-active {
-  background-color: #e6e6e6 !important;
+  background-color: #f0f0f0 !important;
   color: #333333 !important;
 }
 
@@ -980,4 +980,175 @@ button.primary:hover {
 .ant-dropdown-menu-submenu > .ant-dropdown-menu,
 .ant-select-dropdown-menu-submenu > .ant-select-dropdown-menu {
   background: #ffffff !important;
+}
+
+/* 移除所有可能的外层样式干扰 */
+.ant-picker-dropdown[class*="css-dev-only-do-not-override"] {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+/* 确保日期面板样式正确 */
+.ant-picker-panel-container {
+  margin: 0 !important;
+  padding: 0 !important;
+  background: #ffffff !important;
+}
+
+/* 修复日期选择器的选中和悬停效果 */
+.ant-picker-cell {
+  transition: color 0.3s !important;
+}
+
+.ant-picker-cell:hover .ant-picker-cell-inner {
+  color: #333333 !important;
+}
+
+.ant-picker-cell-in-view.ant-picker-cell-selected .ant-picker-cell-inner,
+.ant-picker-cell-in-view.ant-picker-cell-range-start .ant-picker-cell-inner,
+.ant-picker-cell-in-view.ant-picker-cell-range-end .ant-picker-cell-inner {
+  background: transparent !important;
+  color: #333333 !important;
+  font-weight: bold !important;
+}
+
+.ant-picker-cell-in-view.ant-picker-cell-today .ant-picker-cell-inner::before {
+  border-color: #333333 !important;
+}
+
+/* 修复日期范围选择的背景色 */
+.ant-picker-cell-in-view.ant-picker-cell-in-range::before {
+  background: #f0f0f0 !important;
+}
+
+.ant-picker-cell-in-view.ant-picker-cell-range-hover::before,
+.ant-picker-cell-in-view.ant-picker-cell-range-hover-start::before,
+.ant-picker-cell-in-view.ant-picker-cell-range-hover-end::before {
+  background: #f0f0f0 !important;
+}
+
+/* 菜单弹出框样式 */
+.ant-menu-submenu-popup {
+  background: #ffffff !important;
+  border: 1px solid #d9d9d9 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
+}
+
+.ant-menu-submenu-popup .ant-menu-item,
+.ant-menu-submenu-popup .ant-menu-submenu-title {
+  color: #333333 !important;
+  background: #ffffff !important;
+  margin: 0 !important;
+  padding: 0 16px !important;
+  height: 40px !important;
+  line-height: 40px !important;
+  width: 100% !important;
+  border-radius: 0 !important;
+  text-align: left !important;
+  justify-content: flex-start !important;
+}
+
+.ant-menu-submenu-popup .ant-menu-item:hover,
+.ant-menu-submenu-popup .ant-menu-submenu-title:hover {
+  color: #333333 !important;
+  background-color: #f0f0f0 !important;
+}
+
+.ant-menu-submenu-popup .ant-menu-item-selected {
+  color: #333333 !important;
+  background-color: #f0f0f0 !important;
+}
+
+.ant-menu-submenu-popup .ant-menu-item-selected:hover {
+  color: #333333 !important;
+  background-color: #f0f0f0 !important;
+}
+
+.ant-menu-submenu-popup .ant-menu-item .anticon,
+.ant-menu-submenu-popup .ant-menu-submenu-title .anticon {
+  color: #333333 !important;
+  margin-right: 8px !important;
+}
+
+.ant-menu-submenu-popup .ant-menu-item:hover .anticon,
+.ant-menu-submenu-popup .ant-menu-submenu-title:hover .anticon {
+  color: #333333 !important;
+}
+
+.ant-menu-submenu-popup .ant-menu-item-selected .anticon {
+  color: #333333 !important;
+}
+
+/* 确保子菜单弹出框的样式一致 */
+.ant-menu-submenu-popup .ant-menu-sub {
+  background: #ffffff !important;
+}
+
+.ant-menu-submenu-popup .ant-menu-sub .ant-menu-item {
+  padding-left: 32px !important;
+  color: #333333 !important;
+  margin: 0 !important;
+  width: 100% !important;
+  border-radius: 0 !important;
+  text-align: left !important;
+  justify-content: flex-start !important;
+}
+
+.ant-menu-submenu-popup .ant-menu-sub .ant-menu-item:hover {
+  color: #333333 !important;
+  background-color: #f0f0f0 !important;
+}
+
+.ant-menu-submenu-popup .ant-menu-sub .ant-menu-item-selected {
+  color: #333333 !important;
+  background-color: #f0f0f0 !important;
+}
+
+.ant-menu-submenu-popup .ant-menu-sub .ant-menu-item-selected:hover {
+  color: #333333 !important;
+  background-color: #f0f0f0 !important;
+}
+
+/* 移除所有可能的外层样式干扰 */
+.ant-menu-submenu-popup[class*="css-dev-only-do-not-override"] {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+/* 确保弹出框内容区域样式正确 */
+.ant-menu-submenu-popup .ant-menu {
+  background: #ffffff !important;
+  border: 1px solid #d9d9d9 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
+  padding: 4px 0 !important;
+  min-width: 160px !important;
+}
+
+/* 修复弹出框的选中和悬停效果 */
+.ant-menu-submenu-popup .ant-menu-item {
+  transition: all 0.3s !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+.ant-menu-submenu-popup .ant-menu-item:hover,
+.ant-menu-submenu-popup .ant-menu-item-selected {
+  background-color: #f0f0f0 !important;
+  color: #333333 !important;
+}
+
+.ant-menu-submenu-popup .ant-menu-item-selected::after {
+  display: none !important;
+}
+
+/* 确保菜单项内容左对齐 */
+.ant-menu-submenu-popup .ant-menu-item .ant-menu-title-content,
+.ant-menu-submenu-popup .ant-menu-submenu-title .ant-menu-title-content {
+  text-align: left !important;
+  margin-left: 0 !important;
+  flex: 1 !important;
 }
