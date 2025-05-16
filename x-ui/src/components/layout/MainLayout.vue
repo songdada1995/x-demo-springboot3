@@ -127,10 +127,7 @@
                 :title="tab.title"
               >
                 <template #tab>
-                  <span>
-                    <component :is="tab.icon" v-if="tab.icon" />
-                    {{ tab.title }}
-                  </span>
+                  <span>{{ tab.title }}</span>
                 </template>
               </a-tab-pane>
             </a-tabs>
@@ -1455,42 +1452,29 @@ const refreshAllTabs = () => {
     height: 100%;
     display: flex;
     align-items: center;
-    padding: 0 4px; /* 添加内边距 */
+    padding: 0 2px; /* 减小内边距 */
   }
 
   .ant-tabs-tab {
-    padding: 0 16px;
+    padding: 0 12px; /* 减小标签内边距 */
     height: 32px;
     line-height: 32px;
     background: transparent;
     border: none;
-    margin: 0 2px; /* 减小标签页之间的间距 */
-    border-radius: 0; /* 移除圆角 */
+    margin: 0 1px; /* 减小标签间距 */
+    border-radius: 0;
     transition: all 0.3s;
     display: flex;
     align-items: center;
-    position: relative; /* 添加相对定位 */
+    position: relative;
 
     &:hover {
       color: #333333;
       background-color: #f0f0f0;
     }
 
-    .anticon {
-      margin-right: 8px;
+    .ant-tabs-tab-btn {
       font-size: 14px;
-    }
-
-    /* 添加底部边框 */
-    &::after {
-      content: '';
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      height: 2px;
-      background-color: transparent;
-      transition: all 0.3s;
     }
   }
 
@@ -1501,7 +1485,6 @@ const refreshAllTabs = () => {
       color: #333333;
     }
 
-    /* 激活状态显示底部边框 */
     &::after {
       background-color: #27c2ad;
     }
@@ -1509,10 +1492,10 @@ const refreshAllTabs = () => {
 
   .ant-tabs-tab-remove {
     color: #999;
-    margin-left: 8px;
+    margin-left: 4px;
     transition: all 0.3s;
     font-size: 12px;
-    opacity: 0; /* 默认隐藏关闭按钮 */
+    opacity: 1;
     width: 16px;
     height: 16px;
     display: flex;
@@ -1526,7 +1509,6 @@ const refreshAllTabs = () => {
     }
   }
 
-  /* 鼠标悬停时显示关闭按钮 */
   .ant-tabs-tab:hover .ant-tabs-tab-remove {
     opacity: 1;
   }
