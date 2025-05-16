@@ -25,30 +25,28 @@
       </div>
       <!-- 添加用户信息区域 -->
       <div class="header-right">
-        <a-dropdown v-model:visible="dropdownVisible">
-          <div class="username">
-            <user-outlined />
-            <span>{{ userInfo?.username || '管理员' }}</span>
-            <down-outlined :style="{ transform: dropdownVisible ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s' }" />
+        <div class="username" @mouseenter="dropdownVisible = true" @mouseleave="dropdownVisible = false">
+          <user-outlined />
+          <span>{{ userInfo?.username || '管理员' }}</span>
+          <down-outlined :style="{ transform: dropdownVisible ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s' }" />
+        </div>
+        <div class="custom-dropdown" v-show="dropdownVisible" @mouseenter="dropdownVisible = true" @mouseleave="dropdownVisible = false">
+          <div class="dropdown-menu">
+            <div class="dropdown-item" @click="handleUserMenuClick({ key: 'profile' })">
+              <user-outlined />
+              <span>个人信息</span>
+            </div>
+            <div class="dropdown-item" @click="handleUserMenuClick({ key: 'password' })">
+              <lock-outlined />
+              <span>修改密码</span>
+            </div>
+            <div class="dropdown-divider"></div>
+            <div class="dropdown-item" @click="handleUserMenuClick({ key: 'logout' })">
+              <logout-outlined />
+              <span>退出登录</span>
+            </div>
           </div>
-          <template #overlay>
-            <a-menu @click="handleUserMenuClick">
-              <a-menu-item key="profile">
-                <user-outlined />
-                <span>个人信息</span>
-              </a-menu-item>
-              <a-menu-item key="password">
-                <lock-outlined />
-                <span>修改密码</span>
-              </a-menu-item>
-              <a-menu-divider />
-              <a-menu-item key="logout">
-                <logout-outlined />
-                <span>退出登录</span>
-              </a-menu-item>
-            </a-menu>
-          </template>
-        </a-dropdown>
+        </div>
       </div>
     </a-layout-header>
 
@@ -486,39 +484,6 @@ const fixMenuStyles = () => {
   }, 100)
 }
 
-// 添加全局点击事件监听器
-const addGlobalClickListener = () => {
-  // 使用MutationObserver监听菜单项的class变化
-  const menuObserver = new MutationObserver((mutations) => {
-    mutations.forEach((mutation) => {
-      if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
-        const target = mutation.target as HTMLElement
-        // 如果是菜单项且有上次选中的菜单项
-        if (target.classList.contains('ant-menu-item') && lastSelectedKey.value) {
-          // 检查是否是我们应该选中的菜单项
-          const key = target.getAttribute('data-menu-id') || ''
-          if (key.includes(lastSelectedKey.value.replace(/^(item-|sub-)/, ''))) {
-            // 如果这个菜单项应该被选中但没有选中类，则添加选中类
-            if (!target.classList.contains('ant-menu-item-selected')) {
-              nextTick(() => {
-                selectedKeys.value = [lastSelectedKey.value]
-              })
-            }
-          }
-        }
-      }
-    })
-  })
-  
-  // 监听所有菜单项
-  setTimeout(() => {
-    const menuItems = document.querySelectorAll('.ant-menu-item')
-    menuItems.forEach(item => {
-      menuObserver.observe(item, { attributes: true })
-    })
-  }, 500)
-}
-
 // 修改初始化函数
 const initTopMenu = () => {
   // 根据路由路径判断应该选中哪个顶部菜单
@@ -603,7 +568,6 @@ onMounted(() => {
     initTopMenu()
     initFirstMenuItem()
     fixMenuStyles()
-    addGlobalClickListener()
   })
 })
 
@@ -769,31 +733,15 @@ watch(() => route.path, () => {
   padding: 0;
   margin-left: auto;
   height: 48px;
-  width: 168px;
-  min-width: 168px;
-  max-width: 168px;
-  
-  :deep(.ant-dropdown) {
-    width: 168px;
-  }
-  
-  :deep(.ant-dropdown-menu) {
-    width: 168px;
-    min-width: 168px;
-    max-width: 168px;
-  }
-  
-  :deep(.ant-dropdown-menu-item) {
-    padding: 8px 12px;
-    width: 168px;
-    min-width: 168px;
-    max-width: 168px;
-  }
+  width: 120px;
+  min-width: 120px;
+  max-width: 120px;
+  position: relative;
   
   .username {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
+    justify-content: center;
     padding: 0 12px;
     height: 48px;
     cursor: pointer;
@@ -801,7 +749,7 @@ watch(() => route.path, () => {
     transition: all 0.3s;
     color: #ffffff;
     width: 100%;
-    min-width: 168px;
+    min-width: 120px;
     margin: 0;
     
     &:hover {
@@ -817,13 +765,76 @@ watch(() => route.path, () => {
       font-size: 14px;
       color: #ffffff;
       transition: all 0.3s;
+      display: flex;
+      align-items: center;
     }
 
     span {
-      display: inline-block;
+      margin-left: 4px;
+      font-size: 14px;
+      line-height: 1;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+    }
+
+    .anticon-down {
+      margin-left: 4px;
+    }
+  }
+
+  .custom-dropdown {
+    position: absolute;
+    top: 48px;
+    right: 0;
+    z-index: 1000;
+    width: 120px;
+    background: #ffffff;
+    border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    padding: 4px 0;
+
+    .dropdown-menu {
+      width: 100%;
+    }
+
+    .dropdown-item {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8px 12px;
+      cursor: pointer;
+      transition: all 0.3s;
+      color: #333333;
+      height: 32px;
+      line-height: 16px;
+
+      .anticon {
+        font-size: 14px;
+        margin: 0;
+        display: flex;
+        align-items: center;
+      }
+
+      span {
+        margin-left: 4px;
+        font-size: 14px;
+        line-height: 1;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      &:hover {
+        background-color: #f0f0f0;
+        color: #333333;
+      }
+    }
+
+    .dropdown-divider {
+      height: 1px;
+      background-color: #e6e6e6;
+      margin: 4px 0;
     }
   }
 }
