@@ -13,8 +13,14 @@
           class="top-menu"
           @select="handleTopMenuSelect"
         >
-          <a-menu-item key="system">系统管理</a-menu-item>
-          <a-menu-item key="business">业务平台</a-menu-item>
+          <a-menu-item key="system">
+            <template #icon><setting-outlined /></template>
+            系统管理
+          </a-menu-item>
+          <a-menu-item key="business">
+            <template #icon><appstore-outlined /></template>
+            业务平台
+          </a-menu-item>
         </a-menu>
       </div>
       <!-- 添加用户信息区域 -->
@@ -628,7 +634,7 @@ watch(() => route.path, () => {
   display: flex;
   align-items: center;
   padding: 0;
-  background: #ffffff !important;
+  background: linear-gradient(135deg, #27c2ad 0%, #1fa195 100%) !important;
   height: 48px;
   min-height: 48px;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
@@ -708,30 +714,41 @@ watch(() => route.path, () => {
   line-height: 48px !important;
   margin: 0 !important;
   padding: 0 24px !important;
-  color: #333333 !important;
-  background: #ffffff !important;
+  color: #ffffff !important;
+  background: transparent !important;
   border: none !important;
   min-width: 110px !important;
   transition: all 0.3s !important;
+  border-radius: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
 }
 
 :deep(.top-menu.ant-menu-horizontal > .ant-menu-item:hover) {
   color: #333333 !important;
-  background-color: #f0f0f0 !important;
+  background-color: #e6e6e6 !important;
+  border-radius: 0 !important;
 }
 
-:deep(.top-menu.ant-menu-horizontal > .ant-menu-item-selected) {
-  color: #ffffff !important;
-  background-color: #52c4b7 !important;
+:deep(.top-menu.ant-menu-horizontal > .ant-menu-item-selected),
+:deep(.top-menu.ant-menu-horizontal > .ant-menu-item.ant-menu-item-selected) {
+  color: #333333 !important;
+  background-color: #e6e6e6 !important;
+  border-radius: 0 !important;
 }
 
-:deep(.top-menu.ant-menu-horizontal > .ant-menu-item::after) {
-  display: none !important;
+:deep(.top-menu.ant-menu-horizontal > .ant-menu-item .anticon) {
+  font-size: 16px !important;
+  margin-right: 4px !important;
+  color: inherit !important;
 }
 
-:deep(.top-menu.ant-menu-horizontal > .ant-menu-item .ant-menu-title-content) {
-  transition: color 0.3s !important;
-  text-align: center !important;
+:deep(.top-menu.ant-menu-horizontal > .ant-menu-item:hover .anticon),
+:deep(.top-menu.ant-menu-horizontal > .ant-menu-item-selected .anticon),
+:deep(.top-menu.ant-menu-horizontal > .ant-menu-item.ant-menu-item-selected .anticon) {
+  color: #333333 !important;
 }
 
 /* 确保内容居中 */
@@ -774,21 +791,21 @@ watch(() => route.path, () => {
     cursor: pointer;
   border-radius: 4px;
   transition: all 0.3s;
-    color: #333333;
+    color: #ffffff;
     width: auto;
     
     &:hover {
-      background-color: #e6e6e6;
-      color: #333333;
+      background-color: rgba(255, 255, 255, 0.1);
+      color: #ffffff;
 
       .anticon {
-        color: #333333;
+        color: #ffffff;
       }
     }
     
     .anticon {
       font-size: 14px;
-      color: #333333;
+      color: #ffffff;
   transition: all 0.3s;
     }
 
@@ -927,33 +944,11 @@ watch(() => route.path, () => {
 
     &:hover {
       color: #333333 !important;
-      background-color: #e6e6e6 !important;
+      background-color: #f0f0f0 !important;
     }
 
     .anticon {
       color: #333333 !important;
-    }
-  }
-
-  /* 没有子级的菜单选中样式 */
-  .ant-menu-item-selected {
-    color: #333333 !important;
-    background-color: #e6e6e6 !important;
-    margin: 0 !important;
-    width: 100% !important;
-    border-radius: 0 !important;
-
-    &:hover {
-      color: #333333 !important;
-      background-color: #e6e6e6 !important;
-    }
-
-    .anticon {
-      color: #333333 !important;
-    }
-
-    &::after {
-      display: none !important;
     }
   }
 
@@ -989,6 +984,28 @@ watch(() => route.path, () => {
     }
   }
 
+  /* 没有子级的菜单选中样式 */
+  .ant-menu-item-selected {
+    color: #333333 !important;
+    background-color: #f0f0f0 !important;
+    margin: 0 !important;
+    width: 100% !important;
+    border-radius: 0 !important;
+
+    &:hover {
+      color: #333333 !important;
+      background-color: #f0f0f0 !important;
+    }
+
+    .anticon {
+      color: #333333 !important;
+    }
+
+    &::after {
+      display: none !important;
+    }
+  }
+
   /* 子菜单内容区域 */
   .ant-menu-sub {
     background: #ffffff !important;
@@ -1002,12 +1019,12 @@ watch(() => route.path, () => {
 
       &:hover {
         color: #333333 !important;
-        background-color: #e6e6e6 !important;
+        background-color: #f0f0f0 !important;
       }
 
       &.ant-menu-item-selected {
         color: #333333 !important;
-        background-color: #e6e6e6 !important;
+        background-color: #f0f0f0 !important;
         
         &::after {
           display: none !important;
@@ -1025,13 +1042,13 @@ watch(() => route.path, () => {
   .ant-menu-item,
   .ant-menu-submenu .ant-menu-submenu-title {
     padding: 0 !important;
-  text-align: center !important;
+    text-align: center !important;
     margin: 0 !important;
     width: 80px !important;
     border-radius: 0 !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
 
     .anticon {
       margin: 0 !important;
@@ -1052,7 +1069,7 @@ watch(() => route.path, () => {
 
 /* 顶部菜单样式 */
 :deep(.ant-menu.top-menu) {
-  background: #ffffff !important;
+  background: transparent !important;
   border: none !important;
   line-height: 48px !important;
   height: 48px !important;
@@ -1069,12 +1086,16 @@ watch(() => route.path, () => {
   line-height: 48px !important;
   margin: 0 !important;
   padding: 0 24px !important;
-  color: #333333 !important;
-  background: #ffffff !important;
+  color: #ffffff !important;
+  background: transparent !important;
   border: none !important;
   min-width: 110px !important;
   transition: all 0.3s !important;
   border-radius: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
 }
 
 :deep(.ant-menu.top-menu.ant-menu-horizontal > .ant-menu-item:hover) {
@@ -1085,9 +1106,21 @@ watch(() => route.path, () => {
 
 :deep(.ant-menu.top-menu.ant-menu-horizontal > .ant-menu-item-selected),
 :deep(.ant-menu.top-menu.ant-menu-horizontal > .ant-menu-item.ant-menu-item-selected) {
-  color: #ffffff !important;
-  background-color: #52c4b7 !important;
+  color: #333333 !important;
+  background-color: #f0f0f0 !important;
   border-radius: 0 !important;
+}
+
+:deep(.ant-menu.top-menu.ant-menu-horizontal > .ant-menu-item .anticon) {
+  font-size: 16px !important;
+  margin-right: 4px !important;
+  color: inherit !important;
+}
+
+:deep(.ant-menu.top-menu.ant-menu-horizontal > .ant-menu-item:hover .anticon),
+:deep(.ant-menu.top-menu.ant-menu-horizontal > .ant-menu-item-selected .anticon),
+:deep(.ant-menu.top-menu.ant-menu-horizontal > .ant-menu-item.ant-menu-item-selected .anticon) {
+  color: #333333 !important;
 }
 
 :deep(.ant-menu.top-menu.ant-menu-horizontal > .ant-menu-item::after),
