@@ -1,2 +1,3 @@
 com.example.common.security.config.XCommonSecurityJwtAutoConfiguration
 com.example.common.security.config.XCommonSecurityHandlersAutoConfiguration
+com.example.common.security.config.OAuth2AuthorizationServerAutoConfiguration

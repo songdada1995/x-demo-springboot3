@@ -939,6 +939,43 @@ button.primary:hover {
   color: rgba(0, 0, 0, 0.85) !important;
 }
 
+/* 弹框表单：输入框、下拉框统一宽度，填满表单区域，减少右侧空白 */
+.ant-modal-body .modal-form .ant-form-item-control-input {
+  width: 100%;
+}
+.ant-modal-body .modal-form .ant-form-item-control-input .ant-input,
+.ant-modal-body .modal-form .ant-form-item-control-input .ant-input-number,
+.ant-modal-body .modal-form .ant-form-item-control-input .ant-textarea {
+  width: 100% !important;
+  max-width: none !important;
+}
+.ant-modal-body .modal-form .ant-form-item-control-input .ant-select,
+.ant-modal-body .modal-form .ant-form-item-control-input .ant-select .ant-select-selector,
+.ant-modal-body .modal-form .ant-form-item-control-input .ant-tree-select,
+.ant-modal-body .modal-form .ant-form-item-control-input .ant-tree-select .ant-select-selector {
+  width: 100% !important;
+  max-width: none !important;
+}
+.ant-modal-body .modal-form .ant-form-item-control-input .ant-select,
+.ant-modal-body .modal-form .ant-form-item-control-input .ant-tree-select {
+  min-width: 0;
+}
+
+/* 弹框表单：两列布局，缩短竖直方向高度 */
+.ant-modal-body .modal-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 20px;
+  column-gap: 20px;
+  row-gap: 0;
+}
+.ant-modal-body .modal-form .ant-form-item {
+  margin-bottom: 16px;
+}
+.ant-modal-body .modal-form .ant-form-item-full-width {
+  grid-column: 1 / -1;
+}
+
 /* Ensure dropdown menu items have white background */
 .ant-dropdown-menu-item,
 .ant-select-item,

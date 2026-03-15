@@ -116,8 +116,8 @@
       okText="确定"
       cancelText="取消"
     >
-      <a-form ref="formRef" :model="formState" :rules="rules" :label-col="{ span: 5 }" :wrapper-col="{ span: 17 }">
-        <a-form-item label="上级菜单" name="parentId">
+      <a-form ref="formRef" :model="formState" :rules="rules" layout="vertical" class="modal-form">
+        <a-form-item label="上级菜单" name="parentId" class="form-item-full-width">
           <a-tree-select
             v-model:value="formState.parentId"
             :tree-data="parentTreeData"
@@ -399,13 +399,14 @@ onMounted(() => fetchData())
   margin-bottom: 16px;
 }
 
-:deep(.ant-form-item) {
+/* 仅搜索区域表单项，避免影响弹框表单 */
+.search-area :deep(.ant-form-item) {
   margin-bottom: 16px;
   display: flex;
   align-items: center;
 }
 
-:deep(.ant-form-item-label) {
+.search-area :deep(.ant-form-item-label) {
   padding-bottom: 0;
 }
 

@@ -9,6 +9,9 @@ import com.example.upms.mapper.BizAccountMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 @RestController
 @RequestMapping("/api/biz/account")
 @RequiredArgsConstructor
@@ -22,13 +25,25 @@ public class BizAccountController {
             @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize,
             @RequestParam(name = "accountName", required = false) String accountName,
             @RequestParam(name = "accountType", required = false) String accountType,
-            @RequestParam(name = "status", required = false) Integer status) {
+            @RequestParam(name = "status", required = false) Integer status,
+            @RequestParam(name = "createTimeStart", required = false) String createTimeStart,
+            @RequestParam(name = "createTimeEnd", required = false) String createTimeEnd) {
 
         Page<BizAccount> page = new Page<>(pageNum, pageSize);
         LambdaQueryWrapper<BizAccount> wrapper = new LambdaQueryWrapper<>();
+        LocalDateTime startTime = null;
+        LocalDateTime endTime = null;
+        if (createTimeStart != null && !createTimeStart.isEmpty()) {
+            startTime = LocalDate.parse(createTimeStart).atStartOfDay();
+        }
+        if (createTimeEnd != null && !createTimeEnd.isEmpty()) {
+            endTime = LocalDate.parse(createTimeEnd).atTime(23, 59, 59);
+        }
         wrapper.like(accountName != null && !accountName.isEmpty(), BizAccount::getAccountName, accountName)
                 .eq(accountType != null && !accountType.isEmpty(), BizAccount::getAccountType, accountType)
                 .eq(status != null, BizAccount::getStatus, status)
+                .ge(startTime != null, BizAccount::getCreateTime, startTime)
+                .le(endTime != null, BizAccount::getCreateTime, endTime)
                 .orderByDesc(BizAccount::getCreateTime);
 
         accountMapper.selectPage(page, wrapper);
@@ -53,9 +68,12 @@ public class BizAccountController {
     }
 
     @DeleteMapping("/{ids}")
-    public R<Void> remove(@PathVariable("ids") Long[] ids) {
-        for (Long id : ids) {
-            accountMapper.deleteById(id);
+    public R<Void> remove(@PathVariable("ids") String ids) {
+        if (ids != null && !ids.isEmpty()) {
+            for (String s : ids.split(",")) {
+                Long id = Long.parseLong(s.trim());
+                accountMapper.deleteById(id);
+            }
         }
         return R.ok();
     }

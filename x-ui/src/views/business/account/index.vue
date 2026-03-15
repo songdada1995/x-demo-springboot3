@@ -79,6 +79,7 @@
         :data-source="dataSource"
         :loading="loading"
         :pagination="pagination"
+        row-key="id"
         :row-selection="{ selectedRowKeys, onChange: onSelectChange }"
         @change="handleTableChange"
       >
@@ -98,8 +99,6 @@
           <template v-if="column.key === 'action'">
             <div class="action-column">
               <a class="action-link" @click="handleEdit(record)">编辑</a>
-              <a-divider type="vertical" />
-              <a class="action-link" @click="handleResetPassword(record)">重置密码</a>
               <a-divider type="vertical" />
               <a-popconfirm
                 title="确定要删除这个账号吗？"
@@ -123,19 +122,13 @@
       :title="modalTitle"
       @ok="handleModalOk"
       @cancel="handleModalCancel"
-      width="600px"
+      width="650px"
       :maskClosable="false"
       :destroyOnClose="true"
       okText="确定"
       cancelText="取消"
     >
-      <a-form
-        ref="formRef"
-        :model="formState"
-        :rules="rules"
-        :label-col="{ span: 6 }"
-        :wrapper-col="{ span: 16 }"
-      >
+      <a-form ref="formRef" :model="formState" :rules="rules" layout="vertical" class="modal-form">
         <a-form-item label="账号名称" name="accountName">
           <a-input v-model:value="formState.accountName" placeholder="请输入账号名称" />
         </a-form-item>
@@ -161,11 +154,11 @@
             <a-radio :value="0">禁用</a-radio>
           </a-radio-group>
         </a-form-item>
-        <a-form-item label="备注" name="description">
+        <a-form-item label="备注" name="description" class="form-item-full-width">
           <a-textarea
             v-model:value="formState.description"
             placeholder="请输入备注"
-            :rows="4"
+            :rows="2"
           />
         </a-form-item>
       </a-form>
@@ -186,6 +179,7 @@ import {
 } from '@ant-design/icons-vue'
 import type { TablePaginationConfig } from 'ant-design-vue'
 import zhCN from 'ant-design-vue/es/locale/zh_CN'
+import dayjs from 'dayjs'
 import { accountApi } from '../../../api/account'
 
 // 日期选择器中文配置
@@ -288,8 +282,8 @@ const pagination = reactive<TablePaginationConfig>({
   pageSizeOptions: ['10', '20', '50', '100'],
 })
 
-// 选中的行
-const selectedRowKeys = ref<string[]>([])
+// 选中的行（与 rowKey 类型一致，支持 number/string）
+const selectedRowKeys = ref<(string | number)[]>([])
 
 // 表单相关
 const modalVisible = ref(false)
@@ -327,13 +321,18 @@ const handleTableChange = (pag: TablePaginationConfig) => {
 const fetchData = async () => {
   loading.value = true
   try {
-    const res: any = await accountApi.list({
+    const params: any = {
       pageNum: pagination.current,
       pageSize: pagination.pageSize,
       accountName: searchForm.accountName || undefined,
       accountType: searchForm.accountType || undefined,
       status: searchForm.status || undefined,
-    })
+    }
+    if (searchForm.createTime && searchForm.createTime.length === 2) {
+      params.createTimeStart = dayjs(searchForm.createTime[0]).format('YYYY-MM-DD')
+      params.createTimeEnd = dayjs(searchForm.createTime[1]).format('YYYY-MM-DD')
+    }
+    const res: any = await accountApi.list(params)
     const page = res.data
     dataSource.value = (page.records || []).map((r: any) => ({
       id: r.id,
@@ -360,8 +359,30 @@ const handleSearch = () => {
   fetchData()
 }
 
-// 处理导出
+// 处理导出 - 导出当前页数据为 CSV
 const handleExport = () => {
+  if (dataSource.value.length === 0) {
+    message.warning('暂无数据可导出')
+    return
+  }
+  const headers = ['账号名称', '账号类型', '联系人', '联系电话', '电子邮箱', '状态', '创建时间']
+  const rows = dataSource.value.map(r => [
+    r.accountName,
+    getAccountTypeText(r.accountType),
+    r.contactPerson,
+    r.contactPhone,
+    r.email,
+    r.status === 1 ? '启用' : '禁用',
+    r.createTime || '',
+  ])
+  const csv = [headers.join(','), ...rows.map(row => row.map(c => `"${String(c).replace(/"/g, '""')}"`).join(','))].join('\n')
+  const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8' })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = `账号列表_${new Date().toISOString().slice(0, 10)}.csv`
+  a.click()
+  URL.revokeObjectURL(url)
   message.success('导出成功')
 }
 
@@ -371,8 +392,8 @@ const handleBatchEdit = () => {
     message.warning('请选择一条记录进行编辑')
     return
   }
-  const id = Number(selectedRowKeys.value[0])
-  const record = dataSource.value.find(item => item.id === id)
+  const id = selectedRowKeys.value[0]
+  const record = dataSource.value.find(item => String(item.id) === String(id))
   if (record) {
     handleEdit(record)
   }
@@ -384,15 +405,15 @@ const handleBatchDelete = async () => {
     message.warning('请选择要删除的记录')
     return
   }
-  await accountApi.remove(selectedRowKeys.value.join(','))
+  await accountApi.remove(selectedRowKeys.value.map(k => String(k)).join(','))
   message.success(`删除选中的 ${selectedRowKeys.value.length} 条记录成功`)
   selectedRowKeys.value = []
   fetchData()
 }
 
 // 处理选择变化
-const onSelectChange = (keys: string[] | number[]) => {
-  selectedRowKeys.value = keys.map(key => key.toString())
+const onSelectChange = (keys: (string | number)[]) => {
+  selectedRowKeys.value = keys
 }
 
 // 新增账号
@@ -414,11 +435,6 @@ const handleEdit = (record: any) => {
   modalTitle.value = '编辑账号'
   Object.assign(formState, record)
   modalVisible.value = true
-}
-
-// 重置密码
-const handleResetPassword = (record: any) => {
-  message.success(`重置账号 ${record.accountName} 的密码成功`)
 }
 
 // 删除账号
@@ -479,14 +495,14 @@ onMounted(() => {
   margin-bottom: 16px;
 }
 
-/* 与角色管理一致的搜索表单宽度约束 */
-:deep(.ant-form-item) {
+/* 仅搜索区域表单项，避免影响弹框表单 */
+.search-area :deep(.ant-form-item) {
   margin-bottom: 16px;
   display: flex;
   align-items: center;
 }
 
-:deep(.ant-form-item-label) {
+.search-area :deep(.ant-form-item-label) {
   padding-bottom: 0;
   width: 70px;
   text-align: right;
@@ -495,50 +511,50 @@ onMounted(() => {
   max-width: 70px !important;
 }
 
-:deep(.ant-form-item-control) {
+.search-area :deep(.ant-form-item-control) {
   width: 240px;
   margin-left: 0 !important;
   flex: 0 0 240px !important;
 }
 
-:deep(.ant-form-item-label > label) {
+.search-area :deep(.ant-form-item-label > label) {
   height: 32px;
   line-height: 32px;
   padding-right: 0;
 }
 
-:deep(.ant-input),
-:deep(.ant-select),
-:deep(.ant-picker) {
+.search-area :deep(.ant-input),
+.search-area :deep(.ant-select),
+.search-area :deep(.ant-picker) {
   width: 240px;
 }
 
-:deep(.ant-picker-range) {
+.search-area :deep(.ant-picker-range) {
   width: 240px;
 }
 
 @media screen and (max-width: 1200px) {
-  :deep(.ant-form-item-control) {
+  .search-area :deep(.ant-form-item-control) {
     width: 220px;
     flex: 0 0 220px !important;
   }
-  :deep(.ant-input),
-  :deep(.ant-select),
-  :deep(.ant-picker),
-  :deep(.ant-picker-range) {
+  .search-area :deep(.ant-input),
+  .search-area :deep(.ant-select),
+  .search-area :deep(.ant-picker),
+  .search-area :deep(.ant-picker-range) {
     width: 220px;
   }
 }
 
 @media screen and (max-width: 992px) {
-  :deep(.ant-form-item-control) {
+  .search-area :deep(.ant-form-item-control) {
     width: 200px;
     flex: 0 0 200px !important;
   }
-  :deep(.ant-input),
-  :deep(.ant-select),
-  :deep(.ant-picker),
-  :deep(.ant-picker-range) {
+  .search-area :deep(.ant-input),
+  .search-area :deep(.ant-select),
+  .search-area :deep(.ant-picker),
+  .search-area :deep(.ant-picker-range) {
     width: 200px;
   }
 }
@@ -575,6 +591,7 @@ onMounted(() => {
 }
 
 /* 自定义下拉框样式 */
+/* 弹框表单样式由全局 style.css 统一处理 */
 :deep(.custom-select .ant-select-dropdown) {
   background-color: #fff !important;
 }

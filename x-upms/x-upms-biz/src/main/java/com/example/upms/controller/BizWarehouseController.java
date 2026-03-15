@@ -55,9 +55,12 @@ public class BizWarehouseController {
     }
 
     @DeleteMapping("/{ids}")
-    public R<Void> remove(@PathVariable("ids") Long[] ids) {
-        for (Long id : ids) {
-            warehouseMapper.deleteById(id);
+    public R<Void> remove(@PathVariable("ids") String ids) {
+        if (ids != null && !ids.isEmpty()) {
+            for (String s : ids.split(",")) {
+                Long id = Long.parseLong(s.trim());
+                warehouseMapper.deleteById(id);
+            }
         }
         return R.ok();
     }

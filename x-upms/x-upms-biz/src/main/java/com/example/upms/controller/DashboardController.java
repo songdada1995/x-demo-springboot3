@@ -4,7 +4,6 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.example.common.core.response.R;
 import com.example.upms.api.domain.entity.SysLoginLog;
 import com.example.upms.api.domain.entity.SysNotice;
-import com.example.upms.api.domain.entity.SysUser;
 import com.example.upms.mapper.SysLoginLogMapper;
 import com.example.upms.mapper.SysNoticeMapper;
 import com.example.upms.mapper.SysUserMapper;

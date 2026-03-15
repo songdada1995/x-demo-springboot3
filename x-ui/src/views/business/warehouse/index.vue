@@ -80,6 +80,7 @@
         :data-source="dataSource"
         :loading="loading"
         :pagination="pagination"
+        row-key="id"
         :row-selection="{ selectedRowKeys, onChange: onSelectChange }"
         @change="handleTableChange"
       >
@@ -124,19 +125,13 @@
       :title="modalTitle"
       @ok="handleModalOk"
       @cancel="handleModalCancel"
-      width="600px"
+      width="650px"
       :maskClosable="false"
       :destroyOnClose="true"
       okText="确定"
       cancelText="取消"
     >
-      <a-form
-        ref="formRef"
-        :model="formState"
-        :rules="rules"
-        :label-col="{ span: 6 }"
-        :wrapper-col="{ span: 16 }"
-      >
+      <a-form ref="formRef" :model="formState" :rules="rules" layout="vertical" class="modal-form">
         <a-form-item label="仓库名称" name="warehouseName">
           <a-input v-model:value="formState.warehouseName" placeholder="请输入仓库名称" />
         </a-form-item>
@@ -172,14 +167,31 @@
             <a-radio :value="0">停用</a-radio>
           </a-radio-group>
         </a-form-item>
-        <a-form-item label="备注" name="description">
+        <a-form-item label="备注" name="description" class="form-item-full-width">
           <a-textarea
             v-model:value="formState.description"
             placeholder="请输入备注"
-            :rows="4"
+            :rows="2"
           />
         </a-form-item>
       </a-form>
+    </a-modal>
+
+    <!-- 库存查看弹框 -->
+    <a-modal
+      v-model:open="inventoryVisible"
+      :title="`库存查看 - ${inventoryRecord?.warehouseName || ''}`"
+      width="700px"
+      :footer="null"
+    >
+      <a-empty v-if="inventoryList.length === 0" description="暂无库存数据" />
+      <a-table
+        v-else
+        :columns="inventoryColumns"
+        :data-source="inventoryList"
+        :pagination="false"
+        size="small"
+      />
     </a-modal>
   </div>
 </template>
@@ -305,8 +317,8 @@ const pagination = reactive<TablePaginationConfig>({
   pageSizeOptions: ['10', '20', '50', '100'],
 })
 
-// 选中的行
-const selectedRowKeys = ref<string[]>([])
+// 选中的行（与 rowKey 类型一致，支持 number/string）
+const selectedRowKeys = ref<(string | number)[]>([])
 
 // 表单相关
 const modalVisible = ref(false)
@@ -382,8 +394,31 @@ const handleSearch = () => {
   fetchData()
 }
 
-// 处理导出
+// 处理导出 - 导出当前页数据为 CSV
 const handleExport = () => {
+  if (dataSource.value.length === 0) {
+    message.warning('暂无数据可导出')
+    return
+  }
+  const headers = ['仓库名称', '仓库类型', '区域', '仓库地址', '负责人', '联系电话', '状态', '创建时间']
+  const rows = dataSource.value.map(r => [
+    r.warehouseName,
+    getWarehouseTypeText(r.warehouseType),
+    r.regionName || regionNames[r.region] || '',
+    r.address,
+    r.manager,
+    r.contactPhone,
+    r.status === 1 ? '正常' : '停用',
+    r.createTime || '',
+  ])
+  const csv = [headers.join(','), ...rows.map(row => row.map(c => `"${String(c).replace(/"/g, '""')}"`).join(','))].join('\n')
+  const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8' })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = `仓库列表_${new Date().toISOString().slice(0, 10)}.csv`
+  a.click()
+  URL.revokeObjectURL(url)
   message.success('导出成功')
 }
 
@@ -393,8 +428,8 @@ const handleBatchEdit = () => {
     message.warning('请选择一条记录进行编辑')
     return
   }
-  const id = Number(selectedRowKeys.value[0])
-  const record = dataSource.value.find(item => item.id === id)
+  const id = selectedRowKeys.value[0]
+  const record = dataSource.value.find(item => String(item.id) === String(id))
   if (record) {
     handleEdit(record)
   }
@@ -406,15 +441,15 @@ const handleBatchDelete = async () => {
     message.warning('请选择要删除的记录')
     return
   }
-  await warehouseApi.remove(selectedRowKeys.value.join(','))
+  await warehouseApi.remove(selectedRowKeys.value.map(k => String(k)).join(','))
   message.success(`删除选中的 ${selectedRowKeys.value.length} 条记录成功`)
   selectedRowKeys.value = []
   fetchData()
 }
 
 // 处理选择变化
-const onSelectChange = (keys: string[] | number[]) => {
-  selectedRowKeys.value = keys.map(key => key.toString())
+const onSelectChange = (keys: (string | number)[]) => {
+  selectedRowKeys.value = keys
 }
 
 // 新增仓库
@@ -439,9 +474,22 @@ const handleEdit = (record: any) => {
   modalVisible.value = true
 }
 
-// 查看库存
+// 库存查看弹框
+const inventoryVisible = ref(false)
+const inventoryRecord = ref<any>(null)
+const inventoryList = ref<any[]>([])
+const inventoryColumns = [
+  { title: '物料名称', dataIndex: 'materialName', key: 'materialName' },
+  { title: '规格', dataIndex: 'spec', key: 'spec' },
+  { title: '数量', dataIndex: 'quantity', key: 'quantity' },
+  { title: '单位', dataIndex: 'unit', key: 'unit' },
+]
+
 const handleInventory = (record: any) => {
-  message.info(`查看仓库 ${record.warehouseName} 的库存信息`)
+  inventoryRecord.value = record
+  inventoryVisible.value = true
+  // 暂无库存接口，使用空数据占位
+  inventoryList.value = []
 }
 
 // 删除仓库
@@ -508,6 +556,7 @@ onMounted(() => {
   justify-content: flex-start;
 }
 
+/* 弹框表单样式由全局 style.css 统一处理 */
 /* 使用全局样式 */
 :deep(.action-column) {
   display: flex;
