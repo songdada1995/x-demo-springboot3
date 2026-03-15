@@ -3,6 +3,7 @@ package com.example.common.feign.annotation;
 import com.example.common.feign.config.FeignAutoConfiguration;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.Import;
+import org.springframework.core.annotation.AliasFor;
 
 import java.lang.annotation.*;
 
@@ -13,18 +14,20 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Import(FeignAutoConfiguration.class)
-@EnableFeignClients
+@EnableFeignClients(basePackages = "com.example")
 public @interface EnableXFeignClients {
-    
-    /**
-     * Feign客户端扫描包路径
-     */
-    String[] value() default {};
 
     /**
      * Feign客户端扫描包路径
      */
-    String[] basePackages() default {};
+    @AliasFor(annotation = EnableFeignClients.class, attribute = "basePackages")
+    String[] value() default {"com.example"};
+
+    /**
+     * Feign客户端扫描包路径
+     */
+    @AliasFor(annotation = EnableFeignClients.class, attribute = "basePackages")
+    String[] basePackages() default {"com.example"};
 
     /**
      * Feign客户端扫描类

@@ -1,0 +1,29 @@
+# ============================================
+# 用户权限服务配置 - 导入到 Nacos DataId: x-upms-biz, Group: DEFAULT_GROUP
+# ============================================
+
+server:
+  port: 9003
+
+mybatis-plus:
+  mapper-locations: classpath*:/mapper/**/*.xml
+  type-aliases-package: com.example.upms.api.domain.entity
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    db-config:
+      id-type: auto
+      logic-delete-field: delFlag
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+  api-docs:
+    path: /v3/api-docs
+
+logging:
+  level:
+    com.example.upms: ${LOG_LEVEL:INFO}

@@ -1,12 +1,12 @@
-# Nacos 配置优先：先加载 common.yaml，再加载 x-upms-biz.yaml
-# 无 Nacos 或 Nacos 中无对应配置时，使用下方本地配置兜底
+# ============================================
+# 公共配置 - 导入到 Nacos DataId: common, Group: DEFAULT_GROUP
+# ============================================
+# 使用 hosts 文件解析域名，需在 hosts 中配置：
+#   x-nacos.com   x-mysql.com   x-redis.com   x-sentinel.com   x-gateway.com
+# 环境变量可覆盖：DB_PORT, DB_NAME, DB_USERNAME, DB_PASSWORD, REDIS_PORT, REDIS_PASSWORD, JWT_SECRET
+# ============================================
+
 spring:
-  application:
-    name: x-upms-biz
-  config:
-    import:
-      - "optional:nacos:common.yaml"
-      - "optional:nacos:${spring.application.name}.${spring.cloud.nacos.config.file-extension:yaml}"
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://x-mysql.com:${DB_PORT:3306}/${DB_NAME:x_demo}?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8
@@ -34,33 +34,12 @@ spring:
         dashboard: x-sentinel.com:8080
       eager: true
 
-server:
-  port: 9003
-
-mybatis-plus:
-  mapper-locations: classpath*:/mapper/**/*.xml
-  type-aliases-package: com.example.upms.api.domain.entity
-  configuration:
-    map-underscore-to-camel-case: true
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
-  global-config:
-    db-config:
-      id-type: auto
-      logic-delete-field: delFlag
-      logic-delete-value: 1
-      logic-not-delete-value: 0
-
-springdoc:
-  swagger-ui:
-    path: /swagger-ui.html
-  api-docs:
-    path: /v3/api-docs
-
+# JWT - 生产环境必须通过 JWT_SECRET 环境变量覆盖
 jwt:
   secret: ${JWT_SECRET:your-secret-key-please-change-in-production}
   expiration: 86400000
 
-# 生产环境建议改为 INFO
+# 日志
 logging:
   level:
-    com.example.upms: ${LOG_LEVEL:INFO}
+    root: INFO

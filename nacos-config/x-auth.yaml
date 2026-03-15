@@ -1,38 +1,16 @@
-# Nacos 配置优先：先加载 common.yaml，再加载 x-auth.yaml
-# 无 Nacos 或 Nacos 中无对应配置时，使用下方本地配置兜底
+# ============================================
+# 认证服务配置 - 导入到 Nacos DataId: x-auth, Group: DEFAULT_GROUP
+# ============================================
+
+server:
+  port: 9002
+
 spring:
-  application:
-    name: x-auth
-  config:
-    import:
-      - "optional:nacos:common.yaml"
-      - "optional:nacos:${spring.application.name}.${spring.cloud.nacos.config.file-extension:yaml}"
-  datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://x-mysql.com:${DB_PORT:3306}/${DB_NAME:x_demo}?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8
-    username: ${DB_USERNAME:root}
-    password: ${DB_PASSWORD:123456}
-  data:
-    redis:
-      host: x-redis.com
-      port: ${REDIS_PORT:6379}
-      password: ${REDIS_PASSWORD:}
-      database: 0
   cloud:
-    nacos:
-      discovery:
-        server-addr: x-nacos.com:8848
-        username: ${NACOS_USERNAME:nacos}
-        password: ${NACOS_PASSWORD:nacos}
-      config:
-        server-addr: x-nacos.com:8848
-        username: ${NACOS_USERNAME:nacos}
-        password: ${NACOS_PASSWORD:nacos}
-        file-extension: yaml
     sentinel:
-      transport:
-        dashboard: x-sentinel.com:8080
-      eager: true
+      scg:
+        fallback:
+          mode: response
     openfeign:
       client:
         config:
@@ -61,9 +39,6 @@ spring:
         jwt:
           issuer-uri: http://x-gateway.com:9001
 
-server:
-  port: 9002
-
 mybatis-plus:
   mapper-locations: classpath*:/mapper/**/*.xml
   type-aliases-package: com.example.auth.domain
@@ -76,10 +51,6 @@ springdoc:
     path: /swagger-ui.html
   api-docs:
     path: /v3/api-docs
-
-jwt:
-  secret: ${JWT_SECRET:your-secret-key-please-change-in-production}
-  expiration: 86400000
 
 auth:
   server:

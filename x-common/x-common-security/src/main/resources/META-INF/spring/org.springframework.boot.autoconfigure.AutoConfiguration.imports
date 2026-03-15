@@ -1,0 +1,2 @@
+com.example.common.security.config.XCommonSecurityJwtAutoConfiguration
+com.example.common.security.config.XCommonSecurityHandlersAutoConfiguration
