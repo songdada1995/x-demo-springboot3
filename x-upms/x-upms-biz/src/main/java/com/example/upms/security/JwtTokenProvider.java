@@ -2,6 +2,7 @@ package com.example.upms.security;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
@@ -17,15 +18,16 @@ import java.util.Date;
 @Component
 public class JwtTokenProvider {
 
-    @Value("${app.jwt.secret}")
+    @Value("${jwt.secret:your-secret-key-please-change-in-production}")
     private String jwtSecret;
 
-    @Value("${app.jwt.expiration}")
-    private int jwtExpirationInMs;
+    @Value("${jwt.expiration:86400000}")
+    private long jwtExpirationInMs;
 
     private Key key;
 
-    public void afterPropertiesSet() {
+    @PostConstruct
+    public void init() {
         this.key = Keys.hmacShaKeyFor(jwtSecret.getBytes());
     }
 

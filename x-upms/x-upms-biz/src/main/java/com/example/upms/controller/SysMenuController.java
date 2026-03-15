@@ -3,17 +3,17 @@ package com.example.upms.controller;
 import com.example.common.core.response.R;
 import com.example.upms.api.domain.dto.SysMenuDTO;
 import com.example.upms.api.domain.vo.SysMenuVO;
+import com.example.upms.security.UserPrincipal;
 import com.example.upms.service.ISysMenuService;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
-@Tag(name = "菜单管理")
 @RestController
 @RequestMapping("/api/system/menu")
 @RequiredArgsConstructor
@@ -21,55 +21,67 @@ public class SysMenuController {
 
     private final ISysMenuService menuService;
 
-    @Operation(summary = "获取菜单列表")
     @GetMapping("/list")
-    @PreAuthorize("@ss.hasPermi('system:menu:list')")
     public R<List<SysMenuVO>> list(SysMenuDTO menuDTO) {
         List<SysMenuVO> menus = menuService.list(menuDTO);
         return R.ok(menus);
     }
 
-    @Operation(summary = "获取菜单详细信息")
+    @GetMapping("/user/routes")
+    public R<List<SysMenuVO>> getUserRoutes() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || !(auth.getPrincipal() instanceof UserPrincipal principal)) {
+            return R.fail("未登录");
+        }
+        Long userId = principal.getId();
+
+        List<SysMenuVO> menus;
+        if (userId == 1L) {
+            menus = menuService.list(new SysMenuDTO()).stream()
+                    .filter(m -> "0".equals(m.getStatus()))
+                    .collect(Collectors.toList());
+        } else {
+            menus = menuService.selectMenusByUserId(userId);
+        }
+
+        List<SysMenuVO> navigationMenus = menus.stream()
+                .filter(m -> "M".equals(m.getMenuType()) || "C".equals(m.getMenuType()))
+                .collect(Collectors.toList());
+
+        return R.ok(menuService.buildMenuTree(navigationMenus));
+    }
+
     @GetMapping("/{menuId}")
-    @PreAuthorize("@ss.hasPermi('system:menu:query')")
-    public R<SysMenuVO> getInfo(@PathVariable Long menuId) {
+    public R<SysMenuVO> getInfo(@PathVariable("menuId") Long menuId) {
         return R.ok(menuService.getInfo(menuId));
     }
 
-    @Operation(summary = "新增菜单")
     @PostMapping
-    @PreAuthorize("@ss.hasPermi('system:menu:add')")
     public R<Void> add(@Validated @RequestBody SysMenuDTO menuDTO) {
         menuService.add(menuDTO);
         return R.ok();
     }
 
-    @Operation(summary = "修改菜单")
     @PutMapping
-    @PreAuthorize("@ss.hasPermi('system:menu:edit')")
     public R<Void> edit(@Validated @RequestBody SysMenuDTO menuDTO) {
         menuService.edit(menuDTO);
         return R.ok();
     }
 
-    @Operation(summary = "删除菜单")
     @DeleteMapping("/{menuId}")
-    @PreAuthorize("@ss.hasPermi('system:menu:remove')")
-    public R<Void> remove(@PathVariable Long menuId) {
+    public R<Void> remove(@PathVariable("menuId") Long menuId) {
         menuService.remove(menuId);
         return R.ok();
     }
 
-    @Operation(summary = "获取菜单下拉树列表")
     @GetMapping("/treeselect")
     public R<List<SysMenuVO>> treeselect(SysMenuDTO menuDTO) {
         List<SysMenuVO> menus = menuService.list(menuDTO);
         return R.ok(menuService.buildMenuTree(menus));
     }
 
-    @Operation(summary = "获取角色菜单列表")
     @GetMapping("/roleMenuTreeselect/{roleId}")
-    public R<List<SysMenuVO>> roleMenuTreeselect(@PathVariable Long roleId) {
+    public R<List<SysMenuVO>> roleMenuTreeselect(@PathVariable("roleId") Long roleId) {
         List<SysMenuVO> menus = menuService.list(new SysMenuDTO());
         return R.ok(menuService.buildMenuTree(menus));
     }

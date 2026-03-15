@@ -39,11 +39,8 @@ import java.util.UUID;
 @EnableWebSecurity
 public class OAuth2AuthorizationServerConfig {
 
-    @Value("${auth.server.issuer}")
+    @Value("${auth.server.issuer:http://localhost:9002}")
     private String issuer;
-
-    @Value("${auth.server.allowed-redirect-uris}")
-    private String[] allowedRedirectUris;
 
     @Autowired
     private RemoteClientDetailsService remoteClientDetailsService;
@@ -57,6 +54,7 @@ public class OAuth2AuthorizationServerConfig {
     @Bean
     @Order(1)
     public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity http) throws Exception {
+        OAuth2AuthorizationServerConfiguration.applyDefaultSecurity(http);
         http.getConfigurer(OAuth2AuthorizationServerConfigurer.class)
                 .oidc(Customizer.withDefaults());
         http
@@ -80,7 +78,8 @@ public class OAuth2AuthorizationServerConfig {
 
             @Override
             public RegisteredClient findById(String id) {
-                OAuth2RegisteredClient client = remoteClientDetailsService.selectById(id);
+                R<OAuth2RegisteredClient> r = remoteClientDetailsService.selectById(id);
+                OAuth2RegisteredClient client = r != null ? r.getData() : null;
                 return client != null ? client.toRegisteredClient() : null;
             }
 

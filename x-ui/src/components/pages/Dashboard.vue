@@ -9,7 +9,7 @@
         <a-card>
           <template #title>用户总数</template>
           <div class="card-content">
-            <span class="number">1,234</span>
+            <span class="number">{{ stats.userCount }}</span>
             <span class="label">人</span>
           </div>
         </a-card>
@@ -18,7 +18,7 @@
         <a-card>
           <template #title>今日访问</template>
           <div class="card-content">
-            <span class="number">256</span>
+            <span class="number">{{ stats.todayVisits }}</span>
             <span class="label">次</span>
           </div>
         </a-card>
@@ -27,7 +27,7 @@
         <a-card>
           <template #title>系统消息</template>
           <div class="card-content">
-            <span class="number">12</span>
+            <span class="number">{{ stats.messageCount }}</span>
             <span class="label">条</span>
           </div>
         </a-card>
@@ -36,7 +36,7 @@
         <a-card>
           <template #title>待办事项</template>
           <div class="card-content">
-            <span class="number">5</span>
+            <span class="number">{{ stats.todoCount }}</span>
             <span class="label">项</span>
           </div>
         </a-card>
@@ -47,10 +47,10 @@
       <a-col :span="12">
         <a-card title="最近活动">
           <a-timeline>
-            <a-timeline-item>创建项目 2024-01-01</a-timeline-item>
-            <a-timeline-item>系统初始化 2024-01-02</a-timeline-item>
-            <a-timeline-item>技术评审 2024-01-03</a-timeline-item>
-            <a-timeline-item>设计评审 2024-01-04</a-timeline-item>
+            <a-timeline-item v-for="(activity, index) in activities" :key="index">
+              {{ activity.content }} {{ activity.time }}
+            </a-timeline-item>
+            <a-timeline-item v-if="activities.length === 0">暂无活动记录</a-timeline-item>
           </a-timeline>
         </a-card>
       </a-col>
@@ -59,8 +59,8 @@
           <a-list :data-source="notices" :pagination="false">
             <template #renderItem="{ item }">
               <a-list-item>
-                <a-list-item-meta :title="item.title">
-                  <template #description>{{ item.date }}</template>
+                <a-list-item-meta :title="item.noticeTitle">
+                  <template #description>{{ item.createTime }}</template>
                 </a-list-item-meta>
               </a-list-item>
             </template>
@@ -72,22 +72,29 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
+import { dashboardApi } from '../../api/dashboard'
 
-const notices = ref([
-  {
-    title: '系统升级通知',
-    date: '2024-01-01'
-  },
-  {
-    title: '新功能发布公告',
-    date: '2024-01-02'
-  },
-  {
-    title: '安全更新提醒',
-    date: '2024-01-03'
+const stats = reactive({ userCount: 0, todayVisits: 0, messageCount: 0, todoCount: 0 })
+const notices = ref<any[]>([])
+const activities = ref<any[]>([])
+
+const loadData = async () => {
+  try {
+    const [statsRes, noticesRes, activityRes] = await Promise.all([
+      dashboardApi.stats(),
+      dashboardApi.notices(),
+      dashboardApi.recentActivity(),
+    ])
+    Object.assign(stats, (statsRes as any).data)
+    notices.value = (noticesRes as any).data || []
+    activities.value = (activityRes as any).data || []
+  } catch {
+    // fallback
   }
-])
+}
+
+onMounted(() => loadData())
 </script>
 
 <style scoped>

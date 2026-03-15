@@ -37,6 +37,18 @@
             <groupId>com.alibaba.cloud</groupId>
             <artifactId>spring-cloud-alibaba-sentinel-gateway</artifactId>
         </dependency>
+        <!-- Common Security (for JWT Utils) -->
+        <dependency>
+            <groupId>com.example</groupId>
+            <artifactId>x-common-security</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+        <!-- Common Core -->
+        <dependency>
+            <groupId>com.example</groupId>
+            <artifactId>x-common-core</artifactId>
+            <version>1.0.0</version>
+        </dependency>
     </dependencies>
 
     <build>

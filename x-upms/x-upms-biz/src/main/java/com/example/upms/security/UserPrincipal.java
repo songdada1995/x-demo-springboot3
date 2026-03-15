@@ -29,6 +29,7 @@ public class UserPrincipal implements UserDetails {
 
     public static UserPrincipal create(SysUser user, List<String> permissions) {
         List<GrantedAuthority> authorities = permissions.stream()
+                .filter(permission -> permission != null && !permission.isBlank())
                 .map(permission -> new SimpleGrantedAuthority(permission))
                 .collect(Collectors.toList());
 

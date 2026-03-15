@@ -236,6 +236,49 @@
   }
 }
 
+/* 搜索区域与操作按钮 - 响应式布局 */
+.search-area,
+.search-form {
+  .ant-form-item-control-input {
+    min-width: 0; /* 防止 flex 子项溢出 */
+  }
+  .ant-input,
+  .ant-select,
+  .ant-picker {
+    width: 100% !important;
+    max-width: 100%;
+    min-width: 0;
+  }
+}
+
+.table-operations,
+.search-form .button-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+
+  .ant-space {
+    flex-wrap: wrap;
+  }
+}
+
+/* 小屏下搜索区域表单项与选择器自适应 */
+@media (max-width: 768px) {
+  .search-area .ant-form-item .ant-select,
+  .search-area .ant-form-item .ant-select-selector,
+  .search-form .ant-form-item .ant-select,
+  .search-form .ant-form-item .ant-select-selector {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  .search-area .ant-form-item .ant-picker,
+  .search-form .ant-form-item .ant-picker {
+    width: 100% !important;
+    max-width: 100%;
+  }
+}
+
 /* 全局弹出菜单样式 */
 .ant-dropdown-menu {
   background-color: #fff !important;

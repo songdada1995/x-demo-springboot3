@@ -1,104 +1,101 @@
 <template>
-  <div class="permissions-container">
+  <div class="menu-container">
     <a-card :bordered="false">
       <!-- 搜索区域 -->
       <div class="search-area">
         <a-row :gutter="[16, 16]">
-          <a-col :span="6">
-            <a-form-item label="权限名称">
-              <a-input v-model:value="searchForm.name" placeholder="请输入权限名称" />
+          <a-col :xs="24" :sm="12" :md="8" :lg="6">
+            <a-form-item label="菜单名称">
+              <a-input v-model:value="searchForm.menuName" placeholder="请输入菜单名称" allow-clear />
             </a-form-item>
           </a-col>
-          <a-col :span="6">
-            <a-form-item label="权限编码">
-              <a-input v-model:value="searchForm.code" placeholder="请输入权限编码" />
-            </a-form-item>
-          </a-col>
-          <a-col :span="6">
-            <a-form-item label="权限类型">
-              <a-select v-model:value="searchForm.type" placeholder="请选择权限类型">
+          <a-col :xs="24" :sm="12" :md="8" :lg="6">
+            <a-form-item label="状态">
+              <a-select v-model:value="searchForm.status" placeholder="请选择状态" allow-clear>
                 <a-select-option value="">全部</a-select-option>
-                <a-select-option value="menu">菜单</a-select-option>
-                <a-select-option value="button">按钮</a-select-option>
-                <a-select-option value="api">接口</a-select-option>
+                <a-select-option value="0">正常</a-select-option>
+                <a-select-option value="1">停用</a-select-option>
               </a-select>
             </a-form-item>
           </a-col>
           <a-col :span="6">
-            <a-form-item label="创建时间">
-              <a-range-picker
-                v-model:value="searchForm.createTime"
-                style="width: 240px"
-                :locale="locale"
-                :placeholder="['开始时间', '结束时间']"
-                :show-time="false"
-                format="YYYY-MM-DD"
-              />
-            </a-form-item>
+            <a-space>
+              <a-button type="primary" class="theme-button" @click="handleSearch">
+                <template #icon><search-outlined /></template>
+                搜索
+              </a-button>
+              <a-button @click="handleReset">
+                <template #icon><reload-outlined /></template>
+                重置
+              </a-button>
+            </a-space>
           </a-col>
         </a-row>
       </div>
 
-      <!-- 操作按钮区域 -->
+      <!-- 操作按钮 -->
       <div class="table-operations">
-        <a-space>
-          <a-button type="primary" class="theme-button" @click="handleSearch">
-            <template #icon><search-outlined /></template>
-            搜索
-          </a-button>
-          <a-button type="primary" class="theme-button" @click="handleExport">
-            <template #icon><export-outlined /></template>
-            导出
-          </a-button>
-          <a-button type="primary" class="theme-button" @click="handleAdd">
+        <a-space wrap>
+          <a-button type="primary" class="theme-button" @click="handleAdd(0)">
             <template #icon><plus-outlined /></template>
-            新增
+            新增菜单
           </a-button>
-          <a-button type="primary" class="theme-button" @click="handleBatchEdit">
-            <template #icon><edit-outlined /></template>
-            修改
-          </a-button>
-          <a-button danger @click="handleBatchDelete">
-            <template #icon><delete-outlined /></template>
-            删除
-          </a-button>
-          <a-button @click="handleReset">
-            <template #icon><reload-outlined /></template>
-            重置
+          <a-button @click="toggleExpandAll">
+            <template #icon><menu-unfold-outlined v-if="!isExpandAll" /><menu-fold-outlined v-else /></template>
+            {{ isExpandAll ? '全部折叠' : '全部展开' }}
           </a-button>
         </a-space>
       </div>
 
-      <!-- 表格区域 -->
+      <!-- 树形表格 -->
       <a-table
         :columns="columns"
-        :data-source="dataSource"
+        :data-source="treeData"
         :loading="loading"
-        :pagination="pagination"
-        :row-selection="{ selectedRowKeys, onChange: onSelectChange }"
-        row-key="id"
-        @change="handleTableChange"
+        :pagination="false"
+        v-model:expandedRowKeys="expandedKeys"
+        row-key="menuId"
       >
-        <!-- 权限类型列 -->
         <template #bodyCell="{ column, record }">
-          <template v-if="column.key === 'type'">
-            <a-tag :color="getTypeColor(record.type)">
-              {{ getTypeText(record.type) }}
-            </a-tag>
+          <!-- 菜单名称列：带图标 -->
+          <template v-if="column.key === 'menuName'">
+            <span>
+              <folder-outlined v-if="record.menuType === 'M'" style="color: #faad14; margin-right: 6px;" />
+              <file-outlined v-else-if="record.menuType === 'C'" style="color: #1890ff; margin-right: 6px;" />
+              <api-outlined v-else style="color: #52c41a; margin-right: 6px;" />
+              {{ record.menuName }}
+            </span>
           </template>
-          <!-- 操作列 -->
+          <!-- 类型 -->
+          <template v-if="column.key === 'menuType'">
+            <a-tag :color="typeColorMap[record.menuType]">{{ typeTextMap[record.menuType] }}</a-tag>
+          </template>
+          <!-- 图标 -->
+          <template v-if="column.key === 'icon'">
+            <span v-if="record.icon && record.icon !== '#'">{{ record.icon }}</span>
+            <span v-else style="color: #ccc;">-</span>
+          </template>
+          <!-- 权限标识 -->
+          <template v-if="column.key === 'perms'">
+            <span v-if="record.perms">{{ record.perms }}</span>
+            <span v-else style="color: #ccc;">-</span>
+          </template>
+          <!-- 状态 -->
+          <template v-if="column.key === 'status'">
+            <a-tag :color="record.status === '0' ? 'green' : 'red'">{{ record.status === '0' ? '正常' : '停用' }}</a-tag>
+          </template>
+          <!-- 排序 -->
+          <template v-if="column.key === 'orderNum'">
+            {{ record.orderNum }}
+          </template>
+          <!-- 操作 -->
           <template v-if="column.key === 'action'">
             <div class="action-column">
+              <a class="action-link" v-if="record.menuType !== 'F'" @click="handleAdd(record.menuId)">新增</a>
+              <a-divider type="vertical" v-if="record.menuType !== 'F'" />
               <a class="action-link" @click="handleEdit(record)">编辑</a>
               <a-divider type="vertical" />
-              <a-popconfirm
-                title="确定要删除这个权限吗？"
-                @confirm="handleDelete(record)"
-                okText="确定"
-                cancelText="取消"
-                :okButtonProps="{ type: 'primary', danger: true }"
-                :cancelButtonProps="{ type: 'default' }"
-              >
+              <a-popconfirm title="确定要删除此菜单吗？" @confirm="handleDelete(record)" okText="确定" cancelText="取消">
                 <a class="action-danger">删除</a>
               </a-popconfirm>
             </div>
@@ -107,61 +104,65 @@
       </a-table>
     </a-card>
 
-    <!-- 权限表单对话框 -->
+    <!-- 菜单表单对话框 -->
     <a-modal
       v-model:open="modalVisible"
       :title="modalTitle"
       @ok="handleModalOk"
-      @cancel="handleModalCancel"
-      width="600px"
+      @cancel="modalVisible = false"
+      width="650px"
       :maskClosable="false"
       :destroyOnClose="true"
       okText="确定"
       cancelText="取消"
     >
-      <a-form
-        ref="formRef"
-        :model="formState"
-        :rules="rules"
-        :label-col="{ span: 6 }"
-        :wrapper-col="{ span: 16 }"
-      >
-        <a-form-item label="权限名称" name="name">
-          <a-input v-model:value="formState.name" placeholder="请输入权限名称" />
-        </a-form-item>
-        <a-form-item label="权限编码" name="code">
-          <a-input v-model:value="formState.code" placeholder="请输入权限编码" />
-        </a-form-item>
-        <a-form-item label="权限类型" name="type">
-          <a-select v-model:value="formState.type" placeholder="请选择权限类型">
-            <a-select-option value="menu">菜单</a-select-option>
-            <a-select-option value="button">按钮</a-select-option>
-            <a-select-option value="api">接口</a-select-option>
-          </a-select>
-        </a-form-item>
-        <a-form-item label="父级权限" name="parentId">
+      <a-form ref="formRef" :model="formState" :rules="rules" :label-col="{ span: 5 }" :wrapper-col="{ span: 17 }">
+        <a-form-item label="上级菜单" name="parentId">
           <a-tree-select
             v-model:value="formState.parentId"
-            :tree-data="permissionTree"
-            placeholder="请选择父级权限"
+            :tree-data="parentTreeData"
+            placeholder="选择上级菜单（不选则为顶级）"
             allow-clear
+            :field-names="{ label: 'menuName', value: 'menuId', children: 'children' }"
+            tree-default-expand-all
           />
         </a-form-item>
-        <a-form-item label="权限路径" name="path">
-          <a-input v-model:value="formState.path" placeholder="请输入权限路径" />
+        <a-form-item label="菜单类型" name="menuType">
+          <a-radio-group v-model:value="formState.menuType">
+            <a-radio value="M">目录</a-radio>
+            <a-radio value="C">菜单</a-radio>
+            <a-radio value="F">按钮</a-radio>
+          </a-radio-group>
         </a-form-item>
-        <a-form-item label="权限图标" name="icon">
-          <a-input v-model:value="formState.icon" placeholder="请输入权限图标" />
+        <a-form-item label="菜单名称" name="menuName">
+          <a-input v-model:value="formState.menuName" placeholder="请输入菜单名称" />
         </a-form-item>
-        <a-form-item label="排序" name="sort">
-          <a-input-number v-model:value="formState.sort" :min="0" :max="999" />
+        <a-form-item label="排序" name="orderNum">
+          <a-input-number v-model:value="formState.orderNum" :min="0" :max="999" style="width: 100%;" />
         </a-form-item>
-        <a-form-item label="备注" name="description">
-          <a-textarea
-            v-model:value="formState.description"
-            placeholder="请输入备注"
-            :rows="4"
-          />
+        <a-form-item label="路由地址" name="path" v-if="formState.menuType !== 'F'">
+          <a-input v-model:value="formState.path" placeholder="请输入路由地址，如 users" />
+        </a-form-item>
+        <a-form-item label="组件路径" name="component" v-if="formState.menuType === 'C'">
+          <a-input v-model:value="formState.component" placeholder="请输入组件路径，如 system/users/index" />
+        </a-form-item>
+        <a-form-item label="权限标识" name="perms" v-if="formState.menuType !== 'M'">
+          <a-input v-model:value="formState.perms" placeholder="请输入权限标识，如 system:user:list" />
+        </a-form-item>
+        <a-form-item label="菜单图标" name="icon" v-if="formState.menuType !== 'F'">
+          <a-input v-model:value="formState.icon" placeholder="请输入图标名称，如 setting、user" />
+        </a-form-item>
+        <a-form-item label="显示状态" name="visible" v-if="formState.menuType !== 'F'">
+          <a-radio-group v-model:value="formState.visible">
+            <a-radio value="0">显示</a-radio>
+            <a-radio value="1">隐藏</a-radio>
+          </a-radio-group>
+        </a-form-item>
+        <a-form-item label="菜单状态" name="status">
+          <a-radio-group v-model:value="formState.status">
+            <a-radio value="0">正常</a-radio>
+            <a-radio value="1">停用</a-radio>
+          </a-radio-group>
         </a-form-item>
       </a-form>
     </a-modal>
@@ -175,284 +176,218 @@ import {
   PlusOutlined,
   SearchOutlined,
   ReloadOutlined,
-  ExportOutlined,
-  EditOutlined,
-  DeleteOutlined,
+  FolderOutlined,
+  FileOutlined,
+  ApiOutlined,
+  MenuUnfoldOutlined,
+  MenuFoldOutlined,
 } from '@ant-design/icons-vue'
-import type { TablePaginationConfig } from 'ant-design-vue'
-import zhCN from 'ant-design-vue/es/locale/zh_CN'
-import { createDefaultPagination } from '../../../utils/pagination'
+import { menuApi } from '../../../api/menu'
 
-// 日期选择器中文配置
-const locale = zhCN
+const typeTextMap: Record<string, string> = { M: '目录', C: '菜单', F: '按钮' }
+const typeColorMap: Record<string, string> = { M: 'orange', C: 'blue', F: 'green' }
 
-// 搜索表单数据
-const searchForm = reactive({
-  name: '',
-  code: '',
-  type: '',
-  createTime: [],
-})
+const searchForm = reactive({ menuName: '', status: '' })
 
-// 表格列定义
 const columns = [
-  {
-    title: '权限名称',
-    dataIndex: 'name',
-    key: 'name',
-    width: '20%',
-  },
-  {
-    title: '权限编码',
-    dataIndex: 'code',
-    key: 'code',
-    width: '20%',
-  },
-  {
-    title: '权限类型',
-    dataIndex: 'type',
-    key: 'type',
-    width: '10%',
-  },
-  {
-    title: '权限路径',
-    dataIndex: 'path',
-    key: 'path',
-    width: '20%',
-  },
-  {
-    title: '创建时间',
-    dataIndex: 'createTime',
-    key: 'createTime',
-    width: '10%',
-  },
-  {
-    title: '操作',
-    key: 'action',
-    width: '20%',
-  },
+  { title: '菜单名称', dataIndex: 'menuName', key: 'menuName', width: 220 },
+  { title: '类型', dataIndex: 'menuType', key: 'menuType', width: 80, align: 'center' as const },
+  { title: '图标', dataIndex: 'icon', key: 'icon', width: 80, align: 'center' as const },
+  { title: '排序', dataIndex: 'orderNum', key: 'orderNum', width: 60, align: 'center' as const },
+  { title: '权限标识', dataIndex: 'perms', key: 'perms', width: 180 },
+  { title: '路由地址', dataIndex: 'path', key: 'path', width: 120 },
+  { title: '组件路径', dataIndex: 'component', key: 'component', width: 180 },
+  { title: '状态', dataIndex: 'status', key: 'status', width: 80, align: 'center' as const },
+  { title: '操作', key: 'action', width: 180, fixed: 'right' as const },
 ]
 
-// 表格数据
-const dataSource = ref([
-  {
-    id: 1,
-    name: '系统管理',
-    code: 'system',
-    type: 'menu',
-    path: '/system',
-    icon: 'setting',
-    sort: 1,
-    parentId: null,
-    createTime: '2024-01-01 12:00:00',
-    description: '系统管理模块',
-  },
-  {
-    id: 2,
-    name: '用户管理',
-    code: 'system:user',
-    type: 'menu',
-    path: '/system/user',
-    icon: 'user',
-    sort: 1,
-    parentId: 1,
-    createTime: '2024-01-01 12:00:00',
-    description: '用户管理模块',
-  },
-  {
-    id: 3,
-    name: '新增用户',
-    code: 'system:user:add',
-    type: 'button',
-    path: null,
-    icon: null,
-    sort: 1,
-    parentId: 2,
-    createTime: '2024-01-01 12:00:00',
-    description: '新增用户按钮',
-  },
-])
-
-// 权限树数据
-const permissionTree = ref([
-  {
-    title: '系统管理',
-    value: 1,
-    children: [
-      {
-        title: '用户管理',
-        value: 2,
-      },
-    ],
-  },
-])
-
-// 加载状态
+const treeData = ref<any[]>([])
+const allMenus = ref<any[]>([])
+const parentTreeData = ref<any[]>([])
 const loading = ref(false)
+const expandedKeys = ref<number[]>([])
+const isExpandAll = ref(true)
 
-// 分页配置
-const pagination = reactive<TablePaginationConfig>(createDefaultPagination())
-
-// 选中的行
-const selectedRowKeys = ref<number[]>([])
-
-// 表单相关
 const modalVisible = ref(false)
-const modalTitle = ref('新增权限')
+const modalTitle = ref('新增菜单')
 const formRef = ref()
 const formState = reactive({
-  id: undefined,
-  name: '',
-  code: '',
-  type: 'menu',
+  menuId: undefined as number | undefined,
+  parentId: 0 as number | null,
+  menuType: 'M' as string,
+  menuName: '',
+  orderNum: 0,
   path: '',
+  component: '',
+  perms: '',
   icon: '',
-  sort: 0,
-  parentId: null,
-  description: '',
+  visible: '0',
+  status: '0',
 })
 
-// 表单验证规则
 const rules = {
-  name: [{ required: true, message: '请输入权限名称', trigger: 'blur' }],
-  code: [{ required: true, message: '请输入权限编码', trigger: 'blur' }],
-  type: [{ required: true, message: '请选择权限类型', trigger: 'change' }],
+  menuName: [{ required: true, message: '请输入菜单名称', trigger: 'blur' }],
+  menuType: [{ required: true, message: '请选择菜单类型', trigger: 'change' }],
+  orderNum: [{ required: true, message: '请输入排序', trigger: 'blur' }],
 }
 
-// 获取权限类型颜色
-const getTypeColor = (type: 'menu' | 'button' | 'api') => {
-  const colors: Record<string, string> = {
-    menu: 'blue',
-    button: 'green',
-    api: 'purple',
+const buildTree = (menus: any[], parentId: number = 0): any[] => {
+  return menus
+    .filter(m => m.parentId === parentId)
+    .sort((a, b) => (a.orderNum || 0) - (b.orderNum || 0))
+    .map(m => {
+      const children = buildTree(menus, m.menuId)
+      return children.length > 0 ? { ...m, children } : { ...m }
+    })
+}
+
+const collectAllKeys = (tree: any[]): number[] => {
+  const keys: number[] = []
+  const walk = (nodes: any[]) => {
+    for (const n of nodes) {
+      if (n.children && n.children.length > 0) {
+        keys.push(n.menuId)
+        walk(n.children)
+      }
+    }
   }
-  return colors[type] || 'default'
+  walk(tree)
+  return keys
 }
 
-// 获取权限类型文本
-const getTypeText = (type: 'menu' | 'button' | 'api') => {
-  const texts: Record<string, string> = {
-    menu: '菜单',
-    button: '按钮',
-    api: '接口',
-  }
-  return texts[type] || type
-}
-
-// 处理表格变化
-const handleTableChange = (pag: TablePaginationConfig) => {
-  pagination.current = pag.current || 1
-  pagination.pageSize = pag.pageSize || 10
-  fetchData()
-}
-
-// 获取数据
-const fetchData = () => {
+const fetchData = async () => {
   loading.value = true
-  // 这里模拟异步请求
-  setTimeout(() => {
+  try {
+    const res: any = await menuApi.list({
+      menuName: searchForm.menuName || undefined,
+      status: searchForm.status || undefined,
+    })
+    allMenus.value = res.data || []
+    const tree = buildTree(allMenus.value)
+    treeData.value = tree
+    expandedKeys.value = collectAllKeys(tree)
+    isExpandAll.value = true
+
+    const rootNode = { menuId: 0, menuName: '根目录', children: [] as any[] }
+    rootNode.children = buildTree(
+      allMenus.value.filter(m => m.menuType === 'M' || m.menuType === 'C'),
+    )
+    parentTreeData.value = [rootNode]
+  } catch (e: any) {
+    message.error(e.message || '获取菜单列表失败')
+  } finally {
     loading.value = false
-    pagination.total = dataSource.value.length
-  }, 500)
-}
-
-// 处理搜索
-const handleSearch = () => {
-  pagination.current = 1
-  fetchData()
-}
-
-// 处理导出
-const handleExport = () => {
-  message.success('导出成功')
-}
-
-// 处理批量编辑
-const handleBatchEdit = () => {
-  if (selectedRowKeys.value.length !== 1) {
-    message.warning('请选择一条记录进行编辑')
-    return
-  }
-  const record = dataSource.value.find(item => item.id === selectedRowKeys.value[0])
-  if (record) {
-    handleEdit(record)
   }
 }
 
-// 处理批量删除
-const handleBatchDelete = () => {
-  if (selectedRowKeys.value.length === 0) {
-    message.warning('请选择要删除的记录')
-    return
-  }
-  message.success(`删除选中的 ${selectedRowKeys.value.length} 条记录成功`)
-  fetchData()
-}
-
-// 处理选择变化
-const onSelectChange = (keys: number[]) => {
-  selectedRowKeys.value = keys
-}
-
-// 新增权限
-const handleAdd = () => {
-  modalTitle.value = '新增权限'
-  formState.id = undefined
-  formState.name = ''
-  formState.code = ''
-  formState.type = 'menu'
-  formState.path = ''
-  formState.icon = ''
-  formState.sort = 0
-  formState.parentId = null
-  formState.description = ''
-  modalVisible.value = true
-}
-
-// 编辑权限
-const handleEdit = (record: any) => {
-  modalTitle.value = '编辑权限'
-  Object.assign(formState, record)
-  modalVisible.value = true
-}
-
-// 删除权限
-const handleDelete = (record: any) => {
-  message.success(`删除权限 ${record.name} 成功`)
-  fetchData()
-}
-
-// 重置搜索
+const handleSearch = () => fetchData()
 const handleReset = () => {
-  searchForm.name = ''
-  searchForm.code = ''
-  searchForm.type = ''
-  searchForm.createTime = []
-  handleSearch()
+  searchForm.menuName = ''
+  searchForm.status = ''
+  fetchData()
 }
 
-// 模态框确认
-const handleModalOk = () => {
-  formRef.value?.validate().then(() => {
-    message.success(`${modalTitle.value}成功`)
-    modalVisible.value = false
+const toggleExpandAll = () => {
+  if (isExpandAll.value) {
+    expandedKeys.value = []
+    isExpandAll.value = false
+  } else {
+    expandedKeys.value = collectAllKeys(treeData.value)
+    isExpandAll.value = true
+  }
+}
+
+const resetForm = () => {
+  formState.menuId = undefined
+  formState.parentId = 0
+  formState.menuType = 'M'
+  formState.menuName = ''
+  formState.orderNum = 0
+  formState.path = ''
+  formState.component = ''
+  formState.perms = ''
+  formState.icon = ''
+  formState.visible = '0'
+  formState.status = '0'
+}
+
+const handleAdd = (parentId: number) => {
+  resetForm()
+  formState.parentId = parentId || 0
+  if (parentId > 0) {
+    const parent = allMenus.value.find(m => m.menuId === parentId)
+    if (parent?.menuType === 'M') {
+      formState.menuType = 'C'
+    } else if (parent?.menuType === 'C') {
+      formState.menuType = 'F'
+    }
+  }
+  modalTitle.value = '新增菜单'
+  modalVisible.value = true
+}
+
+const handleEdit = (record: any) => {
+  resetForm()
+  formState.menuId = record.menuId
+  formState.parentId = record.parentId || 0
+  formState.menuType = record.menuType
+  formState.menuName = record.menuName
+  formState.orderNum = record.orderNum
+  formState.path = record.path || ''
+  formState.component = record.component || ''
+  formState.perms = record.perms || ''
+  formState.icon = record.icon || ''
+  formState.visible = record.visible || '0'
+  formState.status = record.status || '0'
+  modalTitle.value = '编辑菜单'
+  modalVisible.value = true
+}
+
+const handleDelete = async (record: any) => {
+  try {
+    await menuApi.remove(record.menuId)
+    message.success(`删除菜单"${record.menuName}"成功`)
     fetchData()
+  } catch (e: any) {
+    message.error(e.message || '删除失败')
+  }
+}
+
+const handleModalOk = () => {
+  formRef.value?.validate().then(async () => {
+    try {
+      const data: any = {
+        menuId: formState.menuId,
+        parentId: formState.parentId || 0,
+        menuType: formState.menuType,
+        menuName: formState.menuName,
+        orderNum: formState.orderNum,
+        path: formState.path,
+        component: formState.component || null,
+        perms: formState.perms || null,
+        icon: formState.icon || '#',
+        visible: formState.visible,
+        status: formState.status,
+      }
+      if (formState.menuId) {
+        await menuApi.edit(data)
+      } else {
+        await menuApi.add(data)
+      }
+      message.success(`${modalTitle.value}成功`)
+      modalVisible.value = false
+      fetchData()
+    } catch (e: any) {
+      message.error(e.message || `${modalTitle.value}失败`)
+    }
   })
 }
 
-// 模态框取消
-const handleModalCancel = () => {
-  modalVisible.value = false
-}
-
-// 初始化
-onMounted(() => {
-  fetchData()
-})
+onMounted(() => fetchData())
 </script>
 
 <style scoped>
-.permissions-container {
+.menu-container {
   padding: 0;
 }
 
@@ -462,16 +397,6 @@ onMounted(() => {
 
 .table-operations {
   margin-bottom: 16px;
-  display: flex;
-  justify-content: flex-start;
-}
-
-.danger {
-  color: #ff4d4f;
-}
-
-.danger:hover {
-  color: #ff7875;
 }
 
 :deep(.ant-form-item) {
@@ -482,187 +407,33 @@ onMounted(() => {
 
 :deep(.ant-form-item-label) {
   padding-bottom: 0;
-  width: 70px;
-  text-align: right;
-  padding-right: 8px;
-  flex: 0 0 70px !important;
-  max-width: 70px !important;
-}
-
-:deep(.ant-form-item-control) {
-  width: 240px;
-  margin-left: 0 !important;
-  flex: 0 0 240px !important;
-}
-
-:deep(.ant-card-head) {
-  min-height: 48px;
-  padding: 0 16px;
 }
 
 :deep(.ant-card-body) {
   padding: 16px;
 }
 
-:deep(.ant-form-item-label > label) {
-  height: 32px;
-  line-height: 32px;
-  padding-right: 0;
+.action-column {
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
 }
 
-:deep(.ant-input),
-:deep(.ant-select),
-:deep(.ant-picker) {
-  width: 240px;
+.action-link {
+  color: #27c2ad;
+  cursor: pointer;
 }
 
-:deep(.ant-picker-range) {
-  width: 240px;
+.action-link:hover {
+  color: #2ed3bd;
 }
 
-/* 响应式布局调整 */
-@media screen and (max-width: 1200px) {
-  :deep(.ant-form-item-control) {
-    width: 220px;
-    flex: 0 0 220px !important;
-  }
-  
-  :deep(.ant-input),
-  :deep(.ant-select),
-  :deep(.ant-picker),
-  :deep(.ant-picker-range) {
-    width: 220px;
-  }
+.action-danger {
+  color: #ff4d4f;
+  cursor: pointer;
 }
 
-@media screen and (max-width: 992px) {
-  :deep(.ant-form-item-control) {
-    width: 200px;
-    flex: 0 0 200px !important;
-  }
-  
-  :deep(.ant-input),
-  :deep(.ant-select),
-  :deep(.ant-picker),
-  :deep(.ant-picker-range) {
-    width: 200px;
-  }
+.action-danger:hover {
+  color: #ff7875;
 }
-
-/* 覆盖 ant-design-vue 的默认样式 */
-:deep(.ant-form-item-control-input) {
-  margin-left: 0 !important;
-  padding-left: 0 !important;
-}
-
-:deep(.ant-form-item-control-input-content) {
-  margin-left: 0 !important;
-  padding-left: 0 !important;
-}
-
-:deep(.ant-form-item-explain) {
-  margin-left: 0 !important;
-  padding-left: 0 !important;
-}
-
-:deep(.ant-form-item-extra) {
-  margin-left: 0 !important;
-  padding-left: 0 !important;
-}
-
-:deep(.ant-form-item-label-col) {
-  flex: 0 0 70px !important;
-  max-width: 70px !important;
-}
-
-:deep(.ant-form-item-control-col) {
-  flex: 0 0 240px !important;
-  max-width: 240px !important;
-}
-
-:deep(.ant-form-item-label-col > label) {
-  padding-right: 0 !important;
-  margin-right: 0 !important;
-}
-
-/* 日期选择器特殊处理 */
-:deep(.ant-picker) {
-  margin-left: 0 !important;
-}
-
-:deep(.ant-picker-range) {
-  margin-left: 0 !important;
-}
-
-:deep(.ant-picker-input) {
-  margin-left: 0 !important;
-}
-
-:deep(.ant-picker-separator) {
-  margin: 0 4px !important;
-}
-
-:deep(.ant-picker-suffix) {
-  margin-left: 4px !important;
-}
-
-/* 统一所有表单项的间距 */
-:deep(.ant-form-item-label),
-:deep(.ant-form-item-control),
-:deep(.ant-form-item-label-col),
-:deep(.ant-form-item-control-col) {
-  margin-right: 0 !important;
-  margin-left: 0 !important;
-  padding-right: 0 !important;
-  padding-left: 0 !important;
-}
-
-:deep(.ant-form-item-label) {
-  margin-right: 8px !important;
-}
-
-:deep(.ant-form-item-control) {
-  margin-left: 0 !important;
-}
-
-/* 确保所有输入框组件对齐 */
-:deep(.ant-input),
-:deep(.ant-select),
-:deep(.ant-picker),
-:deep(.ant-picker-range),
-:deep(.ant-select-selector),
-:deep(.ant-picker-input) {
-  margin-left: 0 !important;
-  padding-left: 0 !important;
-}
-
-/* 调整输入框内占位文字的边距 */
-:deep(.ant-input) {
-  padding-left: 8px !important;
-}
-
-:deep(.ant-select-selector) {
-  padding-left: 8px !important;
-}
-
-:deep(.ant-picker-input) {
-  padding-left: 8px !important;
-}
-
-:deep(.ant-picker-range .ant-picker-input) {
-  padding-left: 8px !important;
-}
-
-:deep(.ant-select-selection-placeholder) {
-  padding-left: 0 !important;
-}
-
-:deep(.ant-picker-input > input) {
-  padding-left: 0 !important;
-}
-
-/* 移除自定义按钮样式 */
-.primary-button {
-  display: none;
-}
-</style> 
+</style>

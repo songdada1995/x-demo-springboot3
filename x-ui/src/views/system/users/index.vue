@@ -4,36 +4,36 @@
       <!-- 搜索区域 -->
       <div class="search-area">
         <a-row :gutter="[16, 16]">
-          <a-col :span="6">
+          <a-col :xs="24" :sm="12" :md="8" :lg="6">
             <a-form-item label="用户名">
               <a-input v-model:value="searchForm.username" placeholder="请输入用户名" />
             </a-form-item>
           </a-col>
-          <a-col :span="6">
+          <a-col :xs="24" :sm="12" :md="8" :lg="6">
             <a-form-item label="姓名">
               <a-input v-model:value="searchForm.name" placeholder="请输入姓名" />
             </a-form-item>
           </a-col>
-          <a-col :span="6">
+          <a-col :xs="24" :sm="12" :md="8" :lg="6">
             <a-form-item label="手机号">
               <a-input v-model:value="searchForm.phone" placeholder="请输入手机号" />
             </a-form-item>
           </a-col>
-          <a-col :span="6">
+          <a-col :xs="24" :sm="12" :md="8" :lg="6">
             <a-form-item label="邮箱">
               <a-input v-model:value="searchForm.email" placeholder="请输入邮箱" />
             </a-form-item>
           </a-col>
-          <a-col :span="6">
+          <a-col :xs="24" :sm="12" :md="8" :lg="6">
             <a-form-item label="状态">
               <a-select v-model:value="searchForm.status" placeholder="请选择状态">
                 <a-select-option value="">全部</a-select-option>
-                <a-select-option value="1">启用</a-select-option>
-                <a-select-option value="0">禁用</a-select-option>
+                <a-select-option value="0">启用</a-select-option>
+                <a-select-option value="1">禁用</a-select-option>
               </a-select>
             </a-form-item>
           </a-col>
-          <a-col :span="6">
+          <a-col :xs="24" :sm="12" :md="8" :lg="6">
             <a-form-item label="创建时间">
               <a-range-picker
                 v-model:value="searchForm.createTime"
@@ -67,7 +67,7 @@
 
       <!-- 操作按钮区域 -->
       <div class="table-operations">
-        <a-space>
+        <a-space wrap>
           <a-button type="primary" class="theme-button" @click="handleSearch">
             <template #icon><search-outlined /></template>
             搜索
@@ -111,8 +111,8 @@
         <!-- 状态列 -->
         <template #bodyCell="{ column, record }">
           <template v-if="column.key === 'status'">
-            <a-tag :color="record.status === 1 ? 'green' : 'red'">
-              {{ record.status === 1 ? '启用' : '禁用' }}
+            <a-tag :color="record.status === 0 ? 'green' : 'red'">
+              {{ record.status === 0 ? '启用' : '禁用' }}
             </a-tag>
           </template>
           <!-- 操作列 -->
@@ -174,16 +174,13 @@
             v-model:value="formState.roles"
             mode="multiple"
             placeholder="请选择角色"
-          >
-            <a-select-option value="admin">超级管理员</a-select-option>
-            <a-select-option value="user">普通用户</a-select-option>
-            <a-select-option value="guest">访客</a-select-option>
-          </a-select>
+            :options="roleOptions"
+          />
         </a-form-item>
         <a-form-item label="状态" name="status">
           <a-radio-group v-model:value="formState.status">
-            <a-radio :value="1">启用</a-radio>
-            <a-radio :value="0">禁用</a-radio>
+            <a-radio :value="0">启用</a-radio>
+            <a-radio :value="1">禁用</a-radio>
           </a-radio-group>
         </a-form-item>
         <a-form-item label="备注" name="description">
@@ -212,23 +209,11 @@ import {
 import type { TablePaginationConfig } from 'ant-design-vue'
 import zhCN from 'ant-design-vue/es/date-picker/locale/zh_CN'
 import { createDefaultPagination } from '../../../utils/pagination'
+import { userApi } from '../../../api/user'
+import { roleApi } from '../../../api/role'
 
 // 日期选择器中文配置
 const locale = zhCN
-
-// 分页本地化配置
-const paginationLocale = {
-  items_per_page: '条/页',
-  jump_to: '跳至',
-  jump_to_confirm: '确定',
-  page: '页',
-  prev_page: '上一页',
-  next_page: '下一页',
-  prev_5: '向前 5 页',
-  next_5: '向后 5 页',
-  prev_3: '向前 3 页',
-  next_3: '向后 3 页',
-}
 
 // 搜索表单数据
 const searchForm = reactive({
@@ -290,41 +275,10 @@ const columns = [
 ]
 
 // 表格数据
-const dataSource = ref([
-  {
-    id: 1,
-    username: 'admin',
-    name: '管理员',
-    phone: '13800138000',
-    email: 'admin@example.com',
-    roles: ['admin'],
-    status: 1,
-    createTime: '2024-01-01 12:00:00',
-    description: '系统管理员',
-  },
-  {
-    id: 2,
-    username: 'user1',
-    name: '张三',
-    phone: '13800138001',
-    email: 'user1@example.com',
-    roles: ['user'],
-    status: 1,
-    createTime: '2024-01-01 12:00:00',
-    description: '普通用户',
-  },
-  {
-    id: 3,
-    username: 'guest1',
-    name: '李四',
-    phone: '13800138002',
-    email: 'guest1@example.com',
-    roles: ['guest'],
-    status: 0,
-    createTime: '2024-01-01 12:00:00',
-    description: '访客用户',
-  },
-])
+const dataSource = ref<any[]>([])
+
+// 角色选项列表（从后端加载）
+const roleOptions = ref<{ value: number; label: string }[]>([])
 
 // 加载状态
 const loading = ref(false)
@@ -343,7 +297,7 @@ const formState = reactive({
   phone: '',
   email: '',
   roles: [],
-  status: 1,
+  status: 0,
   description: '',
 })
 
@@ -365,13 +319,35 @@ const handleTableChange = (pag: TablePaginationConfig) => {
 }
 
 // 获取数据
-const fetchData = () => {
+const fetchData = async () => {
   loading.value = true
-  // 这里模拟异步请求
-  setTimeout(() => {
+  try {
+    const res: any = await userApi.list({
+      pageNum: pagination.current,
+      pageSize: pagination.pageSize,
+      username: searchForm.username || undefined,
+      nickname: searchForm.name || undefined,
+      phone: searchForm.phone || undefined,
+      email: searchForm.email || undefined,
+      status: searchForm.status || undefined,
+    })
+    const page = res.data
+    dataSource.value = (page.records || []).map((u: any) => ({
+      id: u.userId,
+      username: u.username,
+      name: u.nickname,
+      phone: u.phone,
+      email: u.email,
+      status: u.status,
+      createTime: u.createTime,
+      description: u.remark,
+    }))
+    pagination.total = page.total || 0
+  } catch (e: any) {
+    message.error(e.message || '获取用户列表失败')
+  } finally {
     loading.value = false
-    pagination.total = dataSource.value.length
-  }, 500)
+  }
 }
 
 // 处理搜索
@@ -399,12 +375,16 @@ const handleBatchEdit = () => {
 }
 
 // 处理批量删除
-const handleBatchDelete = () => {
+const handleBatchDelete = async () => {
   if (selectedRowKeys.value.length === 0) {
     message.warning('请选择要删除的记录')
     return
   }
+  for (const id of selectedRowKeys.value) {
+    await userApi.remove(id)
+  }
   message.success(`删除选中的 ${selectedRowKeys.value.length} 条记录成功`)
+  selectedRowKeys.value = []
   fetchData()
 }
 
@@ -417,27 +397,51 @@ const handleAdd = () => {
   formState.phone = ''
   formState.email = ''
   formState.roles = []
-  formState.status = 1
+  formState.status = 0
   formState.description = ''
   modalVisible.value = true
 }
 
 // 编辑用户
-const handleEdit = (record: any) => {
+const handleEdit = async (record: any) => {
+  if (record.id === 1) {
+    message.warning('超级管理员不允许编辑')
+    return
+  }
   modalTitle.value = '编辑用户'
   Object.assign(formState, record)
+  try {
+    const res: any = await userApi.getRoleIds(record.id)
+    formState.roles = res.data || []
+  } catch {
+    formState.roles = []
+  }
   modalVisible.value = true
 }
 
 // 重置密码
-const handleResetPassword = (record: any) => {
-  message.success(`重置用户 ${record.username} 的密码成功`)
+const handleResetPassword = async (record: any) => {
+  try {
+    await userApi.resetPwd({ userId: record.id, password: '123456' })
+    message.success(`重置用户 ${record.username} 的密码成功`)
+  } catch (e: any) {
+    message.error(e.message || '重置密码失败')
+  }
 }
 
 // 删除用户
-const handleDelete = (record: any) => {
-  message.success(`删除用户 ${record.username} 成功`)
-  fetchData()
+const handleDelete = async (record: any) => {
+  if (record.id === 1) {
+    message.warning('超级管理员不允许删除')
+    return
+  }
+  try {
+    await userApi.remove(record.id)
+    message.success(`删除用户 ${record.username} 成功`)
+    fetchData()
+  } catch (e: any) {
+    message.error(e.message || '删除用户失败')
+  }
 }
 
 // 重置搜索
@@ -453,10 +457,30 @@ const handleReset = () => {
 
 // 模态框确认
 const handleModalOk = () => {
-  formRef.value?.validate().then(() => {
-    message.success(`${modalTitle.value}成功`)
-    modalVisible.value = false
-    fetchData()
+  formRef.value?.validate().then(async () => {
+    try {
+      const data: any = {
+        userId: formState.id,
+        username: formState.username,
+        nickname: formState.name,
+        phone: formState.phone,
+        email: formState.email,
+        status: formState.status,
+        remark: formState.description,
+        roleIds: formState.roles,
+      }
+      if (formState.id) {
+        await userApi.edit(data)
+        message.success('编辑用户成功')
+      } else {
+        await userApi.add({ ...data, password: '123456' })
+        message.success('新增用户成功，默认密码为 123456')
+      }
+      modalVisible.value = false
+      fetchData()
+    } catch (e: any) {
+      message.error(e.message || `${modalTitle.value}失败`)
+    }
   })
 }
 
@@ -470,9 +494,23 @@ const handleSelectionChange = (keys: number[]) => {
   selectedRowKeys.value = keys
 }
 
+// 加载角色选项
+const loadRoleOptions = async () => {
+  try {
+    const res: any = await roleApi.list({ pageNum: 1, pageSize: 100, status: 0 })
+    roleOptions.value = (res.data?.records || []).map((r: any) => ({
+      value: r.roleId,
+      label: r.roleName,
+    }))
+  } catch {
+    roleOptions.value = []
+  }
+}
+
 // 初始化
 onMounted(() => {
   fetchData()
+  loadRoleOptions()
 })
 </script>
 

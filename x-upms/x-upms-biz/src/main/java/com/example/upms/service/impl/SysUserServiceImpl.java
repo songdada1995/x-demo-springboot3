@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.example.common.core.exception.BusinessException;
 import com.example.common.core.utils.PageUtils;
 import com.example.common.core.utils.StringUtils;
 import com.example.common.security.model.LoginUser;
@@ -16,8 +17,9 @@ import com.example.upms.mapper.SysUserRoleMapper;
 import com.example.upms.service.ISysUserRoleService;
 import com.example.upms.service.ISysUserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,17 +29,26 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> implements ISysUserService {
 
     private final SysUserMapper sysUserMapper;
-    @Autowired
-    private SysUserRoleMapper userRoleMapper;
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-    @Autowired
+    private final RedisTemplate<String, Object> redisTemplate;
+    private final SysUserRoleMapper userRoleMapper;
+    private final PasswordEncoder passwordEncoder;
     private final ISysUserRoleService userRoleService;
+
+    /**
+     * 登录失败记录key前缀（与认证服务保持一致）
+     */
+    private static final String LOGIN_FAIL_KEY = "login:fail:";
+
+    /**
+     * 账号锁定key前缀（与认证服务保持一致）
+     */
+    private static final String ACCOUNT_LOCK_KEY = "login:lock:";
 
     @Override
     public PageUtils<SysUserVO> list(SysUserDTO dto) {
@@ -74,17 +85,17 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     public void add(SysUserDTO dto) {
         // 检查用户名唯一性
         if (!checkUserNameUnique(createUserWithUsername(dto.getUsername()))) {
-            throw new RuntimeException("用户名已存在");
+            throw new BusinessException("用户名已存在");
         }
 
         // 检查手机号唯一性
         if (StringUtils.isNotEmpty(dto.getPhone()) && !checkPhoneUnique(createUserWithPhone(dto.getPhone()))) {
-            throw new RuntimeException("手机号已存在");
+            throw new BusinessException("手机号已存在");
         }
 
         // 检查邮箱唯一性
         if (StringUtils.isNotEmpty(dto.getEmail()) && !checkEmailUnique(createUserWithEmail(dto.getEmail()))) {
-            throw new RuntimeException("邮箱已存在");
+            throw new BusinessException("邮箱已存在");
         }
 
         SysUser user = new SysUser();
@@ -105,19 +116,21 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void edit(SysUserDTO dto) {
-        // 检查用户名唯一性
+        if (dto.getUserId() != null && dto.getUserId() == 1L) {
+            throw new BusinessException("不允许修改超级管理员");
+        }
         if (!checkUserNameUnique(createUserWithIdAndUsername(dto.getUserId(), dto.getUsername()))) {
-            throw new RuntimeException("用户名已存在");
+            throw new BusinessException("用户名已存在");
         }
 
         // 检查手机号唯一性
         if (StringUtils.isNotEmpty(dto.getPhone()) && !checkPhoneUnique(createUserWithIdAndPhone(dto.getUserId(), dto.getPhone()))) {
-            throw new RuntimeException("手机号已存在");
+            throw new BusinessException("手机号已存在");
         }
 
         // 检查邮箱唯一性
         if (StringUtils.isNotEmpty(dto.getEmail()) && !checkEmailUnique(createUserWithIdAndEmail(dto.getUserId(), dto.getEmail()))) {
-            throw new RuntimeException("邮箱已存在");
+            throw new BusinessException("邮箱已存在");
         }
 
         SysUser user = new SysUser();
@@ -142,10 +155,10 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void remove(Long userId) {
-        // 删除用户
+        if (userId != null && userId == 1L) {
+            throw new BusinessException("不允许删除超级管理员");
+        }
         removeById(userId);
-
-        // 删除用户角色关联
         userRoleMapper.delete(new LambdaQueryWrapper<SysUserRole>()
                 .eq(SysUserRole::getUserId, userId));
     }
@@ -242,8 +255,12 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public boolean resetPwd(SysUser user) {
-        return false;
+        // 加密密码
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        // 更新用户密码
+        return updateById(user);
     }
 
     @Override
@@ -387,9 +404,28 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         loginUser.setUsername(user.getUsername());
         loginUser.setPassword(user.getPassword());
         loginUser.setStatus(user.getStatus());
+        loginUser.setAccountLocked(user.getLockFlag() != null ? user.getLockFlag() : 0);
         loginUser.setRoles(roles);
         loginUser.setPermissions(permissions);
 
         return loginUser;
+    }
+
+    @Override
+    public void unlockAccount(String username) {
+        // 检查用户是否存在
+        SysUser user = selectUserByUserName(username);
+        if (user == null) {
+            throw new BusinessException("用户不存在");
+        }
+
+        // 清除Redis中的登录失败记录和锁定状态
+        String failKey = LOGIN_FAIL_KEY + username;
+        String lockKey = ACCOUNT_LOCK_KEY + username;
+
+        redisTemplate.delete(failKey);
+        redisTemplate.delete(lockKey);
+
+        log.info("管理员解锁账号: {}", username);
     }
 } 

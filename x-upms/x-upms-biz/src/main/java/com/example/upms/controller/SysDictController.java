@@ -36,7 +36,7 @@ public class SysDictController {
     @Operation(summary = "删除字典")
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('sys:dict:delete')")
-    public R<Void> deleteDict(@PathVariable Long id) {
+    public R<Void> deleteDict(@PathVariable("id") Long id) {
         dictService.deleteDict(id);
         return R.ok();
     }

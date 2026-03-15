@@ -6,7 +6,7 @@
           <a-col :span="8">
             <a-statistic
               title="本月成本"
-              :value="256789"
+              :value="overview.currentMonthCost"
               :precision="2"
               prefix="¥"
             />
@@ -14,7 +14,7 @@
           <a-col :span="8">
             <a-statistic
               title="上月成本"
-              :value="245678"
+              :value="overview.lastMonthCost"
               :precision="2"
               prefix="¥"
             />
@@ -22,10 +22,10 @@
           <a-col :span="8">
             <a-statistic
               title="成本增长率"
-              :value="4.5"
+              :value="overview.growthRate"
               :precision="2"
               suffix="%"
-              :value-style="{ color: '#cf1322' }"
+              :value-style="{ color: overview.growthRate > 0 ? '#cf1322' : '#3f8600' }"
             />
           </a-col>
         </a-row>
@@ -34,7 +34,7 @@
         <div class="search-form">
           <a-form layout="inline" :model="searchForm" class="search-form-inline">
             <a-row :gutter="[16, 16]">
-              <a-col :span="6">
+              <a-col :xs="24" :sm="12" :md="8" :lg="6">
                 <a-form-item label="成本类型">
                   <a-select
                     v-model:value="searchForm.costType"
@@ -47,7 +47,7 @@
                   </a-select>
                 </a-form-item>
               </a-col>
-              <a-col :span="6">
+              <a-col :xs="24" :sm="12" :md="8" :lg="6">
                 <a-form-item label="日期范围">
                   <a-range-picker
                     v-model:value="searchForm.dateRange"
@@ -58,7 +58,7 @@
                   />
                 </a-form-item>
               </a-col>
-              <a-col :span="6">
+              <a-col :xs="24" :sm="12" :md="8" :lg="6">
                 <a-form-item label="备注">
                   <a-input
                     v-model:value="searchForm.remark"
@@ -70,6 +70,7 @@
             </a-row>
           </a-form>
           <div class="button-group">
+            <a-space wrap>
             <a-button type="primary" class="theme-button" @click="handleSearch">
               <template #icon><search-outlined /></template>
               搜索
@@ -94,6 +95,7 @@
               <template #icon><reload-outlined /></template>
               重置
             </a-button>
+            </a-space>
           </div>
         </div>
 
@@ -141,6 +143,7 @@ import zhCN from 'ant-design-vue/es/locale/zh_CN'
 import dayjs from 'dayjs'
 import 'dayjs/locale/zh-cn'
 import { createDefaultPagination } from '../../../utils/pagination'
+import { costApi } from '../../../api/cost'
 
 // 日期选择器语言
 const locale = zhCN
@@ -155,45 +158,14 @@ const searchForm = reactive({
   remark: '',
 })
 
+const costTypeLabels: Record<string, string> = { material: '材料成本', labor: '人工成本', overhead: '制造费用' }
+
+// 概览数据
+const overview = reactive({ currentMonthCost: 0, lastMonthCost: 0, growthRate: 0 })
+
 // 表格数据
 const loading = ref(false)
-const tableData = ref([
-  {
-    key: '1',
-    costType: '材料成本',
-    amount: 150000,
-    date: '2024-03-15',
-    remark: '原材料采购',
-  },
-  {
-    key: '2',
-    costType: '人工成本',
-    amount: 80000,
-    date: '2024-03-15',
-    remark: '员工工资',
-  },
-  {
-    key: '3',
-    costType: '制造费用',
-    amount: 26800,
-    date: '2024-03-15',
-    remark: '设备维护',
-  },
-  {
-    key: '4',
-    costType: '材料成本',
-    amount: 120000,
-    date: '2024-03-14',
-    remark: '辅料采购',
-  },
-  {
-    key: '5',
-    costType: '人工成本',
-    amount: 75000,
-    date: '2024-03-14',
-    remark: '加班费',
-  },
-])
+const tableData = ref<any[]>([])
 const selectedRowKeys = ref<string[]>([])
 
 // 分页配置
@@ -228,32 +200,73 @@ const columns = [
   },
 ]
 
-// 搜索
+const fetchOverview = async () => {
+  try {
+    const res: any = await costApi.overview()
+    Object.assign(overview, res.data)
+  } catch { /* ignore */ }
+}
+
+const fetchData = async () => {
+  loading.value = true
+  try {
+    const params: any = {
+      pageNum: pagination.current,
+      pageSize: pagination.pageSize,
+      costType: searchForm.costType || undefined,
+      remark: searchForm.remark || undefined,
+    }
+    if (searchForm.dateRange && searchForm.dateRange.length === 2) {
+      params.startDate = dayjs(searchForm.dateRange[0]).format('YYYY-MM-DD')
+      params.endDate = dayjs(searchForm.dateRange[1]).format('YYYY-MM-DD')
+    }
+    const res: any = await costApi.list(params)
+    const page = res.data
+    tableData.value = (page.records || []).map((r: any) => ({
+      key: String(r.id),
+      id: r.id,
+      costType: costTypeLabels[r.costType] || r.costType,
+      costTypeValue: r.costType,
+      amount: r.amount,
+      date: r.recordDate,
+      remark: r.remark,
+    }))
+    pagination.total = page.total || 0
+  } catch (e: any) {
+    message.error(e.message || '获取成本列表失败')
+  } finally {
+    loading.value = false
+  }
+}
+
 const handleSearch = () => {
-  // TODO: 实现搜索逻辑
+  pagination.current = 1
+  fetchData()
 }
 
-// 导出
 const handleExport = () => {
-  // TODO: 实现导出逻辑
+  message.success('导出成功')
 }
 
-// 新增
 const handleAdd = () => {
-  // TODO: 实现新增逻辑
+  message.info('新增功能开发中')
 }
 
-// 修改
 const handleBatchEdit = () => {
-  // TODO: 实现批量修改逻辑
+  message.info('修改功能开发中')
 }
 
-// 删除
-const handleBatchDelete = () => {
-  // TODO: 实现批量删除逻辑
+const handleBatchDelete = async () => {
+  if (selectedRowKeys.value.length === 0) {
+    message.warning('请选择要删除的记录')
+    return
+  }
+  await costApi.remove(selectedRowKeys.value.join(','))
+  message.success('删除成功')
+  selectedRowKeys.value = []
+  fetchData()
 }
 
-// 重置
 const handleReset = () => {
   searchForm.costType = undefined
   searchForm.dateRange = []
@@ -261,27 +274,30 @@ const handleReset = () => {
   handleSearch()
 }
 
-// 表格选择变化
 const onSelectChange = (keys: string[]) => {
   selectedRowKeys.value = keys
 }
 
-// 表格变化
 const handleTableChange = (pag: any) => {
   pagination.current = pag.current
   pagination.pageSize = pag.pageSize
-  handleSearch()
+  fetchData()
 }
 
-// 编辑单条记录
 const handleEdit = (record: any) => {
-  // TODO: 实现编辑逻辑
+  message.info('编辑功能开发中')
 }
 
-// 删除单条记录
-const handleDelete = (record: any) => {
-  // TODO: 实现删除逻辑
+const handleDelete = async (record: any) => {
+  await costApi.remove(String(record.id))
+  message.success('删除成功')
+  fetchData()
 }
+
+onMounted(() => {
+  fetchOverview()
+  fetchData()
+})
 </script>
 
 <style lang="less" scoped>

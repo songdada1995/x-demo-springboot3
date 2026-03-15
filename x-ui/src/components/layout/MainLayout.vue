@@ -13,13 +13,9 @@
           class="top-menu"
           @select="handleTopMenuSelect"
         >
-          <a-menu-item key="system">
-            <template #icon><setting-outlined /></template>
-            系统管理
-          </a-menu-item>
-          <a-menu-item key="business">
-            <template #icon><appstore-outlined /></template>
-            业务平台
+          <a-menu-item v-for="tm in topMenuList" :key="tm.key">
+            <template #icon><component :is="tm.icon" /></template>
+            {{ tm.title }}
           </a-menu-item>
         </a-menu>
       </div>
@@ -203,9 +199,16 @@ import {
   DeleteOutlined,
   ReloadOutlined,
   SyncOutlined,
+  MoneyCollectOutlined,
+  BarChartOutlined,
+  ContactsOutlined,
+  ShopOutlined,
+  FundOutlined,
+  MenuOutlined,
 } from '@ant-design/icons-vue'
 import { message } from 'ant-design-vue'
 import { useAuthStore } from '../../stores/auth'
+import { usePermissionStore, type MenuData } from '../../stores/permission'
 
 interface MenuItem {
   key: string
@@ -215,96 +218,76 @@ interface MenuItem {
   children?: MenuItem[]
 }
 
+const iconMap: Record<string, any> = {
+  setting: SettingOutlined,
+  user: UserOutlined,
+  team: TeamOutlined,
+  safety: SafetyOutlined,
+  appstore: AppstoreOutlined,
+  fund: FundOutlined,
+  bank: BankOutlined,
+  dashboard: DashboardOutlined,
+  'money-collect': MoneyCollectOutlined,
+  'bar-chart': BarChartOutlined,
+  contacts: ContactsOutlined,
+  shop: ShopOutlined,
+  calculator: CalculatorOutlined,
+  'account-book': AccountBookOutlined,
+  audit: AuditOutlined,
+  menu: MenuOutlined,
+  wallet: WalletOutlined,
+}
+
+const getIconComponent = (iconName: string | undefined): any => {
+  if (!iconName) return undefined
+  return iconMap[iconName] || AppstoreOutlined
+}
+
+const convertMenuToItem = (menu: MenuData): MenuItem => {
+  const item: MenuItem = {
+    key: String(menu.menuId),
+    title: menu.menuName,
+    icon: getIconComponent(menu.icon),
+    path: menu.menuType === 'C' ? menu.path : undefined,
+  }
+  if (menu.children && menu.children.length > 0) {
+    item.children = menu.children.map(convertMenuToItem)
+  }
+  return item
+}
+
 const authStore = useAuthStore()
+const permissionStore = usePermissionStore()
 const userInfo = computed(() => authStore.userInfo)
 
 const router = useRouter()
 const route = useRoute()
 const collapsed = ref(false)
-const selectedKeys = ref<string[]>(['item-dashboard'])
+const selectedKeys = ref<string[]>([])
 const openKeys = ref<string[]>([])
-const selectedTopKeys = ref<string[]>(['system'])
+const selectedTopKeys = ref<string[]>([])
 const dropdownVisible = ref(false)
 
-// 系统管理菜单
-const systemMenuItems: MenuItem[] = [
-  {
-    key: 'dashboard',
-    title: '仪表盘',
-    icon: DashboardOutlined,
-    path: '/dashboard'
-  },
-  {
-    key: 'systemManagement',
-    title: '系统管理',
-    icon: SettingOutlined,
-    children: [
-      {
-        key: 'users',
-        title: '用户管理',
-        icon: UserOutlined,
-        path: '/system/users'
-      },
-      {
-        key: 'roles',
-        title: '角色管理',
-        icon: TeamOutlined,
-        path: '/system/roles'
-      },
-      {
-        key: 'permissions',
-        title: '权限管理',
-        icon: SafetyOutlined,
-        path: '/system/permissions'
-      },
-    ],
-  },
-]
+const topMenuList = computed(() => {
+  return permissionStore.menus.map(m => ({
+    key: String(m.menuId),
+    title: m.menuName,
+    icon: getIconComponent(m.icon),
+  }))
+})
 
-// 业务平台菜单
-const businessMenuItems: MenuItem[] = [
-  {
-    key: 'financeManagement',
-    title: '财务管理',
-    icon: BankOutlined,
-    path: '/business/finance-management'
-  },
-  {
-    key: 'businessPlatform',
-    title: '业务管理',
-    icon: AppstoreOutlined,
-    children: [
-      {
-        key: '4',
-        title: '成本核算',
-        icon: CalculatorOutlined,
-        path: '/business/cost'
-      },
-      {
-        key: '5',
-        title: '财务报表',
-        icon: AccountBookOutlined,
-        path: '/business/finance'
-      },
-      {
-        key: 'account',
-        title: '账号维护',
-        icon: UserOutlined,
-        path: '/business/account'
-      },
-      {
-        key: 'warehouse',
-        title: '仓库设置',
-        icon: AppstoreOutlined,
-        path: '/business/warehouse'
-      },
-    ],
-  },
-]
-
-// 根据顶部菜单选择显示对应的左侧菜单
 const currentMenuItems = computed(() => {
-  return selectedTopKeys.value[0] === 'system' ? systemMenuItems : businessMenuItems
+  const topKey = selectedTopKeys.value[0]
+  const topMenu = permissionStore.menus.find(m => String(m.menuId) === topKey)
+
+  const items: MenuItem[] = []
+  if (topMenu && topMenu.children) {
+    for (const child of topMenu.children) {
+      items.push(convertMenuToItem(child))
+    }
+  }
+
+  return items
 })
 
 // 查找菜单项
@@ -322,7 +305,7 @@ const findMenuItem = (items: MenuItem[], key: string): MenuItem | null => {
 }
 
 // 记住最后选中的菜单项
-const lastSelectedKey = ref('item-dashboard')
+const lastSelectedKey = ref('')
 
 // 标签页相关
 interface PageTab {
@@ -332,15 +315,8 @@ interface PageTab {
   icon?: any
 }
 
-const pageTabs = ref<PageTab[]>([
-  {
-    key: 'dashboard',
-    title: '仪表盘',
-    path: '/dashboard',
-    icon: DashboardOutlined
-  }
-])
-const activeTabKey = ref('dashboard')
+const pageTabs = ref<PageTab[]>([])
+const activeTabKey = ref('')
 
 // 处理标签页编辑（关闭）
 const onTabEdit = (targetKey: string, action: 'add' | 'remove') => {
@@ -392,46 +368,60 @@ const onTabChange = (key: string) => {
   }
 }
 
-// 更新菜单选中状态
-const updateMenuSelection = (path: string) => {
-  // 根据路径判断应该选中哪个顶部菜单
-  const isSystemPath = path.startsWith('/system') || path === '/dashboard'
-  selectedTopKeys.value = [isSystemPath ? 'system' : 'business']
+// 根据路径查找所属的顶部菜单key
+const findTopKeyByPath = (path: string): string | null => {
+  for (const topMenu of permissionStore.menus) {
+    if (findPathInChildren(topMenu.children || [], path)) {
+      return String(topMenu.menuId)
+    }
+  }
+  return permissionStore.menus.length > 0 ? String(permissionStore.menus[0].menuId) : null
+}
 
-  // 查找对应的菜单项
-  const findMenuItemByPath = (items: MenuItem[], path: string): { key: string, parentKeys: string[] } | null => {
-    for (const item of items) {
-      if (item.path === path) {
-        return { key: `item-${item.key}`, parentKeys: [] }
-      }
-      if (item.children) {
-        for (const child of item.children) {
-          if (child.path === path) {
-            return { key: `item-${child.key}`, parentKeys: [item.key] }
-          }
-          if (child.children) {
-            for (const grandChild of child.children) {
-              if (grandChild.path === path) {
-                return { key: grandChild.key, parentKeys: [item.key, `sub-${child.key}`] }
-              }
+const findPathInChildren = (items: MenuData[], path: string): boolean => {
+  for (const item of items) {
+    if (item.path === path) return true
+    if (item.children && findPathInChildren(item.children, path)) return true
+  }
+  return false
+}
+
+// 在当前侧边栏菜单中查找路径对应的菜单key及其父级keys
+const findMenuKeyByPath = (items: MenuItem[], path: string): { key: string, parentKeys: string[] } | null => {
+  for (const item of items) {
+    if (item.path === path) {
+      return { key: `item-${item.key}`, parentKeys: [] }
+    }
+    if (item.children) {
+      for (const child of item.children) {
+        if (child.path === path) {
+          return { key: `item-${child.key}`, parentKeys: [item.key] }
+        }
+        if (child.children) {
+          for (const gc of child.children) {
+            if (gc.path === path) {
+              return { key: `item-${gc.key}`, parentKeys: [item.key, `sub-${child.key}`] }
             }
           }
         }
       }
     }
-    return null
+  }
+  return null
+}
+
+// 更新菜单选中状态
+const updateMenuSelection = (path: string) => {
+  const topKey = findTopKeyByPath(path)
+  if (topKey) {
+    selectedTopKeys.value = [topKey]
   }
 
-  const currentItems = selectedTopKeys.value[0] === 'system' ? systemMenuItems : businessMenuItems
-  const menuInfo = findMenuItemByPath(currentItems, path)
-
+  const menuInfo = findMenuKeyByPath(currentMenuItems.value, path)
   if (menuInfo) {
-    // 更新左侧菜单选中状态
     selectedKeys.value = [menuInfo.key]
     lastSelectedKey.value = menuInfo.key
     localStorage.setItem('lastSelectedMenuKey', menuInfo.key)
-
-    // 展开父级菜单
     openKeys.value = menuInfo.parentKeys
   }
 }
@@ -567,61 +557,37 @@ const handleSubMenuClick = (item: MenuItem) => {
 
 // 处理顶部菜单选择
 const handleTopMenuSelect = ({ key }: { key: string }) => {
-  // 保存当前所有打开的菜单状态
-  const currentOpenKeys = [...openKeys.value]
-  
-  // 确保顶部菜单的选中状态正确
   selectedTopKeys.value = [key]
-  console.log('Top menu selected:', key, 'Current openKeys:', currentOpenKeys)
-  
-  // 重置左侧菜单选中状态，但不清空打开的菜单
   selectedKeys.value = []
-  
-  // 获取新菜单的第一个可点击项
+  openKeys.value = []
+
   const firstMenuItem = findFirstMenuItem(currentMenuItems.value)
   if (firstMenuItem) {
-    // 设置选中状态
     const newKey = `item-${firstMenuItem.key}`
     selectedKeys.value = [newKey]
     lastSelectedKey.value = newKey
     localStorage.setItem('lastSelectedMenuKey', newKey)
-    
-    // 如果有路径，进行路由跳转
+
     if (firstMenuItem.path) {
       router.push(firstMenuItem.path)
     }
-    
-    // 如果第一个可点击项在子菜单中，需要展开其父菜单
-    const findParentMenu = (items: MenuItem[], targetKey: string): string | null => {
-      for (const item of items) {
-        if (item.children) {
-          if (item.children.some(child => child.key === targetKey)) {
-            return item.key
-          }
-          const found = findParentMenu(item.children, targetKey)
-          if (found) return found
-        }
-      }
-      return null
-    }
-    
-    const parentKey = findParentMenu(currentMenuItems.value, firstMenuItem.key)
-    if (parentKey && !currentOpenKeys.includes(parentKey)) {
-      // 保留当前所有打开的菜单，并添加新的父菜单
-      openKeys.value = [...currentOpenKeys, parentKey]
+
+    const parentKey = findParentMenuKey(currentMenuItems.value, firstMenuItem.key)
+    if (parentKey) {
+      openKeys.value = [parentKey]
     }
   }
-  
-  // 强制应用顶部菜单的选中样式
-  nextTick(() => {
-    // 手动给选中的菜单项添加样式
-    const selectedMenuItem = document.querySelector(`.ant-menu-horizontal .ant-menu-item[data-menu-id="${key}"]`) as HTMLElement
-    if (selectedMenuItem) {
-      selectedMenuItem.classList.add('ant-menu-item-selected')
-      selectedMenuItem.style.backgroundColor = '#27c2ad'
-      selectedMenuItem.style.color = 'white'
+}
+
+const findParentMenuKey = (items: MenuItem[], targetKey: string): string | null => {
+  for (const item of items) {
+    if (item.children) {
+      if (item.children.some(child => child.key === targetKey)) return item.key
+      const found = findParentMenuKey(item.children, targetKey)
+      if (found) return found
     }
-  })
+  }
+  return null
 }
 
 // 查找第一个可点击的菜单项（没有子菜单的项）
@@ -639,7 +605,7 @@ const findFirstMenuItem = (items: MenuItem[]): MenuItem | null => {
 }
 
 // 处理用户菜单点击
-const handleUserMenuClick = ({ key }: { key: string }) => {
+const handleUserMenuClick = async ({ key }: { key: string }) => {
   switch (key) {
     case 'profile':
       router.push('/system/profile')
@@ -648,8 +614,7 @@ const handleUserMenuClick = ({ key }: { key: string }) => {
       router.push('/system/change-password')
       break
     case 'logout':
-      // 退出登录
-      authStore.logout()
+      await authStore.logout()
       message.success('退出成功')
       router.push('/login')
       break
@@ -673,109 +638,48 @@ const fixMenuStyles = () => {
   }, 100)
 }
 
-// 修改初始化函数
-const initTopMenu = () => {
-  // 根据路由路径判断应该选中哪个顶部菜单
-  const path = route.path
-  const isSystemPath = path.startsWith('/system') || path === '/dashboard'
-  selectedTopKeys.value = [isSystemPath ? 'system' : 'business']
-}
+// 初始化菜单状态
+const initMenuState = () => {
+  if (permissionStore.menus.length === 0) return
 
-// 组件挂载时初始化
-const initFirstMenuItem = () => {
-  // 确保 openKeys 初始为空，避免闪烁
+  const defaultTopKey = String(permissionStore.menus[0].menuId)
   openKeys.value = []
-  
-  // 检查URL路径，如果不是仪表盘路径，则尝试根据路径找到对应的菜单项
-  if (route.path !== '/dashboard') {
-    // 查找菜单项所属的顶级菜单
-    const findTopMenuByPath = (path: string): 'system' | 'business' => {
-      // 检查是否在系统菜单中
-      const isInSystemMenu = systemMenuItems.some(item => 
-        item.path === path || 
-        (item.children && item.children.some(child => 
-          child.path === path || 
-          (child.children && child.children.some(grandChild => grandChild.path === path))
-        ))
-      )
-      return isInSystemMenu ? 'system' : 'business'
-    }
-    
-    const topMenu = findTopMenuByPath(route.path)
-    selectedTopKeys.value = [topMenu]
-    
-    // 根据路径查找对应的菜单项
-    const findMenuItemByPath = (items: MenuItem[], path: string): { key: string, parentKeys: string[], menuItem: MenuItem } | null => {
-      for (const item of items) {
-        if (item.path === path) {
-          return { key: `item-${item.key}`, parentKeys: [], menuItem: item }
-        }
-        if (item.children) {
-          for (const child of item.children) {
-            if (child.path === path) {
-              return { key: `item-${child.key}`, parentKeys: [item.key], menuItem: child }
-            }
-            if (child.children) {
-              for (const grandChild of child.children) {
-                if (grandChild.path === path) {
-                  return { key: grandChild.key, parentKeys: [item.key, `sub-${child.key}`], menuItem: grandChild }
-                }
-              }
-            }
-          }
-        }
-      }
-      return null
-    }
-    
-    const currentItems = topMenu === 'system' ? systemMenuItems : businessMenuItems
-    const menuInfo = findMenuItemByPath(currentItems, route.path)
-    
+
+  const topKey = findTopKeyByPath(route.path)
+  selectedTopKeys.value = [topKey || defaultTopKey]
+
+  nextTick(() => {
+    const menuInfo = findMenuKeyByPath(currentMenuItems.value, route.path)
     if (menuInfo) {
       selectedKeys.value = [menuInfo.key]
       lastSelectedKey.value = menuInfo.key
       localStorage.setItem('lastSelectedMenuKey', menuInfo.key)
-      
-      // 只展开当前菜单所在的父菜单
       openKeys.value = menuInfo.parentKeys
 
-      // 更新标签页
-      if (menuInfo && menuInfo.menuItem.path && menuInfo.menuItem.key) {
-        pageTabs.value = [{
-          key: menuInfo.menuItem.key,
-          title: menuInfo.menuItem.title,
-          path: menuInfo.menuItem.path,
-          icon: menuInfo.menuItem.icon
-        }]
-        activeTabKey.value = menuInfo.menuItem.key
+      const foundItem = findMenuItem(currentMenuItems.value, menuInfo.key.replace(/^(item-|sub-)/, ''))
+      if (foundItem && foundItem.path) {
+        pageTabs.value = [{ key: foundItem.key, title: foundItem.title, path: foundItem.path, icon: foundItem.icon }]
+        activeTabKey.value = foundItem.key
       }
       return
     }
-  } else {
-    // 如果是首次加载或是仪表盘路径，只选中仪表盘，不展开任何菜单
-    selectedKeys.value = ['item-dashboard']
-    lastSelectedKey.value = 'item-dashboard'
-    localStorage.setItem('lastSelectedMenuKey', 'item-dashboard')
-    
-    // 确保不会有任何菜单展开
-    openKeys.value = []
-
-    // 更新标签页为仪表盘
-    pageTabs.value = [{
-      key: 'dashboard',
-      title: '仪表盘',
-      path: '/dashboard',
-      icon: DashboardOutlined
-    }]
-    activeTabKey.value = 'dashboard'
-  }
+    const firstItem = findFirstMenuItem(currentMenuItems.value)
+    if (firstItem && firstItem.path) {
+      selectedKeys.value = [`item-${firstItem.key}`]
+      lastSelectedKey.value = `item-${firstItem.key}`
+      pageTabs.value = [{ key: firstItem.key, title: firstItem.title, path: firstItem.path, icon: firstItem.icon }]
+      activeTabKey.value = firstItem.key
+    }
+  })
 }
 
-// 在组件挂载后添加事件监听
-onMounted(() => {
+// 在组件挂载后初始化
+onMounted(async () => {
+  if (!permissionStore.loaded) {
+    await permissionStore.loadPermissions()
+  }
   nextTick(() => {
-    initTopMenu()
-    initFirstMenuItem()
+    initMenuState()
     fixMenuStyles()
   })
 })
@@ -790,28 +694,26 @@ watch(collapsed, () => {
   fixMenuStyles()
 })
 
-// 监听路由变化，保持菜单选中状态
-watch(() => route.path, () => {
-  initTopMenu()
-})
+// 监听权限菜单数据变化，重新初始化
+watch(() => permissionStore.menus, () => {
+  if (permissionStore.menus.length > 0) {
+    nextTick(() => initMenuState())
+  }
+}, { deep: true })
 
 // 监听路由变化，自动添加标签页
 watch(() => route.path, (newPath) => {
-  const findMenuItemByPath = (items: MenuItem[], path: string): MenuItem | null => {
+  if (!permissionStore.loaded || permissionStore.menus.length === 0) return
+
+  const findMenuItemInList = (items: MenuItem[], path: string): MenuItem | null => {
     for (const item of items) {
-      if (item.path === path) {
-        return item
-      }
+      if (item.path === path) return item
       if (item.children) {
         for (const child of item.children) {
-          if (child.path === path) {
-            return child
-          }
+          if (child.path === path) return child
           if (child.children) {
-            for (const grandChild of child.children) {
-              if (grandChild.path === path) {
-                return grandChild
-              }
+            for (const gc of child.children) {
+              if (gc.path === path) return gc
             }
           }
         }
@@ -820,12 +722,18 @@ watch(() => route.path, (newPath) => {
     return null
   }
 
-  const menuItem = findMenuItemByPath(currentMenuItems.value, newPath)
-  if (menuItem) {
-    addTab(menuItem)
-    // 更新菜单选中状态
-    updateMenuSelection(newPath)
+  const topKey = findTopKeyByPath(newPath)
+  if (topKey && selectedTopKeys.value[0] !== topKey) {
+    selectedTopKeys.value = [topKey]
   }
+
+  nextTick(() => {
+    const menuItem = findMenuItemInList(currentMenuItems.value, newPath)
+    if (menuItem) {
+      addTab(menuItem)
+      updateMenuSelection(newPath)
+    }
+  })
 }, { immediate: true })
 
 // 关闭其他标签页
@@ -850,7 +758,8 @@ const closeCurrentTab = () => {
     return
   }
   
-  if (activeTabKey.value !== 'dashboard') {
+  const firstTabKey = pageTabs.value[0]?.key
+  if (firstTabKey && activeTabKey.value !== firstTabKey) {
     const tabs = pageTabs.value
     const currentIndex = tabs.findIndex(tab => tab.key === activeTabKey.value)
     const nextTab = tabs[currentIndex + 1] || tabs[currentIndex - 1]
@@ -868,11 +777,11 @@ const closeCurrentTab = () => {
 
 // 关闭全部标签页
 const closeAllTabs = () => {
-  const dashboardTab = pageTabs.value.find(tab => tab.key === 'dashboard')
-  if (dashboardTab) {
-    pageTabs.value = [dashboardTab]
-    activeTabKey.value = 'dashboard'
-    router.push('/dashboard')
+  const firstTab = pageTabs.value[0]
+  if (firstTab) {
+    pageTabs.value = [firstTab]
+    activeTabKey.value = firstTab.key
+    router.push(firstTab.path)
   }
 }
 

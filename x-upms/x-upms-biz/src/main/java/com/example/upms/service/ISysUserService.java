@@ -138,4 +138,11 @@ public interface ISysUserService extends IService<SysUser> {
      * @return 用户信息和权限信息
      */
     LoginUser getUserInfo(String username);
+
+    /**
+     * 解锁账号（清除登录失败记录和锁定状态）
+     *
+     * @param username 用户名
+     */
+    void unlockAccount(String username);
 } 

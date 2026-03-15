@@ -1,5 +1,6 @@
 package com.example.upms.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.upms.api.domain.dto.SysMenuDTO;
 import com.example.upms.api.domain.entity.SysMenu;
@@ -11,6 +12,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -21,27 +23,42 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
 
     @Override
     public List<SysMenuVO> list(SysMenuDTO menuDTO) {
-        return List.of();
+        LambdaQueryWrapper<SysMenu> wrapper = new LambdaQueryWrapper<>();
+        wrapper.like(menuDTO.getMenuName() != null && !menuDTO.getMenuName().isEmpty(),
+                        SysMenu::getMenuName, menuDTO.getMenuName())
+                .eq(menuDTO.getMenuType() != null && !menuDTO.getMenuType().isEmpty(),
+                        SysMenu::getMenuType, menuDTO.getMenuType())
+                .eq(menuDTO.getPerms() != null && !menuDTO.getPerms().isEmpty(),
+                        SysMenu::getPerms, menuDTO.getPerms())
+                .orderByAsc(SysMenu::getOrderNum);
+        List<SysMenu> menus = list(wrapper);
+        return menus.stream().map(this::convertToVO).collect(Collectors.toList());
     }
 
     @Override
     public SysMenuVO getInfo(Long menuId) {
-        return null;
+        return convertToVO(getById(menuId));
     }
 
     @Override
     public void add(SysMenuDTO menuDTO) {
-
+        SysMenu menu = new SysMenu();
+        BeanUtils.copyProperties(menuDTO, menu);
+        save(menu);
     }
 
     @Override
     public void edit(SysMenuDTO menuDTO) {
-
+        SysMenu menu = getById(menuDTO.getMenuId());
+        if (menu != null) {
+            BeanUtils.copyProperties(menuDTO, menu);
+            updateById(menu);
+        }
     }
 
     @Override
     public void remove(Long menuId) {
-
+        removeById(menuId);
     }
 
     @Override
@@ -63,37 +80,71 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
 
     @Override
     public List<SysMenuVO> selectMenusByUserId(Long userId) {
-        return List.of();
+        List<SysMenu> menus = baseMapper.selectMenusByUserId(userId);
+        List<SysMenuVO> result = menus.stream().map(this::convertToVO).collect(Collectors.toList());
+        // 补充缺失的父级菜单，保证树形结构完整（如：用户仅有财务报表权限时，需补全 财务管理、业务平台）
+        fillParentMenus(result);
+        return result;
+    }
+
+    /**
+     * 补充缺失的父级菜单，确保菜单树层级正确
+     */
+    private void fillParentMenus(List<SysMenuVO> menus) {
+        Set<Long> menuIds = menus.stream().map(SysMenuVO::getMenuId).collect(Collectors.toSet());
+        Set<Long> missingParentIds = new HashSet<>();
+        for (SysMenuVO m : menus) {
+            Long pid = m.getParentId();
+            while (pid != null && pid != 0 && !menuIds.contains(pid)) {
+                missingParentIds.add(pid);
+                SysMenu parent = getById(pid);
+                if (parent == null) break;
+                pid = parent.getParentId();
+            }
+        }
+        for (Long pid : missingParentIds) {
+            SysMenu parent = getById(pid);
+            if (parent != null && "0".equals(parent.getStatus())) {
+                SysMenuVO vo = convertToVO(parent);
+                menus.add(vo);
+                menuIds.add(pid);
+            }
+        }
     }
 
     @Override
     public List<SysMenu> selectMenuList(SysMenuDTO menuDTO) {
-        return List.of();
+        LambdaQueryWrapper<SysMenu> wrapper = new LambdaQueryWrapper<>();
+        wrapper.like(menuDTO.getMenuName() != null && !menuDTO.getMenuName().isEmpty(),
+                        SysMenu::getMenuName, menuDTO.getMenuName())
+                .orderByAsc(SysMenu::getOrderNum);
+        return list(wrapper);
     }
 
     @Override
     public SysMenu selectMenuById(Long menuId) {
-        return null;
+        return getById(menuId);
     }
 
     @Override
     public void insertMenu(SysMenuDTO menuDTO) {
-
+        add(menuDTO);
     }
 
     @Override
     public void updateMenu(SysMenuDTO menuDTO) {
-
+        edit(menuDTO);
     }
 
     @Override
     public void deleteMenuById(Long menuId) {
-
+        removeById(menuId);
     }
 
     @Override
     public Set<String> selectPermsByUserId(Long userId) {
-        return Set.of();
+        List<String> perms = baseMapper.selectPermsByUserId(userId);
+        return new HashSet<>(perms);
     }
 
     private SysMenuVO convertToVO(SysMenu menu) {

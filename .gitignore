@@ -36,3 +36,4 @@ replay_pid*
 /x-common/x-common-redis/target/
 /x-common/x-common-security/target/
 /x-common/x-common-swagger/target/
+/.claude/

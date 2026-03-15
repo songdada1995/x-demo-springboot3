@@ -32,7 +32,8 @@
         <jsonwebtoken.version>0.11.5</jsonwebtoken.version>
         <springdoc.version>2.1.0</springdoc.version>
         <mybatis-spring-boot-starter.version>3.0.3</mybatis-spring-boot-starter.version>
-        <mybatis-plus-boot-starter.version>3.5.5</mybatis-plus-boot-starter.version>
+        <mybatis-plus-boot-starter.version>3.5.10.1</mybatis-plus-boot-starter.version>
+        <mybatis-spring.version>3.0.4</mybatis-spring.version>
         <easyexcel.version>4.0.3</easyexcel.version>
         <poi.version>5.0.0</poi.version>
         <hutool.version>5.8.37</hutool.version>
@@ -155,6 +156,22 @@
                 <groupId>com.baomidou</groupId>
                 <artifactId>mybatis-plus-boot-starter</artifactId>
                 <version>${mybatis-plus-boot-starter.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.mybatis</groupId>
+                        <artifactId>mybatis-spring</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>mybatis-plus-jsqlparser</artifactId>
+                <version>${mybatis-plus-boot-starter.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.mybatis</groupId>
+                <artifactId>mybatis-spring</artifactId>
+                <version>${mybatis-spring.version}</version>
             </dependency>
 
             <!-- EasyExcel -->

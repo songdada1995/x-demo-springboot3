@@ -4,12 +4,12 @@
       <!-- 搜索区域 -->
       <div class="search-area">
         <a-row :gutter="[16, 16]">
-          <a-col :span="6">
+          <a-col :xs="24" :sm="12" :md="8" :lg="6">
             <a-form-item label="角色名称">
               <a-input v-model:value="searchForm.name" placeholder="请输入角色名称" />
             </a-form-item>
           </a-col>
-          <a-col :span="6">
+          <a-col :xs="24" :sm="12" :md="8" :lg="6">
             <a-form-item label="角色编码">
               <a-input v-model:value="searchForm.code" placeholder="请输入角色编码" />
             </a-form-item>
@@ -18,12 +18,12 @@
             <a-form-item label="状态">
               <a-select v-model:value="searchForm.status" placeholder="请选择状态">
                 <a-select-option value="">全部</a-select-option>
-                <a-select-option value="1">启用</a-select-option>
-                <a-select-option value="0">禁用</a-select-option>
+                <a-select-option value="0">启用</a-select-option>
+                <a-select-option value="1">禁用</a-select-option>
               </a-select>
             </a-form-item>
           </a-col>
-          <a-col :span="6">
+          <a-col :xs="24" :sm="12" :md="8" :lg="6">
             <a-form-item label="创建时间">
               <a-range-picker
                 v-model:value="searchForm.createTime"
@@ -40,7 +40,7 @@
 
       <!-- 操作按钮区域 -->
       <div class="table-operations">
-        <a-space>
+        <a-space wrap>
           <a-button type="primary" class="theme-button" @click="handleSearch">
             <template #icon><search-outlined /></template>
             搜索
@@ -81,8 +81,8 @@
         <!-- 状态列 -->
         <template #bodyCell="{ column, record }">
           <template v-if="column.key === 'status'">
-            <a-tag :color="record.status === 1 ? 'green' : 'red'">
-              {{ record.status === 1 ? '启用' : '禁用' }}
+            <a-tag :color="record.status === 0 ? 'green' : 'red'">
+              {{ record.status === 0 ? '启用' : '禁用' }}
             </a-tag>
           </template>
           <!-- 操作列 -->
@@ -130,13 +130,13 @@
         <a-form-item label="角色名称" name="name">
           <a-input v-model:value="formState.name" placeholder="请输入角色名称" />
         </a-form-item>
-        <a-form-item label="角色编码" name="code">
-          <a-input v-model:value="formState.code" placeholder="请输入角色编码" />
+        <a-form-item label="角色编码" name="code" extra="选填，不填则自动生成（如 role_4）">
+          <a-input v-model:value="formState.code" placeholder="如：admin、editor、viewer" />
         </a-form-item>
         <a-form-item label="状态" name="status">
           <a-radio-group v-model:value="formState.status">
-            <a-radio :value="1">启用</a-radio>
-            <a-radio :value="0">禁用</a-radio>
+            <a-radio :value="0">启用</a-radio>
+            <a-radio :value="1">禁用</a-radio>
           </a-radio-group>
         </a-form-item>
         <a-form-item label="备注" name="description">
@@ -147,6 +147,30 @@
           />
         </a-form-item>
       </a-form>
+    </a-modal>
+
+    <!-- 权限设置对话框 -->
+    <a-modal
+      v-model:open="permModalVisible"
+      :title="`设置权限 - ${permRoleName}`"
+      @ok="handlePermModalOk"
+      @cancel="permModalVisible = false"
+      width="500px"
+      :maskClosable="false"
+      okText="确定"
+      cancelText="取消"
+    >
+      <a-spin :spinning="permLoading">
+        <a-tree
+          v-model:checkedKeys="checkedMenuIds"
+          :tree-data="menuTree"
+          checkable
+          :field-names="{ title: 'menuName', key: 'menuId', children: 'children' }"
+          default-expand-all
+          @check="onMenuCheck"
+        />
+        <a-empty v-if="menuTree.length === 0 && !permLoading" description="暂无菜单数据" />
+      </a-spin>
     </a-modal>
   </div>
 </template>
@@ -164,8 +188,9 @@ import {
 } from '@ant-design/icons-vue'
 import type { TablePaginationConfig } from 'ant-design-vue'
 import zhCN from 'ant-design-vue/es/locale/zh_CN'
-import type { Locale } from 'ant-design-vue/es/locale-provider'
 import { createDefaultPagination } from '../../../utils/pagination'
+import { roleApi } from '../../../api/role'
+import { menuApi } from '../../../api/menu'
 
 // 搜索表单数据
 const searchForm = reactive({
@@ -212,32 +237,7 @@ const columns = [
 ]
 
 // 表格数据
-const dataSource = ref([
-  {
-    id: 1,
-    name: '超级管理员',
-    code: 'admin',
-    status: 1,
-    createTime: '2024-01-01 12:00:00',
-    description: '系统超级管理员',
-  },
-  {
-    id: 2,
-    name: '普通用户',
-    code: 'user',
-    status: 1,
-    createTime: '2024-01-01 12:00:00',
-    description: '普通用户',
-  },
-  {
-    id: 3,
-    name: '访客',
-    code: 'guest',
-    status: 0,
-    createTime: '2024-01-01 12:00:00',
-    description: '访客用户',
-  },
-])
+const dataSource = ref<any[]>([])
 
 // 加载状态
 const loading = ref(false)
@@ -256,14 +256,13 @@ const formState = reactive({
   id: undefined,
   name: '',
   code: '',
-  status: 1,
+  status: 0,
   description: '',
 })
 
 // 表单验证规则
 const rules = {
   name: [{ required: true, message: '请输入角色名称', trigger: 'blur' }],
-  code: [{ required: true, message: '请输入角色编码', trigger: 'blur' }],
   status: [{ required: true, message: '请选择状态', trigger: 'change' }],
 }
 
@@ -275,13 +274,31 @@ const handleTableChange = (pag: TablePaginationConfig) => {
 }
 
 // 获取数据
-const fetchData = () => {
+const fetchData = async () => {
   loading.value = true
-  // 这里模拟异步请求
-  setTimeout(() => {
+  try {
+    const res: any = await roleApi.list({
+      pageNum: pagination.current,
+      pageSize: pagination.pageSize,
+      roleName: searchForm.name || undefined,
+      roleKey: searchForm.code || undefined,
+      status: searchForm.status || undefined,
+    })
+    const page = res.data
+    dataSource.value = (page.records || []).map((r: any) => ({
+      id: r.roleId,
+      name: r.roleName,
+      code: r.roleKey,
+      status: r.status,
+      createTime: r.createTime,
+      description: r.remark,
+    }))
+    pagination.total = page.total || 0
+  } catch (e: any) {
+    message.error(e.message || '获取角色列表失败')
+  } finally {
     loading.value = false
-    pagination.total = dataSource.value.length
-  }, 500)
+  }
 }
 
 // 处理搜索
@@ -308,12 +325,16 @@ const handleBatchEdit = () => {
 }
 
 // 处理批量删除
-const handleBatchDelete = () => {
+const handleBatchDelete = async () => {
   if (selectedRowKeys.value.length === 0) {
     message.warning('请选择要删除的记录')
     return
   }
+  for (const id of selectedRowKeys.value) {
+    await roleApi.remove(id)
+  }
   message.success(`删除选中的 ${selectedRowKeys.value.length} 条记录成功`)
+  selectedRowKeys.value = []
   fetchData()
 }
 
@@ -328,7 +349,7 @@ const handleAdd = () => {
   formState.id = undefined
   formState.name = ''
   formState.code = ''
-  formState.status = 1
+  formState.status = 0
   formState.description = ''
   modalVisible.value = true
 }
@@ -340,15 +361,86 @@ const handleEdit = (record: any) => {
   modalVisible.value = true
 }
 
-// 设置权限
-const handlePermission = (record: any) => {
-  message.success(`设置角色 ${record.name} 的权限成功`)
+// 权限设置相关
+const permModalVisible = ref(false)
+const permLoading = ref(false)
+const permRoleName = ref('')
+const permRoleId = ref<number>(0)
+const checkedMenuIds = ref<number[]>([])
+const halfCheckedMenuIds = ref<number[]>([])
+const menuTree = ref<any[]>([])
+
+const buildMenuTree = (menus: any[]): any[] => {
+  const map = new Map<number, any>()
+  menus.forEach((m: any) => map.set(m.menuId, { ...m, children: [] }))
+  const tree: any[] = []
+  map.forEach((node) => {
+    const parent = map.get(node.parentId)
+    if (parent) {
+      parent.children.push(node)
+    } else {
+      tree.push(node)
+    }
+  })
+  return tree
+}
+
+const collectParentIds = (items: any[], parentIds: Set<number>) => {
+  for (const item of items) {
+    if (item.children && item.children.length > 0) {
+      parentIds.add(item.menuId)
+      collectParentIds(item.children, parentIds)
+    }
+  }
+}
+
+const onMenuCheck = (_checked: any, e: any) => {
+  halfCheckedMenuIds.value = e.halfCheckedKeys || []
+}
+
+const handlePermission = async (record: any) => {
+  permRoleName.value = record.name
+  permRoleId.value = record.id
+  permModalVisible.value = true
+  permLoading.value = true
+  try {
+    const [menuRes, roleMenuRes]: any[] = await Promise.all([
+      menuApi.list(),
+      roleApi.getRoleMenuIds(record.id),
+    ])
+    menuTree.value = buildMenuTree(menuRes.data || [])
+    const allRoleMenuIds: number[] = roleMenuRes.data || []
+    const parentIds = new Set<number>()
+    collectParentIds(menuTree.value, parentIds)
+    checkedMenuIds.value = allRoleMenuIds.filter(id => !parentIds.has(id))
+    halfCheckedMenuIds.value = []
+  } catch {
+    message.error('加载权限数据失败')
+  } finally {
+    permLoading.value = false
+  }
+}
+
+const handlePermModalOk = async () => {
+  try {
+    const allMenuIds = [...checkedMenuIds.value, ...halfCheckedMenuIds.value]
+    await roleApi.saveRoleMenus(permRoleId.value, allMenuIds)
+    message.success('权限设置成功')
+    permModalVisible.value = false
+  } catch (e: any) {
+    message.error(e.message || '权限设置失败')
+  }
 }
 
 // 删除角色
-const handleDelete = (record: any) => {
-  message.success(`删除角色 ${record.name} 成功`)
-  fetchData()
+const handleDelete = async (record: any) => {
+  try {
+    await roleApi.remove(record.id)
+    message.success(`删除角色 ${record.name} 成功`)
+    fetchData()
+  } catch (e: any) {
+    message.error(e.message || '删除角色失败')
+  }
 }
 
 // 重置搜索
@@ -362,10 +454,26 @@ const handleReset = () => {
 
 // 模态框确认
 const handleModalOk = () => {
-  formRef.value?.validate().then(() => {
-    message.success(`${modalTitle.value}成功`)
-    modalVisible.value = false
-    fetchData()
+  formRef.value?.validate().then(async () => {
+    try {
+      const data = {
+        roleId: formState.id,
+        roleName: formState.name,
+        roleKey: formState.code,
+        status: formState.status,
+        remark: formState.description,
+      }
+      if (formState.id) {
+        await roleApi.edit(data)
+      } else {
+        await roleApi.add(data)
+      }
+      message.success(`${modalTitle.value}成功`)
+      modalVisible.value = false
+      fetchData()
+    } catch (e: any) {
+      message.error(e.message || `${modalTitle.value}失败`)
+    }
   })
 }
 

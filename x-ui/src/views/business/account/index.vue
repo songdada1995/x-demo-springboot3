@@ -4,12 +4,12 @@
       <!-- 搜索区域 -->
       <div class="search-area">
         <a-row :gutter="[16, 16]">
-          <a-col :span="6">
+          <a-col :xs="24" :sm="12" :md="8" :lg="6">
             <a-form-item label="账号名称">
               <a-input v-model:value="searchForm.accountName" placeholder="请输入账号名称" style="max-width: 200px;" />
             </a-form-item>
           </a-col>
-          <a-col :span="6">
+          <a-col :xs="24" :sm="12" :md="8" :lg="6">
             <a-form-item label="账号类型">
               <a-select v-model:value="searchForm.accountType" placeholder="请选择账号类型" class="custom-select">
                 <a-select-option value="">全部</a-select-option>
@@ -19,7 +19,7 @@
               </a-select>
             </a-form-item>
           </a-col>
-          <a-col :span="6">
+          <a-col :xs="24" :sm="12" :md="8" :lg="6">
             <a-form-item label="状态">
               <a-select v-model:value="searchForm.status" placeholder="请选择状态" class="custom-select">
                 <a-select-option value="">全部</a-select-option>
@@ -28,13 +28,15 @@
               </a-select>
             </a-form-item>
           </a-col>
-          <a-col :span="6">
+          <a-col :xs="24" :sm="12" :md="8" :lg="6">
             <a-form-item label="创建时间">
               <a-range-picker
                 v-model:value="searchForm.createTime"
                 style="width: 240px"
+                :locale="locale"
                 :placeholder="['开始时间', '结束时间']"
-                show-time
+                :show-time="false"
+                format="YYYY-MM-DD"
               />
             </a-form-item>
           </a-col>
@@ -43,7 +45,7 @@
 
       <!-- 操作按钮区域 -->
       <div class="table-operations">
-        <a-space>
+        <a-space wrap>
           <a-button type="primary" class="theme-button" @click="handleSearch">
             <template #icon><search-outlined /></template>
             搜索
@@ -183,6 +185,11 @@ import {
   DeleteOutlined,
 } from '@ant-design/icons-vue'
 import type { TablePaginationConfig } from 'ant-design-vue'
+import zhCN from 'ant-design-vue/es/locale/zh_CN'
+import { accountApi } from '../../../api/account'
+
+// 日期选择器中文配置
+const locale = zhCN
 
 // 搜索表单数据
 const searchForm = reactive({
@@ -245,41 +252,7 @@ const columns = [
 ]
 
 // 表格数据
-const dataSource = ref([
-  {
-    id: 1,
-    accountName: 'company001',
-    accountType: '2',
-    contactPerson: '张三',
-    contactPhone: '13800138000',
-    email: 'company001@example.com',
-    status: 1,
-    createTime: '2024-01-01 12:00:00',
-    description: '企业账号',
-  },
-  {
-    id: 2,
-    accountName: 'person001',
-    accountType: '1',
-    contactPerson: '李四',
-    contactPhone: '13800138001',
-    email: 'person001@example.com',
-    status: 1,
-    createTime: '2024-01-01 12:00:00',
-    description: '个人账号',
-  },
-  {
-    id: 3,
-    accountName: 'system001',
-    accountType: '3',
-    contactPerson: '系统管理员',
-    contactPhone: '13800138002',
-    email: 'system001@example.com',
-    status: 0,
-    createTime: '2024-01-01 12:00:00',
-    description: '系统账号',
-  },
-])
+const dataSource = ref<any[]>([])
 
 // 账号类型颜色
 const getAccountTypeColor = (type: string) => {
@@ -351,13 +324,34 @@ const handleTableChange = (pag: TablePaginationConfig) => {
 }
 
 // 获取数据
-const fetchData = () => {
+const fetchData = async () => {
   loading.value = true
-  // 这里模拟异步请求
-  setTimeout(() => {
+  try {
+    const res: any = await accountApi.list({
+      pageNum: pagination.current,
+      pageSize: pagination.pageSize,
+      accountName: searchForm.accountName || undefined,
+      accountType: searchForm.accountType || undefined,
+      status: searchForm.status || undefined,
+    })
+    const page = res.data
+    dataSource.value = (page.records || []).map((r: any) => ({
+      id: r.id,
+      accountName: r.accountName,
+      accountType: r.accountType,
+      contactPerson: r.contactPerson,
+      contactPhone: r.contactPhone,
+      email: r.email,
+      status: r.status,
+      createTime: r.createTime,
+      description: r.description,
+    }))
+    pagination.total = page.total || 0
+  } catch (e: any) {
+    message.error(e.message || '获取账号列表失败')
+  } finally {
     loading.value = false
-    pagination.total = dataSource.value.length
-  }, 500)
+  }
 }
 
 // 处理搜索
@@ -385,12 +379,14 @@ const handleBatchEdit = () => {
 }
 
 // 处理批量删除
-const handleBatchDelete = () => {
+const handleBatchDelete = async () => {
   if (selectedRowKeys.value.length === 0) {
     message.warning('请选择要删除的记录')
     return
   }
+  await accountApi.remove(selectedRowKeys.value.join(','))
   message.success(`删除选中的 ${selectedRowKeys.value.length} 条记录成功`)
+  selectedRowKeys.value = []
   fetchData()
 }
 
@@ -426,9 +422,14 @@ const handleResetPassword = (record: any) => {
 }
 
 // 删除账号
-const handleDelete = (record: any) => {
-  message.success(`删除账号 ${record.accountName} 成功`)
-  fetchData()
+const handleDelete = async (record: any) => {
+  try {
+    await accountApi.remove(String(record.id))
+    message.success(`删除账号 ${record.accountName} 成功`)
+    fetchData()
+  } catch (e: any) {
+    message.error(e.message || '删除账号失败')
+  }
 }
 
 // 重置搜索
@@ -442,10 +443,19 @@ const handleReset = () => {
 
 // 模态框确认
 const handleModalOk = () => {
-  formRef.value?.validate().then(() => {
-    message.success(`${modalTitle.value}成功`)
-    modalVisible.value = false
-    fetchData()
+  formRef.value?.validate().then(async () => {
+    try {
+      if (formState.id) {
+        await accountApi.edit(formState)
+      } else {
+        await accountApi.add(formState)
+      }
+      message.success(`${modalTitle.value}成功`)
+      modalVisible.value = false
+      fetchData()
+    } catch (e: any) {
+      message.error(e.message || `${modalTitle.value}失败`)
+    }
   })
 }
 
@@ -467,6 +477,70 @@ onMounted(() => {
 
 .search-area {
   margin-bottom: 16px;
+}
+
+/* 与角色管理一致的搜索表单宽度约束 */
+:deep(.ant-form-item) {
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+}
+
+:deep(.ant-form-item-label) {
+  padding-bottom: 0;
+  width: 70px;
+  text-align: right;
+  padding-right: 8px;
+  flex: 0 0 70px !important;
+  max-width: 70px !important;
+}
+
+:deep(.ant-form-item-control) {
+  width: 240px;
+  margin-left: 0 !important;
+  flex: 0 0 240px !important;
+}
+
+:deep(.ant-form-item-label > label) {
+  height: 32px;
+  line-height: 32px;
+  padding-right: 0;
+}
+
+:deep(.ant-input),
+:deep(.ant-select),
+:deep(.ant-picker) {
+  width: 240px;
+}
+
+:deep(.ant-picker-range) {
+  width: 240px;
+}
+
+@media screen and (max-width: 1200px) {
+  :deep(.ant-form-item-control) {
+    width: 220px;
+    flex: 0 0 220px !important;
+  }
+  :deep(.ant-input),
+  :deep(.ant-select),
+  :deep(.ant-picker),
+  :deep(.ant-picker-range) {
+    width: 220px;
+  }
+}
+
+@media screen and (max-width: 992px) {
+  :deep(.ant-form-item-control) {
+    width: 200px;
+    flex: 0 0 200px !important;
+  }
+  :deep(.ant-input),
+  :deep(.ant-select),
+  :deep(.ant-picker),
+  :deep(.ant-picker-range) {
+    width: 200px;
+  }
 }
 
 .table-operations {

@@ -19,6 +19,10 @@ public class SysRole {
     private Integer roleSort;
     
     private String dataScope;
+
+    private Integer menuCheckStrictly;
+
+    private Integer deptCheckStrictly;
     
     private Integer status;
     

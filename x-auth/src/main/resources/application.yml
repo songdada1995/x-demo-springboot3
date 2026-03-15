@@ -4,27 +4,34 @@ server:
 spring:
   application:
     name: x-auth
+  config:
+    import:
+      - "optional:nacos:${spring.application.name}.${spring.cloud.nacos.config.file-extension:yaml}"
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/x_demo?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8
-    username: root
-    password: root
+    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:x_demo}?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:123456}
   data:
     redis:
-      host: localhost
-      port: 6379
-      password:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
       database: 0
   cloud:
     nacos:
       discovery:
-        server-addr: 127.0.0.1:8848
+        server-addr: ${NACOS_SERVER_ADDR:192.168.247.129:8848}
+        username: ${NACOS_USERNAME:nacos}
+        password: ${NACOS_PASSWORD:nacos}
       config:
-        server-addr: 127.0.0.1:8848
+        server-addr: ${NACOS_SERVER_ADDR:192.168.247.129:8848}
+        username: ${NACOS_USERNAME:nacos}
+        password: ${NACOS_PASSWORD:nacos}
         file-extension: yaml
     sentinel:
       transport:
-        dashboard: 127.0.0.1:8858
+        dashboard: ${SENTINEL_DASHBOARD_ADDR:192.168.247.129:8080}
       eager: true
     openfeign:
       client:
@@ -68,7 +75,7 @@ springdoc:
     path: /v3/api-docs
 
 jwt:
-  secret: your-secret-key
+  secret: ${JWT_SECRET:your-secret-key-please-change-in-production}
   expiration: 86400000 # 24 hours
 
 auth:
@@ -93,6 +100,6 @@ auth:
 # 日志配置
 logging:
   level:
-    org.springframework.security: DEBUG
-    org.springframework.security.oauth2: DEBUG
-    com.example.auth: debug
+    org.springframework.security: ${LOG_LEVEL:INFO}
+    org.springframework.security.oauth2: ${LOG_LEVEL:INFO}
+    com.example.auth: ${LOG_LEVEL:INFO}

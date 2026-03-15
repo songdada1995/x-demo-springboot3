@@ -34,7 +34,7 @@ service.interceptors.response.use(
       return res
     } else {
       // 处理业务错误
-      return Promise.reject(new Error(res.message || 'Error'))
+      return Promise.reject(new Error(res.msg || 'Error'))
     }
   },
   (error) => {

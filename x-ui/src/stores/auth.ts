@@ -1,5 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
+import { request } from '../utils/request'
+import { usePermissionStore } from './permission'
 
 interface LoginPayload {
   username: string
@@ -15,46 +17,46 @@ interface UserInfo {
 }
 
 export const useAuthStore = defineStore('auth', () => {
-  // 状态
   const token = ref<string | null>(localStorage.getItem('token'))
   const userInfo = ref<UserInfo | null>(null)
-  
-  // 计算属性
+
   const isLoggedIn = computed(() => !!token.value)
-  
-  // 方法
+
   const login = async (payload: LoginPayload) => {
-    // 模拟API请求
-    const mockToken = 'mock-jwt-token-' + Date.now()
-    const mockUserInfo: UserInfo = {
+    const res = await request.post<any>('/auth/login', payload)
+    const data = (res as any).data
+
+    token.value = data.token
+    localStorage.setItem('token', data.token)
+
+    const permissionStore = usePermissionStore()
+    await permissionStore.loadPermissions()
+
+    const user: UserInfo = {
       username: payload.username,
-      name: '管理员',
-      avatar: '',
-      roles: ['admin'],
-      permissions: ['*']
+      permissions: permissionStore.permissions,
     }
-    
-    // 保存到状态
-    token.value = mockToken
-    userInfo.value = mockUserInfo
-    
-    // 保存到本地存储
-    localStorage.setItem('token', mockToken)
-    localStorage.setItem('userInfo', JSON.stringify(mockUserInfo))
-    
-    return { token: mockToken, userInfo: mockUserInfo }
+    userInfo.value = user
+    localStorage.setItem('userInfo', JSON.stringify(user))
+
+    return data
   }
-  
-  const logout = () => {
-    // 清除状态
+
+  const logout = async () => {
+    try {
+      await request.post('/auth/logout')
+    } catch {
+      // 即使后端登出失败也清除本地状态
+    }
     token.value = null
     userInfo.value = null
-    
-    // 清除本地存储
     localStorage.removeItem('token')
     localStorage.removeItem('userInfo')
+
+    const permissionStore = usePermissionStore()
+    permissionStore.reset()
   }
-  
+
   const loadUserInfo = () => {
     const storedUserInfo = localStorage.getItem('userInfo')
     if (storedUserInfo) {
@@ -62,12 +64,11 @@ export const useAuthStore = defineStore('auth', () => {
     }
     return userInfo.value
   }
-  
-  // 初始化用户信息
+
   if (token.value) {
     loadUserInfo()
   }
-  
+
   return {
     token,
     userInfo,

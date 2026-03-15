@@ -1,6 +1,5 @@
 package com.example.common.security.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 import java.io.Serial;
@@ -27,9 +26,8 @@ public class LoginUser implements Serializable {
     private String username;
 
     /**
-     * 密码
+     * 密码（Feign 内部调用需要传输，不可 JsonIgnore）
      */
-    @JsonIgnore
     private String password;
 
     /**

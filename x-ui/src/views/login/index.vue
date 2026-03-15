@@ -139,20 +139,15 @@ const loginForm = reactive({
 const handleSubmit = async () => {
   loading.value = true
   try {
-    // 假数据登录验证
-    if (loginForm.username === 'admin' && loginForm.password === 'admin123') {
-      // 登录成功
-      await authStore.login({
-        username: loginForm.username,
-        password: loginForm.password,
-      })
-      message.success('登录成功')
-      router.push('/dashboard')
-    } else {
-      message.error('用户名或密码错误')
-    }
-  } catch (error) {
-    message.error('登录失败，请重试')
+    await authStore.login({
+      username: loginForm.username,
+      password: loginForm.password,
+    })
+    message.success('登录成功')
+    router.push('/dashboard')
+  } catch (error: any) {
+    const msg = error?.response?.data?.msg || error?.message || '登录失败，请重试'
+    message.error(msg)
     console.error('登录失败:', error)
   } finally {
     loading.value = false

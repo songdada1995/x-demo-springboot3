@@ -1,0 +1,23 @@
+@import './menu.less';
+
+// 全局样式覆盖
+:global {
+  // 移除菜单的默认边框
+  .ant-menu {
+    border: none !important;
+  }
+
+  // 修复折叠菜单图标居中问题
+  .ant-menu-inline-collapsed {
+    .ant-menu-item,
+    .ant-menu-submenu .ant-menu-submenu-title {
+      padding: 0 !important;
+      text-align: center !important;
+
+      .anticon {
+        margin: 0 !important;
+        line-height: 40px !important;
+      }
+    }
+  }
+} 

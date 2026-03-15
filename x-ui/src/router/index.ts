@@ -242,19 +242,41 @@ const router = createRouter({
 })
 
 // 路由守卫
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, _from, next) => {
   const token = localStorage.getItem('token')
+
+  if (to.path === '/login') {
+    if (token) {
+      const { usePermissionStore } = await import('../stores/permission')
+      const permissionStore = usePermissionStore()
+      if (!permissionStore.loaded) await permissionStore.loadPermissions()
+      next(permissionStore.getFirstMenuPath())
+    } else {
+      next()
+    }
+    return
+  }
+
   const requiresAuth = to.matched.some(record => record.meta.requiresAuth !== false)
-  
-  // 如果需要认证且没有token，则重定向到登录页
   if (requiresAuth && !token) {
     next('/login')
-  } else if (to.path === '/login' && token) {
-    // 如果已登录且访问登录页，则重定向到首页
-    next('/dashboard')
-  } else {
-    next()
+    return
   }
+
+  if (token) {
+    const { usePermissionStore } = await import('../stores/permission')
+    const permissionStore = usePermissionStore()
+    if (!permissionStore.loaded) {
+      await permissionStore.loadPermissions()
+    }
+
+    if (to.path !== '/' && to.path !== '' && !permissionStore.hasMenuAccess(to.path)) {
+      next(permissionStore.getFirstMenuPath())
+      return
+    }
+  }
+
+  next()
 })
 
 export default router 

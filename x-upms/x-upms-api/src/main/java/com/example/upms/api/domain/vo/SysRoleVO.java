@@ -2,6 +2,7 @@ package com.example.upms.api.domain.vo;
 
 import lombok.Data;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -13,5 +14,6 @@ public class SysRoleVO {
     private String dataScope;
     private Integer status;
     private String remark;
+    private LocalDateTime createTime;
     private List<Long> menuIds;
 } 

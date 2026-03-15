@@ -4,12 +4,12 @@
       <!-- 搜索区域 -->
       <div class="search-area">
         <a-row :gutter="[16, 16]">
-          <a-col :span="6">
+          <a-col :xs="24" :sm="12" :md="8" :lg="6">
             <a-form-item label="仓库名称">
               <a-input v-model:value="searchForm.warehouseName" placeholder="请输入仓库名称" style="max-width: 200px;" />
             </a-form-item>
           </a-col>
-          <a-col :span="6">
+          <a-col :xs="24" :sm="12" :md="8" :lg="6">
             <a-form-item label="仓库类型">
               <a-select v-model:value="searchForm.warehouseType" placeholder="请选择仓库类型" class="custom-select">
                 <a-select-option value="">全部</a-select-option>
@@ -20,7 +20,7 @@
               </a-select>
             </a-form-item>
           </a-col>
-          <a-col :span="6">
+          <a-col :xs="24" :sm="12" :md="8" :lg="6">
             <a-form-item label="状态">
               <a-select v-model:value="searchForm.status" placeholder="请选择状态" class="custom-select">
                 <a-select-option value="">全部</a-select-option>
@@ -29,7 +29,7 @@
               </a-select>
             </a-form-item>
           </a-col>
-          <a-col :span="6">
+          <a-col :xs="24" :sm="12" :md="8" :lg="6">
             <a-form-item label="区域">
               <a-select v-model:value="searchForm.region" placeholder="请选择区域" class="custom-select">
                 <a-select-option value="">全部</a-select-option>
@@ -46,7 +46,7 @@
 
       <!-- 操作按钮区域 -->
       <div class="table-operations">
-        <a-space>
+        <a-space wrap>
           <a-button type="primary" class="theme-button" @click="handleSearch">
             <template #icon><search-outlined /></template>
             搜索
@@ -196,6 +196,7 @@ import {
   DeleteOutlined,
 } from '@ant-design/icons-vue'
 import type { TablePaginationConfig } from 'ant-design-vue'
+import { warehouseApi } from '../../../api/warehouse'
 
 // 搜索表单数据
 const searchForm = reactive({
@@ -263,48 +264,10 @@ const columns = [
   },
 ]
 
+const regionNames: Record<string, string> = { '1': '华东区', '2': '华南区', '3': '华北区', '4': '西南区', '5': '东北区' }
+
 // 表格数据
-const dataSource = ref([
-  {
-    id: 1,
-    warehouseName: '上海原材料仓库',
-    warehouseType: '1',
-    region: '1',
-    regionName: '华东区',
-    address: '上海市浦东新区张江高科技园区',
-    manager: '张经理',
-    contactPhone: '13800138000',
-    status: 1,
-    createTime: '2024-01-01 12:00:00',
-    description: '主要存放进口原材料',
-  },
-  {
-    id: 2,
-    warehouseName: '广州成品仓库',
-    warehouseType: '2',
-    region: '2',
-    regionName: '华南区',
-    address: '广州市黄埔区科学城',
-    manager: '李经理',
-    contactPhone: '13800138001',
-    status: 1,
-    createTime: '2024-01-01 12:00:00',
-    description: '主要存放出口成品',
-  },
-  {
-    id: 3,
-    warehouseName: '北京半成品仓库',
-    warehouseType: '3',
-    region: '3',
-    regionName: '华北区',
-    address: '北京市亦庄经济开发区',
-    manager: '王经理',
-    contactPhone: '13800138002',
-    status: 0,
-    createTime: '2024-01-01 12:00:00',
-    description: '主要存放生产中间品',
-  },
-])
+const dataSource = ref<any[]>([])
 
 // 仓库类型颜色
 const getWarehouseTypeColor = (type: string) => {
@@ -380,13 +343,37 @@ const handleTableChange = (pag: TablePaginationConfig) => {
 }
 
 // 获取数据
-const fetchData = () => {
+const fetchData = async () => {
   loading.value = true
-  // 这里模拟异步请求
-  setTimeout(() => {
+  try {
+    const res: any = await warehouseApi.list({
+      pageNum: pagination.current,
+      pageSize: pagination.pageSize,
+      warehouseName: searchForm.warehouseName || undefined,
+      warehouseType: searchForm.warehouseType || undefined,
+      region: searchForm.region || undefined,
+      status: searchForm.status || undefined,
+    })
+    const page = res.data
+    dataSource.value = (page.records || []).map((r: any) => ({
+      id: r.id,
+      warehouseName: r.warehouseName,
+      warehouseType: r.warehouseType,
+      region: r.region,
+      regionName: regionNames[r.region] || '',
+      address: r.address,
+      manager: r.manager,
+      contactPhone: r.contactPhone,
+      status: r.status,
+      createTime: r.createTime,
+      description: r.description,
+    }))
+    pagination.total = page.total || 0
+  } catch (e: any) {
+    message.error(e.message || '获取仓库列表失败')
+  } finally {
     loading.value = false
-    pagination.total = dataSource.value.length
-  }, 500)
+  }
 }
 
 // 处理搜索
@@ -414,12 +401,14 @@ const handleBatchEdit = () => {
 }
 
 // 处理批量删除
-const handleBatchDelete = () => {
+const handleBatchDelete = async () => {
   if (selectedRowKeys.value.length === 0) {
     message.warning('请选择要删除的记录')
     return
   }
+  await warehouseApi.remove(selectedRowKeys.value.join(','))
   message.success(`删除选中的 ${selectedRowKeys.value.length} 条记录成功`)
+  selectedRowKeys.value = []
   fetchData()
 }
 
@@ -456,9 +445,14 @@ const handleInventory = (record: any) => {
 }
 
 // 删除仓库
-const handleDelete = (record: any) => {
-  message.success(`删除仓库 ${record.warehouseName} 成功`)
-  fetchData()
+const handleDelete = async (record: any) => {
+  try {
+    await warehouseApi.remove(String(record.id))
+    message.success(`删除仓库 ${record.warehouseName} 成功`)
+    fetchData()
+  } catch (e: any) {
+    message.error(e.message || '删除仓库失败')
+  }
 }
 
 // 重置搜索
@@ -472,10 +466,19 @@ const handleReset = () => {
 
 // 模态框确认
 const handleModalOk = () => {
-  formRef.value?.validate().then(() => {
-    message.success(`${modalTitle.value}成功`)
-    modalVisible.value = false
-    fetchData()
+  formRef.value?.validate().then(async () => {
+    try {
+      if (formState.id) {
+        await warehouseApi.edit(formState)
+      } else {
+        await warehouseApi.add(formState)
+      }
+      message.success(`${modalTitle.value}成功`)
+      modalVisible.value = false
+      fetchData()
+    } catch (e: any) {
+      message.error(e.message || `${modalTitle.value}失败`)
+    }
   })
 }
 

@@ -3,8 +3,7 @@ package com.example.upms.api.feign;
 import com.example.common.core.response.R;
 import com.example.upms.api.domain.entity.OAuth2RegisteredClient;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * 远程客户端服务
@@ -21,7 +20,9 @@ public interface RemoteClientDetailsService {
     @GetMapping("/client/getClientDetailsById/{clientId}")
     R<OAuth2RegisteredClient> getClientDetailsById(@PathVariable("clientId") String clientId);
 
-    void insert(OAuth2RegisteredClient client);
+    @PostMapping("/client/save")
+    R<Void> insert(@RequestBody OAuth2RegisteredClient client);
 
-    OAuth2RegisteredClient selectById(String id);
+    @GetMapping("/client/selectById/{id}")
+    R<OAuth2RegisteredClient> selectById(@PathVariable("id") String id);
 }

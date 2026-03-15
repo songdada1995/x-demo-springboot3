@@ -1152,3 +1152,31 @@ button.primary:hover {
   margin-left: 0 !important;
   flex: 1 !important;
 }
+
+/* 小屏下搜索区域自适应 - 覆盖固定宽度 */
+@media (max-width: 992px) {
+  .search-area .ant-form-item .ant-select,
+  .search-area .ant-form-item .ant-select-selector,
+  .search-form .ant-form-item .ant-select,
+  .search-form .ant-form-item .ant-select-selector {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  .search-area .ant-form-item .ant-picker,
+  .search-form .ant-form-item .ant-picker,
+  .search-area .ant-form-item .ant-picker-range,
+  .search-form .ant-form-item .ant-picker-range {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  .search-area .ant-form-item .ant-input,
+  .search-form .ant-form-item .ant-input {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  /* 覆盖内联 max-width，使输入框在小屏填满列宽 */
+  .search-area .ant-form-item .ant-input[style*="max-width"],
+  .search-form .ant-form-item .ant-input[style*="max-width"] {
+    max-width: 100% !important;
+  }
+}

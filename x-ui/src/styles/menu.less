@@ -1,0 +1,152 @@
+// 菜单基础样式
+.ant-menu {
+  border-right: none !important;
+
+  // 移除所有过渡动画
+  * {
+    transition: none !important;
+  }
+
+  // 一级菜单项基础样式
+  .ant-menu-item,
+  .ant-menu-submenu-title {
+    margin: 0 !important;
+    padding: 0 24px !important;
+    height: 40px !important;
+    line-height: 40px !important;
+    border-radius: 0 !important;
+
+    .anticon {
+      font-size: 16px !important;
+      margin-right: 10px !important;
+    }
+
+    &:hover {
+      color: #333333 !important;
+      background-color: #f5f5f5 !important;
+    }
+  }
+
+  // 选中状态样式
+  .ant-menu-item-selected {
+    background-color: #27c2ad !important;
+    color: #ffffff !important;
+
+    .anticon {
+      color: #ffffff !important;
+    }
+
+    &:hover {
+      background-color: #27c2ad !important;
+      color: #ffffff !important;
+    }
+
+    &::after {
+      display: none !important;
+    }
+  }
+
+  // 二级菜单样式
+  .ant-menu-sub.ant-menu-inline {
+    background: #ffffff !important;
+
+    .ant-menu-item {
+      padding-left: 80px !important;
+      height: 40px !important;
+      line-height: 40px !important;
+    }
+
+    // 三级菜单样式
+    .ant-menu-sub.ant-menu-inline {
+      .ant-menu-item {
+        padding-left: 120px !important;
+      }
+    }
+  }
+}
+
+// 折叠状态样式
+.ant-menu-inline-collapsed {
+  width: 80px !important;
+
+  .ant-menu-item,
+  .ant-menu-submenu .ant-menu-submenu-title {
+    padding: 0 !important;
+    width: 80px !important;
+    height: 40px !important;
+    line-height: 40px !important;
+    text-align: center !important;
+
+    .anticon {
+      margin: 0 !important;
+      font-size: 16px !important;
+      line-height: 40px !important;
+    }
+
+    .ant-menu-title-content {
+      display: none !important;
+    }
+  }
+}
+
+// 弹出菜单样式
+.custom-popup-menu {
+  .ant-menu {
+    min-width: 160px !important;
+    border: 1px solid #e8e8e8 !important;
+    border-radius: 0 !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
+    background: #ffffff !important;
+    padding: 4px 0 !important;
+
+    .ant-menu-item,
+    .ant-menu-submenu-title {
+      margin: 0 !important;
+      padding: 0 24px !important;
+      height: 40px !important;
+      line-height: 40px !important;
+      background: transparent !important;
+
+      &:hover {
+        color: #333333 !important;
+        background-color: #f5f5f5 !important;
+      }
+
+      .anticon {
+        margin-right: 10px !important;
+      }
+    }
+
+    .ant-menu-item-selected {
+      background-color: #27c2ad !important;
+      color: #ffffff !important;
+
+      .anticon {
+        color: #ffffff !important;
+      }
+    }
+
+    // 移除所有多余的背景和边框
+    .ant-menu-sub,
+    .ant-menu-submenu,
+    .ant-menu-submenu-title {
+      background: transparent !important;
+      box-shadow: none !important;
+      border: none !important;
+    }
+  }
+}
+
+// 移除所有菜单项的选中指示器
+.ant-menu-item::after,
+.ant-menu-submenu::after {
+  display: none !important;
+  border-right: none !important;
+}
+
+// 确保弹出菜单位置正确
+.ant-menu-submenu-popup {
+  .ant-menu {
+    margin-left: 4px !important;
+  }
+}

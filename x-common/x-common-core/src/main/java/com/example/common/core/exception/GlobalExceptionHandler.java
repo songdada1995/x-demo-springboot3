@@ -3,6 +3,9 @@ package com.example.common.core.exception;
 import com.example.common.core.response.R;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DuplicateKeyException;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.LockedException;
 import org.springframework.validation.BindException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -61,6 +64,37 @@ public class GlobalExceptionHandler {
     public R<?> handleHttpRequestMethodNotSupported(HttpRequestMethodNotSupportedException e, HttpServletRequest request) {
         log.error("请求地址'{}',不支持'{}'请求.", request.getRequestURI(), e.getMethod());
         return R.fail("不支持' " + e.getMethod() + "'请求");
+    }
+
+    /**
+     * 处理数据库唯一约束冲突
+     */
+    @ExceptionHandler(DuplicateKeyException.class)
+    public R<?> handleDuplicateKeyException(DuplicateKeyException e, HttpServletRequest request) {
+        log.error("请求地址'{}',数据已存在.", request.getRequestURI(), e);
+        String message = e.getMessage();
+        if (message != null && message.contains("idx_username")) {
+            return R.fail("用户名已存在");
+        }
+        return R.fail("数据已存在，请勿重复操作");
+    }
+
+    /**
+     * 处理登录认证失败（用户名或密码错误）
+     */
+    @ExceptionHandler(BadCredentialsException.class)
+    public R<?> handleBadCredentialsException(BadCredentialsException e, HttpServletRequest request) {
+        log.warn("请求地址'{}',登录失败: {}", request.getRequestURI(), e.getMessage());
+        return R.fail(401, e.getMessage());
+    }
+
+    /**
+     * 处理账号锁定
+     */
+    @ExceptionHandler(LockedException.class)
+    public R<?> handleLockedException(LockedException e, HttpServletRequest request) {
+        log.warn("请求地址'{}',账号被锁定: {}", request.getRequestURI(), e.getMessage());
+        return R.fail(401, e.getMessage());
     }
 
     /**

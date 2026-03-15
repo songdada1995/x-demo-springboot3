@@ -1,0 +1,109 @@
+// 菜单基础样式
+.ant-menu {
+  &.ant-menu-inline,
+  &.ant-menu-vertical {
+    border-right: none !important;
+  }
+
+  // 移除默认过渡动画
+  * {
+    transition: none !important;
+  }
+
+  // 一级菜单项
+  .ant-menu-item,
+  .ant-menu-submenu-title {
+    margin: 0 !important;
+    padding: 0 24px !important;
+    height: 40px !important;
+    line-height: 40px !important;
+    border-radius: 0 !important;
+
+    &:hover {
+      color: rgba(0, 0, 0, 0.85) !important;
+      background-color: #f5f5f5 !important;
+    }
+  }
+
+  // 选中状态
+  .ant-menu-item-selected {
+    background-color: #f5f5f5 !important;
+    color: #333333 !important;
+
+    .anticon {
+      color: #333333 !important;
+    }
+
+    &:hover {
+      background-color: #f5f5f5 !important;
+      color: #333333 !important;
+    }
+
+    &::after {
+      display: none !important;
+    }
+  }
+
+  // 二级菜单
+  .ant-menu-sub.ant-menu-inline {
+    background: #fff !important;
+
+    .ant-menu-item {
+      padding-left: 80px !important;
+      height: 40px !important;
+      line-height: 40px !important;
+    }
+
+    // 三级菜单
+    .ant-menu-sub.ant-menu-inline {
+      .ant-menu-item {
+        padding-left: 120px !important;
+      }
+    }
+  }
+}
+
+// 折叠时的弹出菜单样式
+.ant-menu-inline-collapsed {
+  width: 80px !important;
+
+  & + .ant-menu-vertical {
+    .ant-menu-item,
+    .ant-menu-submenu-title {
+      margin: 0 !important;
+      padding: 0 24px !important;
+      height: 40px !important;
+      line-height: 40px !important;
+      border-radius: 0 !important;
+    }
+
+    .ant-menu-item-selected {
+      background-color: #f5f5f5 !important;
+      color: #333333 !important;
+
+      .anticon {
+        color: #333333 !important;
+      }
+    }
+
+    .ant-menu-sub {
+      .ant-menu-item {
+        padding-left: 48px !important;
+      }
+    }
+  }
+}
+
+// 移除菜单项的 hover 时的蓝色效果
+.ant-menu-light {
+  .ant-menu-item:hover,
+  .ant-menu-item-active,
+  .ant-menu:not(.ant-menu-inline) .ant-menu-submenu-title:hover {
+    color: rgba(0, 0, 0, 0.85) !important;
+  }
+}
+
+// 移除子菜单箭头的过渡动画
+.ant-menu-submenu-arrow {
+  transition: none !important;
+} 
